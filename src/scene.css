@@ -1,0 +1,177 @@
+.precision-scene {
+  --scene-goal-accent: #2558ee;
+  --scene-dial-angle: -.72rad;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  overflow: visible;
+}
+
+.precision-webgl,
+.precision-css3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.precision-webgl { z-index: 1; }
+.precision-css3d { z-index: 2; }
+
+.precision-css-surface {
+  overflow: hidden;
+  border-radius: 5px;
+  background: #f8f7f1;
+  backface-visibility: hidden;
+  pointer-events: none;
+  contain: layout paint;
+}
+
+.precision-css-surface > * { margin: 0; }
+.precision-scene--interactive .precision-css-surface { pointer-events: auto; }
+
+.precision-layers {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 7%;
+  bottom: 2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  pointer-events: none;
+  opacity: 0;
+  color: #52574f;
+  font-size: 10px;
+  letter-spacing: .015em;
+}
+.precision-layers span { display: inline-flex; align-items: center; gap: 7px; }
+.precision-layers i { font-style: normal; font-size: 8px; color: #244bff; }
+
+.precision-scene--static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 26px 35px 10px;
+}
+
+.precision-static-frame {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  padding: 19px 15px 33px 33px;
+  border: 1px solid #c9cecb;
+  border-radius: 11px;
+  background: linear-gradient(125deg, #f8f9f6 0%, #d4d7d3 20%, #eceee9 45%, #c4c8c5 100%);
+  box-shadow: 0 1px 0 #fff inset, 2px 3px 0 #b1b7b4, 5px 7px 0 #dedfd9,
+    6px 8px 0 #c4c8c2, 16px 27px 35px -27px #2c302f66;
+  transform-origin: 50% 50%;
+}
+
+.precision-static-frame::before,
+.precision-static-frame::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  border: 1px solid #9ca49f;
+  top: 8px;
+}
+.precision-static-frame::before { left: 12px; }
+.precision-static-frame::after { right: 9px; }
+
+.precision-static-surface {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #bcc1ba;
+  border-radius: 4px;
+  background: #f8f7f1;
+  box-shadow: 0 1px 2px #3b44322b;
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.precision-static-surface > * { min-width: 0; max-width: 100%; }
+
+.precision-static-trim {
+  position: absolute;
+  left: 36px;
+  right: 32px;
+  bottom: 13px;
+  height: 5px;
+  background: repeating-linear-gradient(90deg, #909891 0 1px, transparent 1px 7px);
+  background-size: 126px 5px;
+  background-repeat: no-repeat;
+}
+.precision-static-trim::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 1px;
+  height: 3px;
+  width: 33px;
+  border-radius: 1px;
+  background: var(--scene-goal-accent);
+  transition: background-color .3s ease;
+}
+
+.precision-static-dial {
+  position: absolute;
+  z-index: 3;
+  width: 37px;
+  height: 37px;
+  right: -18px;
+  bottom: 16%;
+  border: 2px solid #2e55df;
+  border-radius: 50%;
+  background: repeating-conic-gradient(#244cd6 0deg 3deg, #4068ec 3deg 7deg);
+  box-shadow: 2px 3px 0 #143cb7, 3px 5px 5px #0a247333;
+  transform: rotate(var(--scene-dial-angle));
+  transition: transform .65s cubic-bezier(.2, .7, .2, 1);
+}
+.precision-static-dial::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #3767fb, #1949dc);
+  box-shadow: 0 1px 0 #7596ff inset;
+}
+.precision-static-dial::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 7px;
+  top: 6px;
+  left: 15px;
+  border-radius: 2px;
+  background: #eef2ff;
+}
+
+.story--static { height: auto !important; }
+.story--static .hero-sticky {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0;
+}
+
+@media (max-width: 999px) {
+  .precision-scene--mobile {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 16px 25px 30px 5px;
+  }
+  .precision-static-frame { max-width: 670px; padding: 12px 10px 28px 20px; border-radius: 8px; }
+  .precision-static-trim { left: 23px; right: 20px; bottom: 11px; }
+  .precision-static-dial { width: 32px; height: 32px; right: -15px; }
+  .precision-static-dial::after { left: 12px; top: 5px; height: 6px; }
+  .precision-static-frame::before { top: 5px; left: 8px; width: 3px; height: 3px; }
+  .precision-static-frame::after { top: 5px; right: 6px; width: 3px; height: 3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .precision-static-frame { transform: none !important; }
+  .precision-static-dial, .precision-static-trim::after { transition: none; }
+}
