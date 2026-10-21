@@ -24,7 +24,7 @@ Three fictional concepts remain: Klarraum (inquiries), Studio Still (bookings), 
 
 ## Workflow and ownership
 
-One separate Codex chat/worktree per AP1–AP4 and a fifth separate QA chat. AP1 runs first. AP2/AP3/AP4 start from the identical accepted foundation commit and run in parallel. Coordinator integrates AP3, AP4, AP2 in that order, then QA reviews the exact candidate. No package merges itself into the integration branch. All code changes must be committed before handoff, with SHA, test results and known limits.
+One separate Codex chat/worktree per AP1–AP4 and a fifth separate QA chat. AP1 runs first. At the user's request, implementation is serial to conserve the usage allowance: at most one active implementation chat, no additional subagents. AP2/AP3/AP4 start from the identical accepted foundation commit and run one at a time. Coordinator integrates AP3, AP4, AP2 in that order, then QA reviews the exact candidate. No package merges itself into the integration branch. All code changes must be committed before handoff, with SHA, test results and known limits. Preserve existing results; do not repeat broad research or unchanged, already-proven checks. Do not change models without the user's request.
 
 Atomicity: accept or reject a whole package commit set. Consistency: shared contracts, targeted checks, full test/build checks on integration. Isolation: separate worktrees and exclusive file ownership. Durability: Git commits and this handoff record. Failed candidates stay isolated. Reverts operate on complete packages, never destructive resets of others' work.
 
@@ -73,3 +73,4 @@ Verify immediate try; cached form/booking/cart state across selection, dialog an
 ## Handoffs and verification history
 
 - 2026-10-20: AP0 baseline created. Previous approval attempt had not executed due to a usage-limit review failure; retry succeeded. No source changes before baseline.
+- 2026-10-21: Coordination resumed in a new chat at the user's request. Existing AP1 chat `01a15b21-aa11-7e32-a4d6-6dabc570ff0d` continues in `C:/Users/lukas/.codex/worktrees/4d78/Webbyu` on `codex/ap1-foundation`; no duplicate implementation chat created. Integration remains at `083e104` pending AP1 acceptance.
