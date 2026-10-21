@@ -233,56 +233,98 @@ export function createDemo(goal: DemoGoal, options: { interactive?: boolean } = 
   return root;
 }
 
-export function mountDemoDialog(): { open(goal: DemoGoal): void; close(): void; dispose(): void } {
+/** Presents an existing live session; creation and caching belong to the catalogue. */
+export function mountDemoDialog(options: { onRestore?: () => void } = {}): {
+  open(goal: DemoGoal, demoElement: HTMLElement): void;
+  close(): void;
+  dispose(): void;
+} {
   const names: Record<DemoGoal, string> = { inquiries: 'Klarraum', bookings: 'Studio Still', sales: 'Forma' };
-  const cache = new Map<DemoGoal, HTMLElement>();
   const dialog = document.createElement('dialog');
   dialog.className = 'concept-dialog';
   dialog.innerHTML = '<div class="concept-dialog-bar"><div><span>FIKTIVES KONZEPT VON WEBBYU</span><strong data-dialog-title></strong></div><button type="button" class="concept-dialog-close" aria-label="Konzeptdemo schließen">Schließen <span aria-hidden="true">×</span></button></div><div class="concept-dialog-body"></div>';
   document.body.append(dialog);
   let previousFocus: HTMLElement | null = null;
   let oldOverflow = '';
+  let oldScroll = { x: 0, y: 0 };
   let locked = false;
+  let disposed = false;
+  let active: { demo: HTMLElement; placeholder: Comment; responsive: boolean } | null = null;
   const restore = () => {
+    if (active) {
+      const { demo, placeholder, responsive } = active;
+      active = null;
+      demo.classList.toggle('demo--responsive', responsive);
+      placeholder.replaceWith(demo);
+      options.onRestore?.();
+    }
     if (locked) document.body.style.overflow = oldOverflow;
-    locked = false;
-    if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    if (locked) {
+      locked = false;
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+      if (window.scrollX !== oldScroll.x || window.scrollY !== oldScroll.y) {
+        window.scrollTo({ left: oldScroll.x, top: oldScroll.y, behavior: 'instant' });
+      }
+      previousFocus = null;
+    }
   };
-  const close = () => { if (dialog.open) dialog.close(); };
+  const close = () => {
+    if (dialog.open) dialog.close();
+    // Native close events are queued. Restore now so subsequent selections
+    // cannot be overwritten by a delayed return of the previous session.
+    restore();
+  };
   dialog.querySelector('.concept-dialog-close')!.addEventListener('click', close);
-  dialog.addEventListener('cancel', (event) => { event.preventDefault(); close(); });
-  dialog.addEventListener('close', restore);
+  dialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    const panelClose = dialog.querySelector<HTMLButtonElement>('.demo-panel:not([hidden]) [data-panel-close]');
+    if (panelClose) panelClose.click();
+    else close();
+  });
+  dialog.addEventListener('close', () => {
+    // Ignore an earlier queued close event if a new session is already open.
+    if (!dialog.open) restore();
+  });
   dialog.addEventListener('click', (event) => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) close();
   });
   return {
-    open(goal) {
-      if (!cache.has(goal)) {
-        const demo = createDemo(goal);
-        demo.classList.add('demo--responsive');
-        cache.set(goal, demo);
+    open(goal, demoElement) {
+      if (disposed) return;
+      if (active?.demo !== demoElement) {
+        close();
+        const placeholder = document.createComment('Live demo returns here after the dialog closes.');
+        demoElement.before(placeholder);
+        active = { demo: demoElement, placeholder, responsive: demoElement.classList.contains('demo--responsive') };
+        demoElement.classList.add('demo--responsive');
+        dialog.querySelector('.concept-dialog-body')!.replaceChildren(demoElement);
       }
       dialog.querySelector('[data-dialog-title]')!.textContent = names[goal];
       dialog.setAttribute('aria-label', `Interaktive Konzeptdemo: ${names[goal]}`);
-      dialog.querySelector('.concept-dialog-body')!.replaceChildren(cache.get(goal)!);
       if (!dialog.open) {
         previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         oldOverflow = document.body.style.overflow;
+        oldScroll = { x: window.scrollX, y: window.scrollY };
         document.body.style.overflow = 'hidden';
         locked = true;
-        dialog.showModal();
+        try {
+          dialog.showModal();
+        } catch (error) {
+          restore();
+          throw error;
+        }
       }
       dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.focus({ preventScroll: true });
       dialog.scrollTop = 0;
     },
     close,
     dispose() {
+      if (disposed) return;
+      disposed = true;
       close();
-      restore();
       dialog.remove();
-      cache.clear();
     },
   };
 }

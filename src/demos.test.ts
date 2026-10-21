@@ -167,7 +167,8 @@ describe('interactive concept demos', () => {
     document.body.style.overflow = 'clip';
     launch.focus();
     const controller = mountDialog();
-    controller.open('bookings');
+    const liveDemo = demo('bookings');
+    controller.open('bookings', liveDemo);
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
     const root = dialog.querySelector<HTMLElement>('.demo')!;
     const trigger = openPanel(root);
@@ -188,13 +189,16 @@ describe('interactive concept demos', () => {
     // jsdom has no native dialog Escape default action; dispatch its cancel event explicitly.
     dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
     expect(dialog.open).toBe(false);
+    expect(liveDemo.parentElement).toBe(document.body);
+    expect(liveDemo.classList.contains('demo--responsive')).toBe(false);
     expect(document.activeElement).toBe(launch);
     expect(document.body.style.overflow).toBe('clip');
   });
 
   it('resets modal and panel scrolling when opening from a lower CTA and when reopening a cached concept', () => {
     const controller = mountDialog();
-    controller.open('bookings');
+    const liveDemo = demo('bookings');
+    controller.open('bookings', liveDemo);
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
     const root = dialog.querySelector<HTMLElement>('.demo')!;
     const panel = root.querySelector<HTMLElement>('.demo-panel')!;
@@ -209,13 +213,42 @@ describe('interactive concept demos', () => {
     button(root, '[data-panel-close]').click();
     dialog.scrollTop = 350;
     controller.close();
-    controller.open('bookings');
+    controller.open('bookings', liveDemo);
     expect(dialog.scrollTop).toBe(0);
     expect(dialog.querySelector('.demo')).toBe(root);
     expect(root.querySelector<HTMLSelectElement>('[name="service"]')!.value).toBe('Yoga Flow');
     dialog.scrollTop = 260;
-    controller.open('sales');
+    controller.open('sales', demo('sales'));
     expect(dialog.scrollTop).toBe(0);
+    expect(liveDemo.parentElement).toBe(document.body);
+  });
+
+  it('closes an already open inner panel first even when Escape originates from the modal bar', () => {
+    const liveDemo = demo('inquiries');
+    openPanel(liveDemo);
+    const controller = mountDialog();
+    controller.open('inquiries', liveDemo);
+    const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
+    dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+    expect(liveDemo.querySelector<HTMLElement>('.demo-panel')!.hidden).toBe(true);
+    expect(dialog.open).toBe(true);
+    dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+    expect(dialog.open).toBe(false);
+  });
+
+  it('restores the same node, original sibling position and responsive class on disposal', () => {
+    const liveDemo = demo('inquiries');
+    liveDemo.classList.add('demo--responsive');
+    const sibling = document.createElement('span');
+    liveDemo.after(sibling);
+    const controller = mountDialog();
+    controller.open('inquiries', liveDemo);
+    controller.dispose();
+    controller.dispose();
+    expect(liveDemo.nextSibling).toBe(sibling);
+    expect(liveDemo.classList.contains('demo--responsive')).toBe(true);
+    expect(document.querySelector('.concept-dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
   });
 
   it.each([false, true])('scrolls only a responsive inline demo into view (responsive: %s)', (responsive) => {

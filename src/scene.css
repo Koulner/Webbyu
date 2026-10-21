@@ -43,13 +43,15 @@
   pointer-events: none;
   opacity: 0;
   color: #52574f;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: .015em;
 }
 .precision-layers span { display: inline-flex; align-items: center; gap: 7px; }
-.precision-layers i { font-style: normal; font-size: 8px; color: #244bff; }
+.precision-layers i { font-style: normal; font-size: 12px; color: #244bff; }
 
 .precision-scene--static {
+  height: auto !important;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,11 +152,16 @@
   background: #eef2ff;
 }
 
-.story--static { height: auto !important; }
-.story--static .hero-sticky {
-  position: relative !important;
-  height: auto !important;
-  min-height: 0;
+.precision-static-legend {
+  display: none;
+  margin: 16px 0 0;
+  color: #3c413c;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+.precision-scene[data-mode="layers"] .precision-static-legend {
+  display: block;
 }
 
 @media (max-width: 999px) {

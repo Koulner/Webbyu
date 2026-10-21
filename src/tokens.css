@@ -1,0 +1,53 @@
+/* Shared foundation: keep these names stable across the page, catalogue and scene. */
+:root {
+  --color-ivory: #f5f1ea;
+  --color-ink: #241d26;
+  --color-aubergine: #513448;
+  --color-gallery: #151419;
+  --color-champagne: #c7b29a;
+  --color-muted: #685e65;
+  --color-border: #d5cbc9;
+  --color-on-dark: var(--color-ivory);
+
+  --font-sans: 'Instrument Sans', Arial, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --text-body: 1rem;
+  --text-label: 0.875rem;
+  --text-small: 0.75rem;
+  --text-heading: clamp(2.5rem, 5vw, 5rem);
+  --text-display: clamp(3rem, 7vw, 7.5rem);
+  --leading-body: 1.6;
+  --leading-heading: 1.05;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --page-gutter: clamp(1.25rem, 5vw, 5rem);
+  --page-max-width: 90rem;
+  --control-min-size: 2.75rem;
+  --radius-small: 0.25rem;
+  --radius-medium: 0.75rem;
+  --duration-fast: 160ms;
+  --duration-normal: 280ms;
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Compatibility for the existing functional shell; new styles use the names above. */
+  --paper: var(--color-ivory);
+  --ink: var(--color-ink);
+  --blue: var(--color-aubergine);
+  --muted: var(--color-muted);
+  --line: var(--color-border);
+  --gutter: var(--page-gutter);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+  }
+}

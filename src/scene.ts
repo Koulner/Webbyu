@@ -3,23 +3,9 @@ import { CSS3DObject, CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { DemoGoal } from './data';
+import type { SceneController, SceneMode, SceneOptions } from './contracts';
 import './scene.css';
-
-gsap.registerPlugin(ScrollTrigger);
-
-type SceneOptions = {
-  container: HTMLElement;
-  story: HTMLElement;
-  demoElement: HTMLElement;
-  onProgress: (progress: number) => void;
-};
-
-type SceneController = {
-  setGoal: (goal: DemoGoal) => void;
-  dispose: () => void;
-};
 
 const GOAL_ANGLE: Record<DemoGoal, number> = { inquiries: -.72, bookings: 0, sales: .72 };
 const GOAL_ACCENT: Record<DemoGoal, string> = {
@@ -30,7 +16,7 @@ const ease = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * t); };
 
 /** A physical, open aluminium frame around a real, accessible HTML example. */
 export async function initScene(options: SceneOptions): Promise<SceneController> {
-  const { container, story, demoElement, onProgress } = options;
+  const { container, demoElement } = options;
   const originalParent = demoElement.parentNode;
   const originalNextSibling = demoElement.nextSibling;
   const originalStyle = demoElement.getAttribute('style');
@@ -40,14 +26,15 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
   const mobileMedia = window.matchMedia('(max-width: 999px)');
   const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
   let currentGoal: DemoGoal = 'inquiries';
+  let currentMode: SceneMode = 'presentation';
   let modeCleanup: (() => void) | undefined;
   let responsiveMode = false;
   let webglUnavailable = false;
-  let refreshRequest = 0;
   let disposed = false;
 
   container.classList.add('precision-scene');
   container.dataset.goal = currentGoal;
+  container.dataset.mode = currentMode;
 
   // Callers may supply either the demo itself or a persistent slot whose child
   // changes with the chosen goal. Both need the same layout mode immediately.
@@ -69,11 +56,9 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
 
   // The fallback is also the mobile presentation. It keeps the full HTML and
   // permits real reflow instead of shrinking controls into an unreadable image.
-  const createStatic = (mobile: boolean, reduced: boolean) => {
+  const createStatic = (mobile: boolean) => {
     container.classList.add('precision-scene--static');
     container.classList.toggle('precision-scene--mobile', mobile);
-    story.classList.toggle('story--mobile', mobile);
-    story.classList.toggle('story--static', !mobile || reduced);
     const frame = document.createElement('div');
     frame.className = 'precision-static-frame';
     const trim = document.createElement('div');
@@ -91,30 +76,17 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     demoElement.style.transform = '';
     surface.append(demoElement);
     frame.append(trim, surface, dial);
+    const legend = document.createElement('p');
+    legend.className = 'precision-static-legend';
+    legend.textContent = '01 Gestaltung · 02 Inhalt · 03 Funktion';
+    frame.append(legend);
     container.append(frame);
     setDemoInteractive(true);
-    let trigger: ScrollTrigger | undefined;
-    if (mobile && !reduced) {
-      const update = (progress: number) => {
-        const p = ease(progress);
-        frame.style.transform = `perspective(1100px) rotateY(${(1 - p) * -4}deg) rotateX(${(1 - p) * 2}deg)`;
-        onProgress(p);
-      };
-      trigger = ScrollTrigger.create({
-        trigger: container,
-        start: 'top 85%',
-        end: 'top 32%',
-        onUpdate: (self) => update(self.progress),
-        invalidateOnRefresh: true,
-      });
-      update(trigger.progress);
-    } else {
-      onProgress(1);
-    }
-    return () => { trigger?.kill(); frame.remove(); };
+    return () => frame.remove();
   };
 
   let updateGoal: ((goal: DemoGoal) => void) | undefined;
+  let updateMode: ((mode: SceneMode) => void) | undefined;
 
   const createWebGL = () => {
     const cleanupTasks: (() => void)[] = [];
@@ -124,6 +96,7 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
       cleaned = true;
       for (const task of cleanupTasks.reverse()) task();
       updateGoal = undefined;
+      updateMode = undefined;
     };
     // Register partial cleanup before WebGL creation: a context/environment
     // failure partway through initialization must not leave a second renderer.
@@ -332,7 +305,6 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     let visible = true;
     let hidden = document.hidden;
     let alive = true;
-    let progress = 0;
     const knobState = { angle: GOAL_ANGLE[currentGoal] };
     cleanupTasks.push(() => {
       alive = false;
@@ -349,8 +321,10 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     const requestRender = () => {
       if (alive && visible && !hidden && !frameRequest) frameRequest = window.requestAnimationFrame(render);
     };
-    const update = (p: number) => {
-      progress = clamp(p);
+    updateMode = (mode) => {
+      // Explicit poses share the original geometry and HTML projection. No
+      // scroll position can change the user's chosen interaction mode.
+      const progress = mode === 'interactive' ? 1 : mode === 'layers' ? .5 : 0;
       const opening = Math.sin(Math.PI * ease(progress)) ** 2;
       const ending = ease((progress - .56) / .35);
       object.rotation.set(
@@ -371,8 +345,7 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
       cssObject.position.z = .382 + front.position.z;
       layerLegend.style.opacity = String(ease((progress - .19) / .13) * (1 - ease((progress - .66) / .14)));
       layerLegend.style.transform = `translateY(${(1 - opening) * 6}px)`;
-      setDemoInteractive(progress >= .89);
-      onProgress(progress);
+      setDemoInteractive(mode === 'interactive');
       requestRender();
     };
 
@@ -418,12 +391,6 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     document.addEventListener('visibilitychange', onVisibility);
     cleanupTasks.push(() => document.removeEventListener('visibilitychange', onVisibility));
 
-    const trigger = ScrollTrigger.create({
-      trigger: story, start: 'top top', end: 'bottom bottom',
-      invalidateOnRefresh: true, onUpdate: (self) => update(self.progress),
-      onRefresh: (self) => update(self.progress),
-    });
-    cleanupTasks.push(() => trigger.kill());
     const onContextLost = (event: Event) => {
       event.preventDefault();
       if (alive && !disposed) {
@@ -434,7 +401,7 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     renderer.domElement.addEventListener('webglcontextlost', onContextLost);
     cleanupTasks.push(() => renderer.domElement.removeEventListener('webglcontextlost', onContextLost));
     resize();
-    update(trigger.progress);
+    updateMode(currentMode);
 
     return cleanup;
   };
@@ -443,10 +410,10 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     modeCleanup?.();
     modeCleanup = undefined;
     updateGoal = undefined;
+    updateMode = undefined;
     container.classList.remove('precision-scene--static', 'precision-scene--mobile');
-    story.classList.remove('story--static', 'story--mobile');
     if (webglUnavailable || mobileMedia.matches || motionMedia.matches) {
-      modeCleanup = createStatic(mobileMedia.matches, motionMedia.matches || webglUnavailable);
+      modeCleanup = createStatic(mobileMedia.matches);
     } else {
       try {
         modeCleanup = createWebGL();
@@ -455,14 +422,12 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
         modeCleanup?.();
         webglUnavailable = true;
         container.querySelectorAll('.precision-webgl, .precision-css3d').forEach((element) => element.remove());
-        modeCleanup = createStatic(false, true);
+        modeCleanup = createStatic(false);
         console.info('Webbyu: using the accessible static frame.', error);
       }
     }
     container.style.setProperty('--scene-goal-accent', GOAL_ACCENT[currentGoal]);
     container.style.setProperty('--scene-dial-angle', `${GOAL_ANGLE[currentGoal]}rad`);
-    cancelAnimationFrame(refreshRequest);
-    refreshRequest = requestAnimationFrame(() => { if (!disposed) ScrollTrigger.refresh(); });
   };
   const onModeChange = () => { if (!disposed) switchMode(); };
   mobileMedia.addEventListener('change', onModeChange);
@@ -479,10 +444,16 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
       syncDemoLayout();
       updateGoal?.(goal);
     },
+    setMode(mode) {
+      if (disposed) return;
+      currentMode = mode;
+      container.dataset.mode = mode;
+      syncDemoLayout();
+      updateMode?.(mode);
+    },
     dispose() {
       if (disposed) return;
       disposed = true;
-      cancelAnimationFrame(refreshRequest);
       modeCleanup?.();
       mobileMedia.removeEventListener('change', onModeChange);
       motionMedia.removeEventListener('change', onModeChange);
@@ -490,7 +461,7 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
       container.style.removeProperty('--scene-goal-accent');
       container.style.removeProperty('--scene-dial-angle');
       delete container.dataset.goal;
-      story.classList.remove('story--static', 'story--mobile');
+      delete container.dataset.mode;
       for (const [demo, wasResponsive] of responsiveClasses) demo.classList.toggle('demo--responsive', wasResponsive);
       responsiveClasses.clear();
       demoElement.classList.toggle('demo--responsive', originallyResponsive);
