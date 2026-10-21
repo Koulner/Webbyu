@@ -1,0 +1,95 @@
+/* Shell-owned presentation. Finder markup, state and event handling stay in finder.ts. */
+.finder-section .finder {
+  --finder-border: var(--color-border);
+  padding: clamp(24px, 3vw, 44px);
+  border: 1px solid #ffffff30;
+  border-radius: 3px;
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  box-shadow: 0 20px 60px #241d2626;
+}
+.finder-section .finder-topline { font-size: 12px; font-weight: 500; letter-spacing: .06em; line-height: 1.6; padding-bottom: 20px; }
+.finder-section .finder-topline span:last-child { color: var(--color-muted); }
+.finder-section .finder-progress { gap: 12px; margin-block: 22px 36px; }
+.finder-section .finder-progress li { flex-direction: column; align-items: start; gap: 8px; min-width: 0; font-size: 12px; line-height: 1.5; color: var(--color-muted); }
+.finder-section .finder-progress li.is-active { color: var(--color-aubergine); }
+.finder-section .finder-progress-number { width: 28px; height: 28px; font-size: 12px; border-color: var(--color-border); }
+.finder-section .finder-progress .is-active .finder-progress-number { background: var(--color-aubergine); border-color: var(--color-aubergine); color: var(--color-ivory); }
+.finder-section .finder-eyebrow { margin-bottom: 16px; font-size: 12px; font-weight: 500; line-height: 1.6; letter-spacing: .06em; color: var(--color-muted); }
+.finder-section .finder-heading { font: 400 clamp(2.25rem, 3.3vw, 3rem)/1.08 var(--font-serif); letter-spacing: -.02em; scroll-margin-top: 112px; }
+.finder-section .finder-step-intro { margin-block: 20px 24px; font-size: 16px; line-height: 1.7; color: var(--color-muted); }
+.finder-section .finder-options { gap: 12px; }
+.finder-section .finder-goals { grid-template-columns: 1fr; }
+.finder-section .finder-option { padding: 18px; gap: 12px; border-color: var(--color-border); border-radius: 2px; min-height: 56px; }
+.finder-section .finder-option:hover { background: #ece5df; border-color: #a18c99; }
+.finder-section .finder-option.is-selected { border-color: var(--color-aubergine); background: #51344809; box-shadow: inset 0 0 0 .5px var(--color-aubergine); }
+.finder-section .finder-option:has(input:focus-visible) { outline-color: var(--color-aubergine); }
+.finder-section .finder-option-number { color: var(--color-muted); font-size: 12px; padding-top: 3px; }
+.finder-section .finder-option-copy { gap: 5px; }
+.finder-section .finder-option-copy strong { font-size: 16px; line-height: 1.5; font-weight: 600; }
+.finder-section .finder-option-copy > span { font-size: 16px; line-height: 1.6; color: var(--color-muted); }
+.finder-section .finder-selection-mark { width: 18px; height: 18px; margin-top: 3px; border-color: #a18c99; }
+.finder-section .finder-option.is-selected .finder-selection-mark { border-color: var(--color-aubergine); background: var(--color-ivory); }
+.finder-section .finder-option-copy .finder-extension-tag { color: var(--color-aubergine); font-size: 12px; font-weight: 500; letter-spacing: .06em; }
+.finder-section .finder-extension { min-height: 112px; }
+.finder-section .finder-unsure { padding-block: 18px; }
+.finder-section .finder-field { font-size: 14px; line-height: 1.6; font-weight: 500; gap: 10px; }
+.finder-section .finder-optional { color: var(--color-muted); }
+.finder-section .finder-field input,
+.finder-section .finder-field select,
+.finder-section .finder-field textarea { min-height: 52px; padding: 13px 14px; border-color: #b6a5af; border-radius: 2px; background-color: #fbf8f3; color: var(--color-ink); font-size: 16px; line-height: 1.6; }
+.finder-section .finder-field select { padding-right: 36px; }
+.finder-section .finder-field input::placeholder,
+.finder-section .finder-field textarea::placeholder { color: var(--color-muted); }
+.finder-section .finder-field input:focus-visible,
+.finder-section .finder-field select:focus-visible,
+.finder-section .finder-field textarea:focus-visible,
+.finder-section .finder button:focus-visible { outline-color: var(--color-aubergine); }
+.finder-section .finder-recommendation { padding: 24px; background: #eae1e2; border-left-color: var(--color-aubergine); }
+.finder-section .finder-recommendation-label { font-size: 12px; font-weight: 500; color: var(--color-aubergine); }
+.finder-section .finder-recommendation h4 { font: 400 32px/1.15 var(--font-serif); letter-spacing: -.01em; }
+.finder-section .finder-recommendation p { font-size: 16px; line-height: 1.7; color: var(--color-muted); }
+.finder-section .finder-price { font-size: 14px; font-weight: 500; }
+.finder-section .finder-chosen-extras { font-size: 16px; color: var(--color-muted); }
+.finder-section .finder-chosen-extras strong { color: var(--color-ink); }
+.finder-section .finder-required { color: var(--color-aubergine); }
+.finder-section .finder-privacy { font-size: 16px; line-height: 1.7; color: var(--color-muted); }
+.finder-section .finder-actions { gap: 16px; margin-top: 28px; padding-top: 22px; flex-wrap: wrap; }
+.finder-section .finder-back { min-width: 44px; font-size: 14px; color: var(--color-ink); }
+.finder-section .finder-back:hover { color: var(--color-aubergine); text-decoration: underline; text-underline-offset: 4px; }
+.finder-section .finder-next { min-height: 52px; margin-left: auto; padding: 14px 20px; gap: 22px; font-size: 14px; line-height: 1.5; border-color: var(--color-aubergine); background: var(--color-aubergine); color: var(--color-ivory); }
+.finder-section .finder-next:hover { background: var(--color-ink); border-color: var(--color-ink); }
+.finder-section .finder-time { max-width: 160px; font-size: 12px; color: var(--color-muted); }
+.finder-section .finder-complete-mark { color: var(--color-aubergine); }
+.finder-section .finder-notice { padding: 20px; font-size: 16px; line-height: 1.7; background: #eae1e2; color: var(--color-ink); }
+.finder-section .finder-notice strong { color: var(--color-aubergine); }
+.finder-section .finder-summary dl > div { grid-template-columns: minmax(100px, .4fr) minmax(0, 1fr); font-size: 16px; line-height: 1.7; gap: 16px; }
+.finder-section .finder-summary dt { color: var(--color-muted); }
+.finder-section .finder-summary > p,
+.finder-section .finder-copy-status { font-size: 16px; line-height: 1.7; color: var(--color-muted); }
+.finder-section .finder-copy-status { color: var(--color-aubergine); }
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .finder-section .finder-goals { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 1100px) {
+  .finder-section .finder-fields { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .finder-section .finder { padding: 22px 18px; }
+  .finder-section .finder-topline { gap: 16px; }
+  .finder-section .finder-topline span:last-child { text-align: right; }
+  .finder-section .finder-progress { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .finder-section .finder-progress li { flex-direction: row; align-items: center; font-size: 12px; }
+  .finder-section .finder-heading { font-size: 36px; scroll-margin-top: 94px; }
+  .finder-section .finder-option { padding: 16px 12px; gap: 10px; }
+  .finder-section .finder-extensions { grid-template-columns: 1fr; }
+  .finder-section .finder-extension { min-height: 88px; }
+  .finder-section .finder-actions { gap: 12px; }
+  .finder-section .finder-next { padding: 14px 16px; gap: 16px; }
+  .finder-section .finder-time { max-width: 130px; }
+  .finder-section .finder-recommendation { padding: 20px 16px; }
+  .finder-section .finder-summary dl > div { grid-template-columns: 1fr; gap: 4px; }
+  .finder-section .finder-actions-summary { align-items: stretch; }
+  .finder-section .finder-actions-summary .finder-next { margin-left: 0; }
+}
