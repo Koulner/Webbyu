@@ -16,7 +16,7 @@ Three fictional concepts remain: Klarraum (inquiries), Studio Still (bookings), 
 | Package | Owner | State | Base/result |
 | --- | --- | --- | --- |
 | AP0 baseline and protocol | Coordinator | accepted | 693826b |
-| AP1 foundation | Foundation chat | pending | — |
+| AP1 foundation | Foundation chat | accepted | 5635540 → 8a368d7 |
 | AP2 editorial page | Editorial chat | pending | accepted AP1 |
 | AP3 catalogue and demos | Catalogue chat | pending | accepted AP1 |
 | AP4 3D gallery | Scene chat | pending | accepted AP1 |
@@ -74,3 +74,4 @@ Verify immediate try; cached form/booking/cart state across selection, dialog an
 
 - 2026-10-20: AP0 baseline created. Previous approval attempt had not executed due to a usage-limit review failure; retry succeeded. No source changes before baseline.
 - 2026-10-21: Coordination resumed in a new chat at the user's request. Existing AP1 chat `01a15b21-aa11-7e32-a4d6-6dabc570ff0d` continues in `C:/Users/lukas/.codex/worktrees/4d78/Webbyu` on `codex/ap1-foundation`; no duplicate implementation chat created. Integration remains at `083e104` pending AP1 acceptance.
+- 2026-10-21: AP1 accepted as a complete package, source `5635540cbc1a558c43ec5e4fbc8d16b04695bb8d`, integrated as `8a368d74f6bea822c6217a5276342f6aca67e236`. Typecheck, 47 tests, build and whitespace checks passed in the package. Exact source integration introduces no implementation changes, so unchanged checks are retained rather than repeated. Scene chunk 601.24 kB / 164.95 kB gzip; known Vite warning. Browser visual acceptance remains for the composed redesign because the AP1 browser could not reach its preview. Fonts, stable contracts and cached demo ownership reviewed. Shared dependencies and interfaces are now frozen.
