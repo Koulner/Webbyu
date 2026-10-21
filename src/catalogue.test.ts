@@ -49,7 +49,7 @@ describe('catalogue sessions and explicit controls', () => {
     expect(controller.getState()).toEqual({ goal: 'inquiries', mode: 'presentation' });
     expect(container.querySelector('[data-catalogue-goal="inquiries"]')!.textContent).toContain('01 / 03KlarraumAnfragen');
     expect(container.querySelector('[data-catalogue-goal="bookings"]')!.textContent).toContain('02 / 03Studio StillBuchungen');
-    expect(container.querySelector('[data-catalogue-goal="sales"]')!.textContent).toContain('03 / 03FormaVerkäufe');
+    expect(container.querySelector('[data-catalogue-goal="sales"]')!.textContent).toContain('03 / 03Safran AtelierVerkäufe');
     click('[data-scene-mode="interactive"]');
     click('[data-catalogue-goal="bookings"]');
     expect(controller.getState()).toEqual({ goal: 'bookings', mode: 'interactive' });
@@ -94,7 +94,7 @@ describe('catalogue sessions and explicit controls', () => {
     expect(booking.classList.contains('demo--responsive')).toBe(false);
     controller.open('sales');
     expect(dialog.querySelector('.demo')).toBe(sales);
-    expect(sales.querySelector('[data-variant-name]')!.textContent).toBe('Kobalt');
+    expect(sales.querySelector('[data-variant-name]')!.textContent).toBe('3 × 1 g');
     expect(sales.querySelector('[data-cart-count]')!.textContent).toBe('(1)');
     controller.selectGoal('inquiries');
     expect(dialog.open).toBe(false);
@@ -143,6 +143,8 @@ describe('catalogue sessions and explicit controls', () => {
   it('disposes the modal, controls and sessions once and permits a clean remount', () => {
     const { controller, container, demoSlot, onStateChange, onProjectRequest } = setup();
     controller.open('sales');
+    const disposedDemo = document.querySelector<HTMLElement>('.concept-dialog .demo')!;
+    const staleAdd = disposedDemo.querySelector<HTMLButtonElement>('[data-add-cart]')!;
     controller.dispose();
     controller.dispose();
     controller.selectGoal('bookings');
@@ -151,6 +153,8 @@ describe('catalogue sessions and explicit controls', () => {
     expect(container.childElementCount).toBe(0);
     expect(demoSlot.childElementCount).toBe(0);
     expect(document.body.style.overflow).toBe('');
+    staleAdd.click();
+    expect(disposedDemo.querySelector('[data-cart-count]')!.textContent).toBe('(0)');
     const stateCalls = onStateChange.mock.calls.length;
     const next = mountCatalogue({ container, demoSlot, onStateChange, onProjectRequest });
     controllers.push(next);
@@ -158,5 +162,32 @@ describe('catalogue sessions and explicit controls', () => {
     expect(onStateChange).toHaveBeenCalledTimes(stateCalls + 2);
     expect(document.querySelectorAll('.concept-dialog')).toHaveLength(1);
     expect(demoSlot.querySelectorAll('.demo')).toHaveLength(1);
+  });
+
+  it('retains a reviewed order and confirmed inquiry across dialog reparenting, selection and resize', () => {
+    const { controller, demoSlot, dialog } = setup();
+    const inquiry = demoSlot.firstElementChild as HTMLElement;
+    inquiry.querySelector<HTMLInputElement>('[name="name"]')!.value = 'Ada';
+    inquiry.querySelector<HTMLInputElement>('[name="email"]')!.value = 'ada@example.test';
+    inquiry.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    inquiry.querySelector<HTMLButtonElement>('[data-confirm]')!.click();
+    controller.selectGoal('sales');
+    const sales = demoSlot.firstElementChild as HTMLElement;
+    sales.querySelector<HTMLButtonElement>('[data-add-cart]')!.click();
+    sales.querySelector<HTMLButtonElement>('[data-checkout]')!.click();
+    controller.open();
+    expect(dialog.querySelector('.demo')).toBe(sales);
+    expect(sales.querySelector<HTMLElement>('[data-step="review"]')!.hidden).toBe(false);
+    expect(sales.querySelector('[data-order-items]')!.textContent).toContain('1 × Safran · 0,5 g');
+    demoSlot.classList.add('demo--responsive');
+    dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.click();
+    expect(sales.classList.contains('demo--responsive')).toBe(true);
+    controller.selectGoal('inquiries');
+    expect(demoSlot.firstElementChild).toBe(inquiry);
+    expect(inquiry.querySelector<HTMLElement>('[data-step="complete"]')!.hidden).toBe(false);
+    expect(inquiry.querySelector('.demo-result')!.textContent).toContain('Ada');
+    controller.selectGoal('sales');
+    expect(demoSlot.firstElementChild).toBe(sales);
+    expect(sales.querySelector<HTMLElement>('[data-step="review"]')!.hidden).toBe(false);
   });
 });

@@ -40,121 +40,283 @@ function studio(id: string): string {
   </svg>`;
 }
 
-function lamp(id: string): string {
-  return `<svg viewBox="0 0 350 390" role="img" aria-label="Skulpturale Tischlampe Luma mit pilzförmigem Schirm" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="${id}-shade" x1="0" y1="0" x2="1" y2=".6"><stop stop-color="#fff" stop-opacity=".6"/><stop offset=".33" stop-color="#fff" stop-opacity=".1"/><stop offset=".75" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient><linearGradient id="${id}-stem" x1="0" x2="1"><stop stop-color="#fff" stop-opacity=".3"/><stop offset=".45" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient><filter id="${id}-shadow"><feGaussianBlur stdDeviation="7"/></filter></defs>
-    <ellipse cx="191" cy="334" rx="96" ry="15" fill="#5c549a" opacity=".18" filter="url(#${id}-shadow)"/>
-    <path d="M180 321c37 3 49 8 65 3 18-6 11-21 30-27 12-4 23-1 35 1" stroke="#666077" stroke-width="2" fill="none"/>
-    <path d="M157 176h42l10 143c1 13-61 13-60 0Z" fill="var(--lamp-color)"/><path d="M157 176h42l10 143c1 13-61 13-60 0Z" fill="url(#${id}-stem)"/>
-    <ellipse cx="179" cy="318" rx="30" ry="9" fill="var(--lamp-color)"/>
-    <path d="M68 185c0-65 43-112 111-112s111 47 111 112Z" fill="var(--lamp-color)"/><path d="M68 185c0-65 43-112 111-112s111 47 111 112Z" fill="url(#${id}-shade)"/>
-    <ellipse cx="179" cy="185" rx="111" ry="15" fill="var(--lamp-color)"/><ellipse cx="179" cy="185" rx="107" ry="11" fill="#433020" opacity=".22"/><ellipse cx="179" cy="183" rx="88" ry="7" fill="#fff1c8" opacity=".92"/>
-    <path d="M91 154c10-35 40-59 72-64" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="3" stroke-linecap="round"/>
-  </svg>`;
-}
-
 function panelFrame(title: string, content: string): string {
   return `<section class="demo-panel" hidden aria-label="${title}"><div class="demo-panel-heading"><h3>${title}</h3><button class="demo-icon-button" type="button" data-panel-close aria-label="Zurück zur Konzeptdemo">×</button></div>${content}</section>`;
 }
 
-function bindPanel(root: HTMLElement): { open: () => void; close: () => void } {
+const sessions = new WeakMap<HTMLElement, AbortController>();
+
+function bindPanel(root: HTMLElement, signal: AbortSignal): void {
   const panel = root.querySelector<HTMLElement>('.demo-panel')!;
   const main = root.querySelector<HTMLElement>('.demo-main')!;
   let previousFocus: HTMLElement | null = null;
+  let previousScroll = 0;
+  let scrollOrigin: { dialog: HTMLDialogElement | null; top: number; x: number; y: number } | null = null;
   const close = () => {
     panel.hidden = true;
     main.inert = false;
-    if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    root.classList.remove('demo--panel-open');
+    main.scrollTop = previousScroll;
+    if (previousFocus?.isConnected && root.contains(previousFocus)) previousFocus.focus({ preventScroll: true });
+    const dialog = root.closest('dialog');
+    if (scrollOrigin?.dialog === dialog) {
+      if (dialog) dialog.scrollTop = scrollOrigin.top;
+      else if (window.scrollX !== scrollOrigin.x || window.scrollY !== scrollOrigin.y) {
+        window.scrollTo({ left: scrollOrigin.x, top: scrollOrigin.y, behavior: 'instant' });
+      }
+    }
   };
-  const open = () => {
-    previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const open = (event: Event) => {
+    previousFocus = event.currentTarget as HTMLElement;
+    previousScroll = main.scrollTop;
+    const dialog = root.closest('dialog');
+    scrollOrigin = { dialog, top: dialog?.scrollTop ?? 0, x: window.scrollX, y: window.scrollY };
     panel.hidden = false;
     panel.scrollTop = 0;
     main.inert = true;
-    panel.querySelector<HTMLElement>('[data-panel-close]')?.focus({ preventScroll: true });
-    const dialog = root.closest('dialog');
+    root.classList.add('demo--panel-open');
+    panel.querySelector<HTMLElement>('[data-panel-close]')!.focus({ preventScroll: true });
     if (dialog) dialog.scrollTop = 0;
-    else if (root.classList.contains('demo--responsive')) {
-      root.scrollIntoView({ block: 'start', behavior: 'instant' });
-    }
+    else if (root.classList.contains('demo--responsive')) root.scrollIntoView({ block: 'start', behavior: 'instant' });
   };
-  root.querySelectorAll('[data-panel-open]').forEach((button) => button.addEventListener('click', open));
-  panel.querySelector('[data-panel-close]')!.addEventListener('click', close);
-  root.addEventListener('keydown', (event) => {
+  root.querySelectorAll('[data-panel-open]').forEach(button => button.addEventListener('click', open, { signal }));
+  panel.querySelector('[data-panel-close]')!.addEventListener('click', close, { signal });
+  root.addEventListener('keydown', event => {
     if (event.key !== 'Escape' || panel.hidden) return;
     event.preventDefault();
     event.stopPropagation();
     close();
-  });
-  return { open, close };
+  }, { signal });
 }
 
-function inquiryDemo(root: HTMLElement, id: string): void {
-  root.innerHTML = `<div class="demo-main">
-    <nav class="demo-nav" aria-label="Klarraum Konzeptnavigation"><span class="demo-logo">klarraum<span class="demo-logo-dot" aria-hidden="true">•</span></span><span class="demo-nav-note">Beratung, die weiterdenkt.</span><button class="demo-nav-link" data-panel-open type="button">Sprechen wir ${arrow}</button></nav>
-    <div class="demo-editorial"><div class="demo-editorial-copy"><p class="demo-eyebrow">Perspektive verändert alles.</p><h2>Raum für<br>das nächste<br><em>Kapitel.</em></h2><p>Neue Perspektiven. Klare Entscheidungen.<br>Für Unternehmen, die etwas bewegen.</p><button class="demo-cta" data-panel-open type="button">Ins Gespräch kommen ${arrow}</button><span class="demo-caption">Strategie · Positionierung · Entwicklung</span></div><div class="demo-architecture">${architecture(id)}<span class="demo-art-caption">Neue Wege beginnen mit einem Blickwechsel.</span></div></div>
-    <footer class="demo-footer"><span>Weniger Komplexität. Mehr Klarheit.</span><span>Konzeptdemo · keine echte Anfrage</span></footer>
-    </div>${panelFrame('Ein guter Anfang: ein Gespräch.', `<p class="demo-panel-intro">Worum geht es bei Ihnen? Probieren Sie den Anfrageweg aus.</p><form class="demo-inquiry-form"><div class="demo-form-pair"><label>Ihr Name<input name="name" autocomplete="name" required placeholder="Name" maxlength="100"></label><label>E-Mail<input name="email" type="email" autocomplete="email" required placeholder="name@unternehmen.de" maxlength="200"></label></div><label>Ihr Vorhaben <span>(optional)</span><textarea name="project" rows="2" placeholder="Was möchten Sie bewegen?" maxlength="1000"></textarea></label><button class="demo-cta" type="submit">Demo-Anfrage ansehen ${arrow}</button><p class="demo-privacy-note">Dies ist eine Konzeptdemo. Ihre Eingaben bleiben in dieser Ansicht. Es wird nichts versendet.</p><p class="demo-result" role="status" aria-live="polite"></p></form>`)} `;
-  bindPanel(root);
+function scrollToPanelStart(root: HTMLElement): void {
+  root.querySelector<HTMLElement>('.demo-panel')!.scrollTop = 0;
+  const dialog = root.closest('dialog');
+  if (dialog) dialog.scrollTop = 0;
+  else if (root.classList.contains('demo--responsive')) root.scrollIntoView({ block: 'start', behavior: 'instant' });
+}
+
+type SummaryRow = readonly [string, string];
+
+function renderSummary(target: HTMLElement, rows: SummaryRow[]): void {
+  target.replaceChildren();
+  for (const [label, value] of rows) {
+    const row = document.createElement('div');
+    const term = document.createElement('dt');
+    const detail = document.createElement('dd');
+    term.textContent = label;
+    detail.textContent = value;
+    row.append(term, detail);
+    target.append(row);
+  }
+}
+
+function journeySteps(first: string): string {
+  return `<ol class="demo-steps" aria-label="Demoablauf"><li data-step-index="edit" aria-current="step"><span>01</span>${first}</li><li data-step-index="review"><span>02</span>Prüfen</li><li data-step-index="complete"><span>03</span>Bestätigt</li></ol>`;
+}
+
+function reviewSteps(reviewTitle: string, editLabel: string): string {
+  return `<section data-step="review" hidden><h4 tabindex="-1" data-review-title>${reviewTitle}</h4><dl class="demo-summary" data-summary></dl><p class="demo-privacy-note">Nur eine lokale Simulation. Es wird nichts übermittelt.</p><div class="demo-step-actions"><button class="demo-cta" type="button" data-confirm>Demo bestätigen ${arrow}</button><button class="demo-secondary" type="button" data-edit>${editLabel}</button></div></section>
+    <section data-step="complete" hidden><span class="demo-complete-mark" aria-hidden="true">✓</span><h4>In der Demo bestätigt.</h4><p class="demo-result" role="status" aria-live="polite" tabindex="-1"></p><dl class="demo-summary" data-summary></dl><button class="demo-secondary" type="button" data-edit>${editLabel}</button></section>`;
+}
+
+/** Keeps the editable form mounted throughout review and confirmation. */
+function bindReview(root: HTMLElement, signal: AbortSignal, summarize: () => SummaryRow[] | null, confirmation: () => string): void {
   const form = root.querySelector<HTMLFormElement>('form')!;
-  const nameInput = form.elements.namedItem('name') as HTMLInputElement;
-  nameInput.addEventListener('input', () => {
-    nameInput.setCustomValidity(nameInput.value && !nameInput.value.trim() ? 'Bitte geben Sie Ihren Namen ein.' : '');
+  const show = (step: string) => {
+    root.querySelectorAll<HTMLElement>('[data-step]').forEach(element => { element.hidden = element.dataset.step !== step; });
+    root.querySelectorAll<HTMLElement>('[data-step-index]').forEach(element => {
+      if (element.dataset.stepIndex === step) element.setAttribute('aria-current', 'step');
+      else element.removeAttribute('aria-current');
+    });
+    const target = step === 'review' ? root.querySelector<HTMLElement>('[data-review-title]')
+      : step === 'complete' ? root.querySelector<HTMLElement>('.demo-result')
+      : form.querySelector<HTMLElement>('input, select');
+    target?.focus({ preventScroll: true });
+    scrollToPanelStart(root);
+  };
+  const edit = () => {
     root.querySelector('.demo-result')!.textContent = '';
-  });
-  form.addEventListener('input', () => { root.querySelector('.demo-result')!.textContent = ''; });
-  form.addEventListener('submit', (event) => {
+    show('edit');
+  };
+  form.addEventListener('submit', event => {
     event.preventDefault();
-    nameInput.setCustomValidity(!nameInput.value.trim() ? 'Bitte geben Sie Ihren Namen ein.' : '');
-    if (!form.reportValidity()) return;
-    const name = nameInput.value.trim();
-    const result = root.querySelector<HTMLElement>('.demo-result')!;
-    result.textContent = `${name}, so könnte der erste Schritt aussehen. Demo abgeschlossen – Ihre Anfrage wurde nicht versendet.`;
-  });
+    const rows = summarize();
+    if (!rows) return;
+    root.querySelectorAll<HTMLElement>('[data-summary]').forEach(target => renderSummary(target, rows));
+    show('review');
+  }, { signal });
+  root.querySelector('[data-confirm]')!.addEventListener('click', () => {
+    root.querySelector('.demo-result')!.textContent = confirmation();
+    show('complete');
+  }, { signal });
+  root.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', edit, { signal }));
 }
 
-function bookingDemo(root: HTMLElement, id: string): void {
+function inquiryDemo(root: HTMLElement, id: string, signal: AbortSignal): void {
   root.innerHTML = `<div class="demo-main">
-    <nav class="demo-nav" aria-label="Studio Still Konzeptnavigation"><span class="demo-logo">still<span class="demo-studio-mark">✳</span><small>STUDIO FÜR BEWEGUNG</small></span><span class="demo-nav-note">Ein guter Ort für Sie.</span><button class="demo-nav-link" data-panel-open type="button">Kurs finden ${arrow}</button></nav>
+    <nav class="demo-nav" aria-label="Klarraum Konzeptnavigation"><span class="demo-logo">klarraum<span class="demo-logo-dot" aria-hidden="true">•</span></span><span class="demo-nav-note">Beratung mit Weitblick.</span><button class="demo-nav-link" data-panel-open type="button">Sprechen wir ${arrow}</button></nav>
+    <div class="demo-editorial"><div class="demo-editorial-copy"><p class="demo-eyebrow">Strategie & Entwicklung</p><h2>Raum für<br>das nächste<br><em>Kapitel.</em></h2><p>Neue Perspektiven. Klare Entscheidungen. Für Unternehmen im Wandel.</p><button class="demo-cta" data-panel-open type="button">Ins Gespräch kommen ${arrow}</button><span class="demo-caption">Zuhören. Ordnen. Weiterdenken.</span></div><div class="demo-architecture">${architecture(id)}<span class="demo-art-caption">Ein Blickwechsel schafft Raum.</span></div></div>
+    <footer class="demo-footer"><span>Weniger Komplexität. Mehr Klarheit.</span><span>Konzeptdemo · keine echte Anfrage</span></footer>
+    </div>${panelFrame('Ein guter Anfang: ein Gespräch.', `<p class="demo-panel-intro">Skizzieren Sie Ihr Anliegen. Prüfen und bearbeiten Sie Ihren Entwurf, bevor Sie ihn in der Demo bestätigen.</p>${journeySteps('Anliegen')}
+    <form class="demo-inquiry-form" data-step="edit" novalidate>
+      <p class="demo-required-note">Name und E-Mail sind Pflichtfelder. Beispieldaten genügen.</p>
+      <div class="demo-form-pair"><label for="${id}-name">Ihr Name<input id="${id}-name" name="name" autocomplete="off" required placeholder="Alex Beispiel" maxlength="100" aria-describedby="${id}-name-error"><span class="demo-field-error" id="${id}-name-error" data-error-for="name"></span></label><label for="${id}-email">E-Mail<input id="${id}-email" name="email" type="email" autocomplete="off" required placeholder="alex@beispiel.de" maxlength="200" aria-describedby="${id}-email-error"><span class="demo-field-error" id="${id}-email-error" data-error-for="email"></span></label></div>
+      <label>Was beschäftigt Sie?<select name="topic"><option>Strategie & Orientierung</option><option>Positionierung & Marke</option><option>Veränderung begleiten</option></select></label>
+      <label>Ihr Vorhaben (optional)<textarea name="project" rows="3" placeholder="Was soll sich verändern?" maxlength="1000" aria-describedby="${id}-project-error"></textarea><span class="demo-field-error" id="${id}-project-error" data-error-for="project"></span></label>
+      <p class="demo-validation" role="alert"></p><button class="demo-cta" type="submit">Anfrageentwurf prüfen ${arrow}</button><p class="demo-privacy-note">Ihre Eingaben bleiben nur in dieser Sitzung. Es wird nichts gespeichert oder versendet.</p>
+    </form>${reviewSteps('Ihr Anfrageentwurf', 'Anliegen bearbeiten')}`)}`;
+  bindPanel(root, signal);
+  const form = root.querySelector<HTMLFormElement>('form')!;
+  const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement;
+  const errors = root.querySelector<HTMLElement>('.demo-validation')!;
+  const validate = (name: string): boolean => {
+    const input = field(name);
+    input.setCustomValidity('');
+    let message = '';
+    if (name === 'name' && !input.value.trim()) message = 'Bitte geben Sie einen Namen ein.';
+    if (name === 'email' && (!input.value.trim() || input.validity.typeMismatch)) message = 'Bitte geben Sie eine E-Mail wie alex@beispiel.de ein.';
+    if (input.value.length > input.maxLength) message = `Bitte verwenden Sie höchstens ${input.maxLength} Zeichen.`;
+    input.setCustomValidity(message);
+    input.setAttribute('aria-invalid', String(Boolean(message)));
+    root.querySelector(`[data-error-for="${name}"]`)!.textContent = message;
+    return !message;
+  };
+  form.addEventListener('input', event => {
+    const input = event.target as HTMLInputElement;
+    if (['name', 'email', 'project'].includes(input.name) && input.hasAttribute('aria-invalid')) validate(input.name);
+    errors.textContent = '';
+  }, { signal });
+  bindReview(root, signal, () => {
+    const invalid = ['name', 'email', 'project'].filter(name => !validate(name));
+    if (invalid.length) {
+      errors.textContent = 'Bitte prüfen Sie die markierten Felder. Ihr Entwurf bleibt erhalten.';
+      field(invalid[0]).focus();
+      return null;
+    }
+    return [['Name', field('name').value.trim()], ['E-Mail', field('email').value.trim()], ['Thema', field('topic').value], ['Vorhaben', field('project').value.trim() || 'Noch offen – im Gespräch klären.']];
+  }, () => `${field('name').value.trim()}, Ihr Entwurf ist in dieser Sitzung bestätigt. Ihre Anfrage wurde nicht versendet. In einem echten Anfrageweg würden Sie jetzt eine Eingangsbestätigung erhalten.`);
+}
+
+const courseDetails = {
+  Pilates: { duration: 60, price: 22, description: 'Stabilität & Körpergefühl · mit Lea', slots: [['09:00', '12:30', '18:00'], ['12:30'], ['09:00', '18:00'], []] },
+  'Yoga Flow': { duration: 60, price: 20, description: 'Fließende Bewegung · mit Mira', slots: [['09:00', '18:00'], [], ['12:30', '18:00'], ['09:00', '18:00']] },
+  'Slow Stretch': { duration: 45, price: 16, description: 'Sanfte Mobilität · mit Noah', slots: [['12:30'], ['09:00', '18:00'], [], ['12:30', '18:00']] },
+};
+const bookingDays = ['Montag, 19. Oktober', 'Dienstag, 20. Oktober', 'Mittwoch, 21. Oktober', 'Donnerstag, 22. Oktober'];
+const currency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+
+function bookingDemo(root: HTMLElement, id: string, signal: AbortSignal): void {
+  root.innerHTML = `<div class="demo-main">
+    <nav class="demo-nav" aria-label="Studio Still Konzeptnavigation"><span class="demo-logo">still<span class="demo-studio-mark" aria-hidden="true">✳</span><small>STUDIO FÜR BEWEGUNG</small></span><span class="demo-nav-note">Ein guter Ort für Sie.</span><button class="demo-nav-link" data-panel-open type="button">Kurs finden ${arrow}</button></nav>
     <div class="demo-studio-hero"><div class="demo-studio-copy"><p class="demo-eyebrow">Weniger müssen. Mehr spüren.</p><h2>Ganz bei<br><em>sich.</em></h2><p>Bewegung, die gut tut.<br>Raum, der Ihnen gehört.</p><button class="demo-cta" data-panel-open type="button">Ihren Moment finden ${arrow}</button><span class="demo-caption">Pilates & Yoga · Kleine Gruppen</span></div><div class="demo-studio-art">${studio(id)}<span class="demo-studio-seal">RAUM<br>FÜR SIE<span aria-hidden="true">↗</span></span></div></div>
     <footer class="demo-footer"><span>Einatmen. Ankommen. Aufblühen.</span><span>Konzeptdemo · keine echte Buchung</span></footer>
-    </div>${panelFrame('Ein Moment, nur für Sie.', `<p class="demo-panel-intro">Entdecken Sie die Terminwahl. Alle Termine sind Beispiele.</p><form class="demo-booking-form"><label>Ihre Bewegung<select name="service"><option value="Pilates">Pilates · 60 Minuten</option><option value="Yoga Flow">Yoga Flow · 60 Minuten</option><option value="Slow Stretch">Slow Stretch · 45 Minuten</option></select></label><fieldset><legend>Ihr Tag <span>· Beispielwoche im Oktober 2026</span></legend><div class="demo-day-options"><button type="button" data-day="Montag, 19. Oktober" aria-pressed="true"><small>MO</small><strong>19</strong></button><button type="button" data-day="Dienstag, 20. Oktober" aria-pressed="false"><small>DI</small><strong>20</strong></button><button type="button" data-day="Mittwoch, 21. Oktober" aria-pressed="false"><small>MI</small><strong>21</strong></button><button type="button" data-day="Donnerstag, 22. Oktober" aria-pressed="false"><small>DO</small><strong>22</strong></button></div></fieldset><fieldset><legend>Ihre Zeit</legend><div class="demo-time-options"><button type="button" data-time="09:00" aria-pressed="true">09:00</button><button type="button" data-time="12:30" aria-pressed="false">12:30</button><button type="button" data-time="18:00" aria-pressed="false">18:00</button></div></fieldset><button class="demo-cta" type="submit">Demo-Termin auswählen ${arrow}</button><p class="demo-result" role="status" aria-live="polite"></p><p class="demo-privacy-note">Nur eine Demonstration. Es wird kein echter Termin gebucht.</p></form>`)} `;
-  bindPanel(root);
-  let day = 'Montag, 19. Oktober';
-  let time = '09:00';
-  const result = root.querySelector<HTMLElement>('.demo-result')!;
-  for (const kind of ['day', 'time'] as const) {
-    root.querySelectorAll<HTMLButtonElement>(`[data-${kind}]`).forEach((button) => {
-      button.addEventListener('click', () => {
-        root.querySelectorAll(`[data-${kind}]`).forEach((item) => item.setAttribute('aria-pressed', 'false'));
-        button.setAttribute('aria-pressed', 'true');
-        if (kind === 'day') day = button.dataset.day!;
-        else time = button.dataset.time!;
-        result.textContent = '';
-      });
-    });
-  }
+    </div>${panelFrame('Ein Moment, nur für Sie.', `<p class="demo-panel-intro">Wählen Sie Ihre Bewegung und einen passenden Termin. Die Beispielwoche bleibt in dieser Demo bewusst unverändert.</p>${journeySteps('Termin')}
+    <form class="demo-booking-form" data-step="edit" novalidate><label>Ihre Bewegung<select name="service">${Object.entries(courseDetails).map(([name, course]) => `<option value="${name}">${name} · ${course.duration} Minuten</option>`).join('')}</select></label><p class="demo-course-detail" data-course-detail></p>
+    <fieldset><legend>Ihr Tag <span>· Beispielwoche, Oktober 2026</span></legend><div class="demo-day-options">${bookingDays.map((day, index) => `<button type="button" data-day="${day}" aria-pressed="${index === 0}" aria-label="${day} 2026"><small>${['MO', 'DI', 'MI', 'DO'][index]}</small><strong>${19 + index}</strong></button>`).join('')}</div></fieldset>
+    <fieldset><legend>Ihre Zeit <span>· Ortszeit Berlin</span></legend><div class="demo-time-options">${['09:00', '12:30', '18:00'].map(time => `<button type="button" data-time="${time}" aria-pressed="false">${time}</button>`).join('')}</div><p class="demo-availability" role="status" aria-live="polite"></p></fieldset>
+    <p class="demo-validation" role="alert"></p><button class="demo-cta" type="submit">Termin prüfen ${arrow}</button><p class="demo-privacy-note">Beispieltermine und Demopreise. Es wird kein Platz reserviert und nichts bezahlt.</p></form>${reviewSteps('Ihr ausgewählter Moment', 'Termin ändern')}`)}`;
+  bindPanel(root, signal);
   const form = root.querySelector<HTMLFormElement>('form')!;
-  form.addEventListener('change', () => { result.textContent = ''; });
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const service = (form.elements.namedItem('service') as HTMLSelectElement).value;
-    result.textContent = `Ihre Demo-Auswahl: ${service} am ${day} um ${time} Uhr. Kein echter Termin wurde gebucht.`;
-  });
+  const service = form.elements.namedItem('service') as HTMLSelectElement;
+  let day = 0;
+  let time: string | null = '09:00';
+  const course = () => courseDetails[service.value as keyof typeof courseDetails];
+  const availability = root.querySelector<HTMLElement>('.demo-availability')!;
+  const validation = root.querySelector<HTMLElement>('.demo-validation')!;
+  const update = () => {
+    const current = course();
+    const slots = current.slots[day];
+    if (time && !slots.includes(time)) time = null;
+    root.querySelector('[data-course-detail]')!.textContent = `${current.description} · ${current.duration} Min. · ${currency(current.price)} Demopreis`;
+    root.querySelectorAll<HTMLButtonElement>('[data-time]').forEach(button => {
+      const available = slots.includes(button.dataset.time!);
+      button.disabled = !available;
+      button.setAttribute('aria-pressed', String(time === button.dataset.time));
+      button.setAttribute('aria-label', `${button.dataset.time} Uhr${available ? '' : ' · nicht verfügbar'}`);
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-day]').forEach((button, index) => button.setAttribute('aria-pressed', String(index === day)));
+    availability.textContent = !slots.length ? 'Für diesen Kurs gibt es an diesem Tag keinen Beispieltermin. Wählen Sie einen anderen Tag.' : time ? `${time} Uhr ausgewählt · ${slots.length} Beispieltermine an diesem Tag.` : 'Bitte wählen Sie eine der verfügbaren Zeiten. Ihre bisherige Zeit passt nicht zu dieser Auswahl.';
+    validation.textContent = '';
+  };
+  service.addEventListener('change', update, { signal });
+  root.querySelectorAll<HTMLButtonElement>('[data-day]').forEach((button, index) => button.addEventListener('click', () => { day = index; update(); }, { signal }));
+  root.querySelectorAll<HTMLButtonElement>('[data-time]').forEach(button => button.addEventListener('click', () => { time = button.dataset.time!; update(); }, { signal }));
+  bindReview(root, signal, () => {
+    if (!time || !course().slots[day].includes(time)) {
+      validation.textContent = 'Wählen Sie einen Tag mit verfügbarem Termin und anschließend eine Uhrzeit.';
+      root.querySelector<HTMLElement>('[data-time]:not(:disabled)')?.focus();
+      if (!course().slots[day].length) root.querySelector<HTMLElement>('[data-day][aria-pressed="true"]')?.focus();
+      return null;
+    }
+    return [['Kurs', `${service.value} · ${course().duration} Minuten`], ['Tag', `${bookingDays[day]} 2026`], ['Beginn', `${time} Uhr · Berlin`], ['Ort', 'Studio Still · fiktiver Bewegungsraum'], ['Demopreis', `${currency(course().price)} für eine Person`]];
+  }, () => `Ihre Demo-Auswahl: ${service.value} am ${bookingDays[day]} um ${time} Uhr. Kein echter Termin wurde gebucht. Sie können den Termin weiter ändern; es entstehen keine Kosten.`);
+  update();
 }
 
-function salesDemo(root: HTMLElement, id: string): void {
-  const variants = [{ name: 'Terrakotta', color: '#c67550' }, { name: 'Kreide', color: '#e9e1ce' }, { name: 'Kobalt', color: '#4658b5' }];
+function salesDemo(root: HTMLElement, id: string, signal: AbortSignal): void {
+  const variants = [
+    { name: '0,5 g', label: 'Probierglas', price: 9, grams: .5, color: '#b14b3d' },
+    { name: '1 g', label: 'Küchenglas', price: 16, grams: 1, color: '#776a4a' },
+    { name: '3 × 1 g', label: 'Geschenkset', price: 42, grams: 3, color: '#79648c' },
+  ];
+  const botanicalScenes = [
+    { title: 'Die Blüte', image: new URL('./assets/demos/saffron/flower.webp', import.meta.url).href, alt: 'Violette Safranblüte mit roten Narbenästen in Nahaufnahme', text: 'Alles beginnt mit einer Blüte. Zwischen violetten Blütenblättern liegen die feinen roten Narbenäste.' },
+    { title: 'Der rote Faden', image: new URL('./assets/demos/saffron/detail.webp', import.meta.url).href, alt: 'Ein roter Narbenast mit trichterförmiger Spitze vor violetten Blütenblättern', text: 'Ein kleines Detail im großen Bild: die rote Narbe. Die Nahaufnahme macht ihre Struktur sichtbar.' },
+    { title: 'Das Gewürz', image: new URL('./assets/demos/saffron/threads.webp', import.meta.url).href, alt: 'Getrocknete rote Safranfäden auf hellem Grund', text: 'Getrocknete Fäden, intensive Farbe. In dieser fiktiven Kollektion entdecken Sie Safran in drei Größen.' },
+  ];
   let variant = 0;
   const cart = new Map<number, number>();
-  root.style.setProperty('--lamp-color', variants[0].color);
   root.innerHTML = `<div class="demo-main">
-    <nav class="demo-nav" aria-label="Forma Konzeptnavigation"><span class="demo-logo">forma<span aria-hidden="true">↗</span></span><span class="demo-nav-note">OBJECTS FOR EVERY DAY.</span><button class="demo-nav-link" data-panel-open type="button">Tasche <span data-cart-count>(0)</span> ${arrow}</button></nav>
-    <div class="demo-product-hero"><div class="demo-product-copy"><p class="demo-eyebrow">Kleine Dinge. Große Wirkung.</p><h2>Gutes Licht.<br><em>Gute Dinge.</em></h2><p>Ein Objekt. Ein neuer Lieblingsplatz.<br>Lernen Sie Luma kennen.</p><div class="demo-product-spec"><span>Luma — Tischleuchte</span><strong>129 € <small>Demopreis</small></strong></div><fieldset class="demo-variants"><legend>Farbe: <span data-variant-name>Terrakotta</span></legend><div>${variants.map((item, index) => `<button type="button" data-variant="${index}" style="--swatch:${item.color}" aria-pressed="${index === 0}" aria-label="Farbe ${item.name}"><span></span></button>`).join('')}</div></fieldset><button class="demo-cta" type="button" data-add-cart>In die Demo-Tasche ${arrow}</button><p class="demo-shop-status" role="status" aria-live="polite"></p></div><div class="demo-product-art"><span class="demo-product-index">OBJECT<br>NO. 01</span>${lamp(id)}<span class="demo-product-tag">Eine runde<br>Sache.</span><span class="demo-product-dimension">H 28 CM · Ø 22 CM</span></div></div>
-    <footer class="demo-footer"><span>Mit Bedacht gestaltet. Für jeden Tag.</span><span>Konzeptdemo · kein echter Kauf</span></footer>
-    </div>${panelFrame('Ihre Demo-Tasche.', '<p class="demo-panel-intro">Ein kleiner Einblick in einen möglichen Shopablauf.</p><div class="demo-cart-items"></div><div class="demo-cart-total"><span>Demobetrag</span><strong data-cart-total>0 €</strong></div><p class="demo-privacy-note">Lokale Demonstration. Es gibt keine Bestellung und keine Zahlung.</p><p class="demo-cart-status" role="status" aria-live="polite"></p>')} `;
-  bindPanel(root);
-  const currency = (value: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+    <nav class="demo-nav" aria-label="Safran Atelier Konzeptnavigation"><span class="demo-logo">safran<span>ATELIER</span></span><button class="demo-nav-link" data-product-open type="button">Kollektion ${arrow}</button><button class="demo-nav-link" data-panel-open type="button">Tasche <span data-cart-count>(0)</span> ${arrow}</button></nav>
+    <div class="demo-spice-hero"><div class="demo-spice-hero-copy"><p class="demo-eyebrow">Botanik trifft Genuss.</p><h2>Ein kleiner Faden.<br><em>Ein großer Moment.</em></h2><p>Entdecken Sie die leise Schönheit einer besonderen Zutat. Von der Blüte bis in Ihre Küche.</p><button class="demo-cta" data-product-open type="button">Safran entdecken ${arrow}</button><span class="demo-caption">Fiktive Marke · Lokale Shopdemo</span></div></div>
+    <section class="demo-botanical-story" aria-label="Von der Blüte zum Gewürz"><div class="demo-spice-section-heading"><p class="demo-eyebrow">Ein Blick ins Detail</p><h3>Von der Blüte<br><em>zum Gewürz.</em></h3><p>Drei Perspektiven auf eine kleine Zutat. Wählen Sie ein Kapitel.</p></div><div class="demo-botanical-controls" role="group" aria-label="Botanisches Kapitel">${botanicalScenes.map((scene, index) => `<button type="button" data-ingredient="${index}" aria-pressed="${index === 0}" aria-controls="${id}-botanical"><span>0${index + 1}</span>${scene.title}</button>`).join('')}</div><figure id="${id}-botanical" class="demo-botanical-figure"><img data-ingredient-image src="${botanicalScenes[0].image}" alt="${botanicalScenes[0].alt}" width="960" height="728" loading="lazy"><figcaption data-ingredient-caption aria-live="polite">${botanicalScenes[0].text}</figcaption></figure></section>
+    <section class="demo-spice-product" aria-label="Safran-Kollektion" tabindex="-1"><div class="demo-spice-product-art"><img src="${botanicalScenes[2].image}" alt="Rote Safranfäden als unmarkierte Produktillustration" width="960" height="628" loading="lazy"><span>Die Kollektion<br>Safran Atelier</span></div><div class="demo-spice-product-copy"><p class="demo-eyebrow">Für kleine Genussmomente</p><h3>Safranfäden.<br><em>Ganz nach Ihrem Maß.</em></h3><p>Ein Probierglas, ein Vorrat für die Küche oder ein Set zum Verschenken. Finden Sie Ihre Größe.</p><div class="demo-product-spec"><strong><span data-product-price>9 €</span> <small>Demopreis / Packung</small></strong><span data-unit-price>18 € / g · fiktiver Grundpreis</span></div><fieldset class="demo-variants"><legend>Größe: <span data-variant-name>0,5 g</span></legend><div>${variants.map((item, index) => `<button type="button" data-variant="${index}" aria-pressed="${index === 0}" aria-label="${item.label}, ${item.name}"><strong>${item.name}</strong><span>${item.label}</span></button>`).join('')}</div></fieldset><div class="demo-product-purchase"><label>Menge<input name="quantity" type="number" min="1" max="99" step="1" value="1" inputmode="numeric" aria-describedby="${id}-quantity-error"></label><button class="demo-cta" type="button" data-add-cart>In die Demo-Tasche ${arrow}</button></div><p id="${id}-quantity-error" class="demo-shop-status" role="status" aria-live="polite"></p><button type="button" class="demo-secondary demo-shop-cart-link" data-panel-open data-cart-open-inline hidden>Demo-Tasche ansehen ${arrow}</button><details class="demo-product-details"><summary>Was zeigt dieses Beispiel?</summary><p>Eine anonymisierte Produktpräsentation mit frei erfundenen Größen und Preisen. Die Bilder zeigen botanische Details. Die Demo enthält keine reale Herkunftszusage, Zertifizierung oder Kaufmöglichkeit.</p></details></div></section>
+    <section class="demo-spice-ritual" aria-label="Inspiration für die Küche"><p class="demo-eyebrow">Ein kleines Ritual</p><h3>Ein Hauch von <em>besonders.</em></h3><div><p><span>01 / ENTDECKEN</span>Eine Prise Farbe für Reis, Saucen oder Desserts.</p><p><span>02 / AUSWÄHLEN</span>Die passende Größe für Ihre nächste Küchenidee.</p><p><span>03 / AUSPROBIEREN</span>Den Einkaufsweg hier ganz ohne Bestellung erleben.</p></div></section>
+    <footer class="demo-footer"><span>Safran Atelier · Fiktives Konzept</span><span>Anonymisierte Demo · kein echter Kauf</span></footer>
+    </div>${panelFrame('Ihre Demo-Tasche.', `<p class="demo-panel-intro">Größen kombinieren, Mengen ändern, Bestellung durchspielen.</p>${journeySteps('Tasche')}<section data-step="edit"><div class="demo-cart-items"></div><div class="demo-cart-total"><span>Zwischensumme</span><strong data-cart-total>0 €</strong></div><p class="demo-privacy-note">Alle Preise sind erfundene Demopreise, einschließlich beispielhafter MwSt. Die Lieferoption wählen Sie im nächsten Schritt.</p><div class="demo-step-actions"><button type="button" class="demo-cta" data-checkout>Bestellübersicht ${arrow}</button></div><p class="demo-cart-status" role="status" aria-live="polite"></p></section>
+    <section data-step="review" hidden><h4 tabindex="-1" data-review-title>Ihre Bestellübersicht</h4><dl class="demo-summary" data-order-items></dl><label class="demo-shipping-label">Lieferoption<select name="shipping"><option value="delivery">Standardversand · 4 €</option><option value="pickup">Abholung im Beispielatelier · 0 €</option></select></label><p class="demo-shipping-note"></p><dl class="demo-summary demo-order-totals" data-order-totals></dl><p class="demo-privacy-note">Nur eine Simulation: keine Adress- oder Zahlungsdaten, keine Bestellung.</p><div class="demo-step-actions"><button type="button" class="demo-cta" data-order-confirm>Kauf lokal simulieren ${arrow}</button><button type="button" class="demo-secondary" data-cart-edit>Tasche bearbeiten</button></div></section>
+    <section data-step="complete" hidden><span class="demo-complete-mark" aria-hidden="true">✓</span><h4>Ihr Demokauf ist durchgespielt.</h4><p class="demo-result" role="status" aria-live="polite" tabindex="-1"></p><dl class="demo-summary" data-order-receipt></dl><p class="demo-privacy-note">Es wurde nichts bestellt, bezahlt oder versendet. Ihre Tasche bleibt zum Weiterprobieren erhalten.</p><button type="button" class="demo-secondary" data-cart-edit>Tasche weiter bearbeiten</button></section>`)} `;
+  bindPanel(root, signal);
+  root.querySelectorAll<HTMLButtonElement>('[data-ingredient]').forEach(button => button.addEventListener('click', () => {
+    const scene = botanicalScenes[Number(button.dataset.ingredient)];
+    const image = root.querySelector<HTMLImageElement>('[data-ingredient-image]')!;
+    image.src = scene.image;
+    image.alt = scene.alt;
+    root.querySelector('[data-ingredient-caption]')!.textContent = scene.text;
+    root.querySelectorAll('[data-ingredient]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+  }, { signal }));
+  root.querySelectorAll('[data-product-open]').forEach(button => button.addEventListener('click', () => {
+    const product = root.querySelector<HTMLElement>('.demo-spice-product')!;
+    product.focus({ preventScroll: true });
+    if (root.classList.contains('demo--responsive')) product.scrollIntoView({ block: 'start', behavior: 'instant' });
+    else root.querySelector<HTMLElement>('.demo-main')!.scrollTop = product.offsetTop - 88;
+  }, { signal }));
+  const quantityInput = root.querySelector<HTMLInputElement>('[name="quantity"]')!;
+  const shipping = root.querySelector<HTMLSelectElement>('[name="shipping"]')!;
+  const shopStatus = root.querySelector<HTMLElement>('.demo-shop-status')!;
+  const cartStatus = root.querySelector<HTMLElement>('.demo-cart-status')!;
+  const amount = () => [...cart.values()].reduce((sum, quantity) => sum + quantity, 0);
+  const subtotal = () => [...cart].reduce((sum, [key, quantity]) => sum + variants[key].price * quantity, 0);
+  const showStep = (step: string, moveFocus = true) => {
+    root.querySelectorAll<HTMLElement>('[data-step]').forEach(element => { element.hidden = element.dataset.step !== step; });
+    root.querySelectorAll<HTMLElement>('[data-step-index]').forEach(element => {
+      if (element.dataset.stepIndex === step) element.setAttribute('aria-current', 'step');
+      else element.removeAttribute('aria-current');
+    });
+    if (moveFocus) {
+      const target = step === 'review' ? '[data-review-title]' : step === 'complete' ? '.demo-result' : '.demo-cart-line button, [data-panel-close]';
+      root.querySelector<HTMLElement>(target)?.focus({ preventScroll: true });
+      scrollToPanelStart(root);
+    }
+  };
+  const cartRows = (): SummaryRow[] => [...cart].map(([key, quantity]) => [`${quantity} × Safran · ${variants[key].name}`, currency(quantity * variants[key].price)]);
+  const totalRows = (): SummaryRow[] => [['Zwischensumme', currency(subtotal())], [shipping.value === 'pickup' ? 'Abholung' : 'Standardversand', currency(shipping.value === 'pickup' ? 0 : 4)], ['Gesamt · Demobetrag', currency(subtotal() + (shipping.value === 'pickup' ? 0 : 4))]];
+  const updateOrder = () => {
+    renderSummary(root.querySelector('[data-order-items]')!, cartRows());
+    renderSummary(root.querySelector('[data-order-totals]')!, totalRows());
+    root.querySelector('.demo-shipping-note')!.textContent = shipping.value === 'pickup' ? 'Beispiel: ab dem nächsten Werktag im Beispielatelier abholbereit.' : 'Beispiel: Lieferung in 3–5 Werktagen innerhalb Deutschlands.';
+  };
   const focusCartControl = (key: number, selector: string) => {
     const target = root.querySelector<HTMLElement>(`[data-cart-variant="${key}"] ${selector}`)
       ?? root.querySelector<HTMLElement>(`.demo-cart-line ${selector}`)
@@ -162,75 +324,100 @@ function salesDemo(root: HTMLElement, id: string): void {
     target?.focus({ preventScroll: true });
   };
   const updateCart = () => {
-    const amount = [...cart.values()].reduce((sum, quantity) => sum + quantity, 0);
-    root.querySelector('[data-cart-count]')!.textContent = `(${amount})`;
-    root.querySelector('[data-cart-total]')!.textContent = currency(amount * 129);
+    root.querySelector('[data-cart-count]')!.textContent = `(${amount()})`;
+    root.querySelector('[data-cart-total]')!.textContent = currency(subtotal());
+    root.querySelector<HTMLButtonElement>('[data-checkout]')!.disabled = !amount();
+    root.querySelector<HTMLElement>('[data-cart-open-inline]')!.hidden = !amount();
     const items = root.querySelector<HTMLElement>('.demo-cart-items')!;
-    items.replaceChildren();
-    if (!amount) {
-      const empty = document.createElement('p');
-      empty.className = 'demo-cart-empty';
-      empty.textContent = 'Ihre Tasche ist noch leer. Vielleicht braucht Ihr Lieblingsplatz etwas Licht?';
-      items.append(empty);
-    }
+    items.innerHTML = !amount() ? '<p class="demo-cart-empty">Ihre Tasche ist noch leer.</p><p>Zurück zur Kollektion: Größe und Menge wählen, dann in die Demo-Tasche legen.</p>' : '';
     for (const [key, quantity] of cart) {
       const line = document.createElement('div');
       line.className = 'demo-cart-line';
       line.dataset.cartVariant = String(key);
-      line.innerHTML = `<span class="demo-cart-swatch" style="--swatch:${variants[key].color}"></span><div class="demo-cart-title"><strong>Luma</strong><small>${variants[key].name} · ${currency(129)}</small></div><div class="demo-cart-quantity"><button type="button" data-less aria-label="Eine Luma in ${variants[key].name} weniger">−</button><span aria-label="Menge">${quantity}</span><button type="button" data-more aria-label="Eine Luma in ${variants[key].name} mehr">+</button></div><button class="demo-cart-remove" type="button" aria-label="Luma in ${variants[key].name} entfernen">Entfernen</button>`;
-      line.querySelector('[data-less]')!.addEventListener('click', () => {
-        if (quantity === 1) cart.delete(key); else cart.set(key, quantity - 1);
-        updateCart();
-        focusCartControl(key, '[data-less]');
-      });
-      line.querySelector('[data-more]')!.addEventListener('click', () => {
-        cart.set(key, Math.min(99, quantity + 1));
-        updateCart();
-        focusCartControl(key, '[data-more]');
-        if (quantity >= 99) root.querySelector('.demo-cart-status')!.textContent = 'Maximal 99 Stück je Farbe in dieser Demo.';
-      });
-      line.querySelector('.demo-cart-remove')!.addEventListener('click', () => {
-        cart.delete(key);
-        updateCart();
-        focusCartControl(key, '.demo-cart-remove');
-      });
+      line.innerHTML = `<span class="demo-cart-swatch" style="--swatch:${variants[key].color}" aria-hidden="true"></span><div class="demo-cart-title"><strong>Safran · ${variants[key].name}</strong><small>${currency(variants[key].price)} / Packung</small></div><div class="demo-cart-quantity"><button type="button" data-less aria-label="Eine Packung ${variants[key].name} weniger">−</button><span aria-label="Menge">${quantity}</span><button type="button" data-more aria-label="Eine Packung ${variants[key].name} mehr">+</button></div><strong class="demo-cart-line-total">${currency(quantity * variants[key].price)}</strong><button class="demo-cart-remove" type="button" aria-label="Safran ${variants[key].name} entfernen">Entfernen</button>`;
       items.append(line);
     }
-    root.querySelector('.demo-cart-status')!.textContent = `${amount} ${amount === 1 ? 'Objekt' : 'Objekte'} in Ihrer Demo-Tasche.`;
+    cartStatus.textContent = `${amount()} ${amount() === 1 ? 'Packung' : 'Packungen'} in Ihrer Demo-Tasche.`;
   };
-  root.querySelectorAll<HTMLButtonElement>('[data-variant]').forEach((button) => {
-    button.addEventListener('click', () => {
-      variant = Number(button.dataset.variant);
-      root.style.setProperty('--lamp-color', variants[variant].color);
-      root.querySelector('[data-variant-name]')!.textContent = variants[variant].name;
-      root.querySelectorAll('[data-variant]').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-      root.querySelector('.demo-shop-status')!.textContent = '';
-    });
-  });
-  root.querySelector('[data-add-cart]')!.addEventListener('click', () => {
-    const current = cart.get(variant) ?? 0;
-    cart.set(variant, Math.min(99, current + 1));
+  // Delegation keeps cart re-renders free of retained listeners.
+  root.querySelector('.demo-cart-items')!.addEventListener('click', event => {
+    const button = (event.target as Element).closest<HTMLButtonElement>('button');
+    const line = button?.closest<HTMLElement>('[data-cart-variant]');
+    if (!button || !line) return;
+    const key = Number(line.dataset.cartVariant);
+    const quantity = cart.get(key)!;
+    const selector = button.hasAttribute('data-less') ? '[data-less]' : button.hasAttribute('data-more') ? '[data-more]' : '.demo-cart-remove';
+    if (selector === '.demo-cart-remove' || (selector === '[data-less]' && quantity === 1)) cart.delete(key);
+    else cart.set(key, Math.min(99, quantity + (selector === '[data-less]' ? -1 : 1)));
     updateCart();
-    root.querySelector('.demo-shop-status')!.textContent = current >= 99 ? 'Maximal 99 Stück je Farbe in dieser Demo.' : `Luma in ${variants[variant].name} liegt in Ihrer Demo-Tasche.`;
-  });
+    focusCartControl(key, selector);
+    if (selector === '[data-more]' && quantity === 99) cartStatus.textContent = 'Maximal 99 Packungen je Größe in dieser Demo.';
+  }, { signal });
+  root.querySelectorAll<HTMLButtonElement>('[data-variant]').forEach(button => button.addEventListener('click', () => {
+    variant = Number(button.dataset.variant);
+    root.querySelector('[data-product-price]')!.textContent = currency(variants[variant].price);
+    root.querySelector('[data-unit-price]')!.textContent = `${currency(variants[variant].price / variants[variant].grams)} / g · fiktiver Grundpreis`;
+    root.querySelector('[data-variant-name]')!.textContent = variants[variant].name;
+    root.querySelectorAll('[data-variant]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    shopStatus.textContent = '';
+  }, { signal }));
+  root.querySelector('[data-add-cart]')!.addEventListener('click', () => {
+    const quantity = quantityInput.valueAsNumber;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+      quantityInput.setAttribute('aria-invalid', 'true');
+      shopStatus.textContent = 'Bitte wählen Sie eine ganze Menge von 1 bis 99.';
+      quantityInput.focus();
+      return;
+    }
+    quantityInput.setAttribute('aria-invalid', 'false');
+    const current = cart.get(variant) ?? 0;
+    const added = Math.min(quantity, 99 - current);
+    cart.set(variant, current + added);
+    updateCart();
+    showStep('edit', false);
+    root.querySelector('.demo-result')!.textContent = '';
+    shopStatus.textContent = added < quantity ? `${added} hinzugefügt. Maximal 99 Packungen je Größe in dieser Demo.` : `${quantity} × Safran (${variants[variant].name}) liegt in Ihrer Demo-Tasche.`;
+  }, { signal });
+  root.querySelector('[data-checkout]')!.addEventListener('click', () => { if (amount()) { updateOrder(); showStep('review'); } }, { signal });
+  shipping.addEventListener('change', updateOrder, { signal });
+  root.querySelector('[data-order-confirm]')!.addEventListener('click', () => {
+    if (!amount()) return;
+    renderSummary(root.querySelector('[data-order-receipt]')!, [...cartRows(), ...totalRows()]);
+    root.querySelector('.demo-result')!.textContent = `${amount()} ${amount() === 1 ? 'Packung' : 'Packungen'} · ${shipping.value === 'pickup' ? 'Abholung' : 'Standardversand'} · ${currency(subtotal() + (shipping.value === 'pickup' ? 0 : 4))} Demobetrag. Lokal simuliert.`;
+    showStep('complete');
+  }, { signal });
+  root.querySelectorAll('[data-cart-edit]').forEach(button => button.addEventListener('click', () => {
+    root.querySelector('.demo-result')!.textContent = '';
+    showStep('edit');
+  }, { signal }));
   updateCart();
 }
 
-/** A self-contained concept site. Default dimensions match the hero's 5:4 display. */
+/** A self-contained concept site; fixed dimensions match the scene's 5:4 display. */
 export function createDemo(goal: DemoGoal, options: { interactive?: boolean } = {}): HTMLElement {
   const root = document.createElement('div');
   const id = `concept-${++instance}`;
+  const controller = new AbortController();
+  sessions.set(root, controller);
   root.className = `demo demo--${goal}`;
   root.dataset.demo = goal;
-  if (goal === 'inquiries') inquiryDemo(root, id);
-  else if (goal === 'bookings') bookingDemo(root, id);
-  else salesDemo(root, id);
+  if (goal === 'inquiries') inquiryDemo(root, id, controller.signal);
+  else if (goal === 'bookings') bookingDemo(root, id, controller.signal);
+  else salesDemo(root, id, controller.signal);
   if (options.interactive === false) {
+    controller.abort();
     root.inert = true;
     root.setAttribute('aria-hidden', 'true');
     root.classList.add('demo--preview');
   }
   return root;
+}
+
+/** Releases event handlers even if a caller retains a detached session node. */
+export function disposeDemo(root: HTMLElement): void {
+  sessions.get(root)?.abort();
+  sessions.delete(root);
+  root.remove();
 }
 
 /** Presents an existing live session; creation and caching belong to the catalogue. */
@@ -239,8 +426,9 @@ export function mountDemoDialog(options: { onRestore?: () => void } = {}): {
   close(): void;
   dispose(): void;
 } {
-  const names: Record<DemoGoal, string> = { inquiries: 'Klarraum', bookings: 'Studio Still', sales: 'Forma' };
+  const names: Record<DemoGoal, string> = { inquiries: 'Klarraum', bookings: 'Studio Still', sales: 'Safran Atelier' };
   const dialog = document.createElement('dialog');
+  const events = new AbortController();
   dialog.className = 'concept-dialog';
   dialog.innerHTML = '<div class="concept-dialog-bar"><div><span>FIKTIVES KONZEPT VON WEBBYU</span><strong data-dialog-title></strong></div><button type="button" class="concept-dialog-close" aria-label="Konzeptdemo schließen">Schließen <span aria-hidden="true">×</span></button></div><div class="concept-dialog-body"></div>';
   document.body.append(dialog);
@@ -274,22 +462,22 @@ export function mountDemoDialog(options: { onRestore?: () => void } = {}): {
     // cannot be overwritten by a delayed return of the previous session.
     restore();
   };
-  dialog.querySelector('.concept-dialog-close')!.addEventListener('click', close);
+  dialog.querySelector('.concept-dialog-close')!.addEventListener('click', close, { signal: events.signal });
   dialog.addEventListener('cancel', (event) => {
     event.preventDefault();
     const panelClose = dialog.querySelector<HTMLButtonElement>('.demo-panel:not([hidden]) [data-panel-close]');
     if (panelClose) panelClose.click();
     else close();
-  });
+  }, { signal: events.signal });
   dialog.addEventListener('close', () => {
     // Ignore an earlier queued close event if a new session is already open.
     if (!dialog.open) restore();
-  });
+  }, { signal: events.signal });
   dialog.addEventListener('click', (event) => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) close();
-  });
+  }, { signal: events.signal });
   return {
     open(goal, demoElement) {
       if (disposed) return;
@@ -324,6 +512,7 @@ export function mountDemoDialog(options: { onRestore?: () => void } = {}): {
       if (disposed) return;
       disposed = true;
       close();
+      events.abort();
       dialog.remove();
     },
   };

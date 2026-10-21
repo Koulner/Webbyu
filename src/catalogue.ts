@@ -1,12 +1,17 @@
 import { concepts, type DemoGoal } from './data';
 import type { CatalogueController, CatalogueOptions, CatalogueState, SceneMode } from './contracts';
-import { createDemo, mountDemoDialog } from './demos';
+import { createDemo, disposeDemo, mountDemoDialog } from './demos';
 import './catalogue.css';
 
 const goalLabels: Record<DemoGoal, string> = {
   inquiries: 'Anfragen', bookings: 'Buchungen', sales: 'Verkäufe',
 };
 const modes: SceneMode[] = ['presentation', 'layers', 'interactive'];
+const goalDescriptions: Record<DemoGoal, string> = {
+  inquiries: 'Beratung mit einem klaren Anfrageweg.',
+  bookings: 'Bewegung mit einem passenden Termin.',
+  sales: 'Botanische Produktwelt mit lokalem Shop.',
+};
 
 /** Owns the live demo sessions. The scene only receives the persistent slot. */
 export function mountCatalogue(options: CatalogueOptions): CatalogueController {
@@ -24,16 +29,18 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
   container.classList.add('catalogue');
   container.innerHTML = `
     <div class="catalogue-concepts" role="group" aria-label="Konzept auswählen">
-      ${concepts.map(concept => `<button type="button" class="catalogue-concept" data-catalogue-goal="${concept.goal}" aria-pressed="${concept.goal === state.goal}"><span class="catalogue-position">${concept.number} / 03</span><strong>${concept.name}</strong><span>${goalLabels[concept.goal]}</span></button>`).join('')}
+      ${concepts.map(concept => `<button type="button" class="catalogue-concept" data-catalogue-goal="${concept.goal}" aria-pressed="${concept.goal === state.goal}"><span class="catalogue-position">${concept.number} / 03</span><strong>${concept.name}</strong><span class="catalogue-goal">${goalLabels[concept.goal]}</span><span class="catalogue-description">${goalDescriptions[concept.goal]}</span><span class="catalogue-selection-mark" aria-hidden="true">↗</span></button>`).join('')}
     </div>
+    <div class="catalogue-toolbar">
     <div class="catalogue-modes" role="group" aria-label="Ansicht der Konzeptdemo">
-      <button type="button" data-scene-mode="presentation" aria-pressed="true">Präsentation</button>
-      <button type="button" data-scene-mode="layers" aria-pressed="false">Aufbau ansehen</button>
       <button type="button" data-scene-mode="interactive" aria-pressed="false">Demo ausprobieren</button>
+      <button type="button" data-scene-mode="layers" aria-pressed="false">Aufbau ansehen</button>
+      <button type="button" data-scene-mode="presentation" aria-pressed="true">Präsentation</button>
     </div>
     <div class="catalogue-actions">
       <button type="button" data-open-current>Groß öffnen <span aria-hidden="true">↗</span></button>
       <button type="button" data-project-request>So etwas für mein Projekt <span aria-hidden="true">↗</span></button>
+    </div>
     </div>
     <p class="catalogue-status" role="status" aria-live="polite"></p>
   `;
@@ -55,8 +62,8 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
       button.setAttribute('aria-pressed', String(button.dataset.sceneMode === state.mode));
     });
     const name = concepts.find(concept => concept.goal === state.goal)!.name;
-    const label = state.mode === 'interactive' ? 'Direkt ausprobieren.' : state.mode === 'layers' ? 'Aufbau ansehen.' : 'Präsentation.';
-    container.querySelector('.catalogue-status')!.textContent = `${name} · ${goalLabels[state.goal]} · ${label}`;
+    const label = state.mode === 'interactive' ? 'Direkt ausprobieren. Ihre Eingaben bleiben beim Konzeptwechsel erhalten.' : state.mode === 'layers' ? 'Aufbau ansehen. Zum Bedienen „Demo ausprobieren“ wählen.' : 'Präsentation. Mit „Demo ausprobieren“ starten Sie die lokale Simulation.';
+    container.querySelector('.catalogue-status')!.textContent = `${name} · ${label}`;
   }
 
   function notify(): void {
@@ -112,7 +119,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
       disposed = true;
       container.removeEventListener('click', onClick);
       dialog.dispose();
-      for (const demo of cache.values()) demo.remove();
+      for (const demo of cache.values()) disposeDemo(demo);
       cache.clear();
       container.replaceChildren();
       container.classList.remove('catalogue');

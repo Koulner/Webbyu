@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createDemo, mountDemoDialog } from './demos';
+import { createDemo, disposeDemo, mountDemoDialog } from './demos';
 import type { DemoGoal } from './data';
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal');
@@ -76,7 +76,7 @@ function mountDialog(): ReturnType<typeof mountDemoDialog> {
 }
 
 describe('interactive concept demos', () => {
-  it('validates inquiry fields and renders a local, safe result that clears on editing', () => {
+  it('validates inquiry fields, reviews escaped text and confirms locally with an editable draft', () => {
     const fetchSpy = vi.fn();
     const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
     const storageSpy = vi.spyOn(Storage.prototype, 'setItem');
@@ -86,6 +86,9 @@ describe('interactive concept demos', () => {
     openPanel(root);
     submit(root);
     expect(result.textContent).toBe('');
+    expect(root.querySelector('.demo-validation')!.textContent).toContain('markierten Felder');
+    expect(document.activeElement).toBe(root.querySelector('[name="name"]'));
+    expect(root.querySelector('[name="email"]')!.getAttribute('aria-invalid')).toBe('true');
     change(root, 'name', '  ');
     change(root, 'email', 'ada@example.com');
     submit(root);
@@ -97,11 +100,24 @@ describe('interactive concept demos', () => {
     expect(result.textContent).toBe('');
     change(root, 'email', 'ada@example.com');
     submit(root);
+    const review = root.querySelector<HTMLElement>('[data-step="review"]')!;
+    expect(review.hidden).toBe(false);
+    expect(review.textContent).toContain('<img src=x onerror="alert(1)">');
+    expect(review.querySelector('img')).toBeNull();
+    expect(result.textContent).toBe('');
+    expect(document.activeElement).toBe(root.querySelector('[data-review-title]'));
+    button(root, '[data-confirm]').click();
     expect(result.textContent).toContain('<img src=x onerror="alert(1)">');
     expect(result.querySelector('img')).toBeNull();
     expect(result.textContent).toContain('Ihre Anfrage wurde nicht versendet');
+    button(root, '[data-step="complete"] [data-edit]').click();
+    expect(root.querySelector<HTMLInputElement>('[name="email"]')!.value).toBe('ada@example.com');
     change(root, 'project', 'Ein neuer Auftritt.');
     expect(result.textContent).toBe('');
+    submit(root);
+    expect(review.textContent).toContain('Ein neuer Auftritt.');
+    button(root, '[data-step="review"] [data-edit]').click();
+    expect(document.activeElement).toBe(root.querySelector('[name="name"]'));
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrSpy).not.toHaveBeenCalled();
     expect(storageSpy).not.toHaveBeenCalled();
@@ -112,7 +128,10 @@ describe('interactive concept demos', () => {
     const trigger = openPanel(root);
     const result = root.querySelector<HTMLElement>('.demo-result')!;
     submit(root);
+    expect(root.querySelector('[data-step="review"]')!.textContent).toContain('Pilates · 60 Minuten');
+    button(root, '[data-confirm]').click();
     expect(result.textContent).toContain('Pilates am Montag, 19. Oktober um 09:00 Uhr');
+    button(root, '[data-step="complete"] [data-edit]').click();
     change(root, 'service', 'Slow Stretch');
     expect(result.textContent).toBe('');
     button(root, '[data-day="Donnerstag, 22. Oktober"]').click();
@@ -120,6 +139,7 @@ describe('interactive concept demos', () => {
     expect(root.querySelectorAll('[data-day][aria-pressed="true"]')).toHaveLength(1);
     expect(root.querySelectorAll('[data-time][aria-pressed="true"]')).toHaveLength(1);
     submit(root);
+    button(root, '[data-confirm]').click();
     expect(result.textContent).toContain('Slow Stretch am Donnerstag, 22. Oktober um 18:00 Uhr');
     expect(result.textContent).toContain('Kein echter Termin wurde gebucht');
     button(root, '[data-panel-close]').click();
@@ -128,8 +148,35 @@ describe('interactive concept demos', () => {
     expect(root.querySelector<HTMLSelectElement>('[name="service"]')!.value).toBe('Slow Stretch');
     expect(button(root, '[data-day="Donnerstag, 22. Oktober"]').getAttribute('aria-pressed')).toBe('true');
     expect(button(root, '[data-time="18:00"]').getAttribute('aria-pressed')).toBe('true');
+    expect(root.querySelector<HTMLElement>('[data-step="complete"]')!.hidden).toBe(false);
+    button(root, '[data-step="complete"] [data-edit]').click();
     button(root, '[data-time="12:30"]').click();
     expect(result.textContent).toBe('');
+  });
+
+  it('reconciles time availability with course and day, including days without appointments', () => {
+    const root = demo('bookings');
+    openPanel(root);
+    change(root, 'service', 'Slow Stretch');
+    expect(root.querySelectorAll('[data-time][aria-pressed="true"]')).toHaveLength(0);
+    expect(button(root, '[data-time="09:00"]').disabled).toBe(true);
+    submit(root);
+    expect(root.querySelector<HTMLElement>('[data-step="review"]')!.hidden).toBe(true);
+    expect(document.activeElement).toBe(button(root, '[data-time="12:30"]'));
+    button(root, '[data-day="Mittwoch, 21. Oktober"]').click();
+    expect(root.querySelectorAll('[data-time]:disabled')).toHaveLength(3);
+    expect(root.querySelector('.demo-availability')!.textContent).toContain('keinen Beispieltermin');
+    submit(root);
+    expect(root.querySelector('.demo-validation')!.textContent).toContain('verfügbarem Termin');
+    button(root, '[data-day="Donnerstag, 22. Oktober"]').click();
+    button(root, '[data-time="18:00"]').click();
+    change(root, 'service', 'Yoga Flow');
+    expect(button(root, '[data-time="18:00"]').getAttribute('aria-pressed')).toBe('true');
+    submit(root);
+    const review = root.querySelector('[data-step="review"]')!;
+    expect(review.textContent).toContain('Yoga Flow · 60 Minuten');
+    expect(review.textContent).toContain('20');
+    expect(review.textContent).toContain('Donnerstag, 22. Oktober 2026');
   });
 
   it('keeps separate cart variants, updates amounts, and restores focus after quantity changes or removal', () => {
@@ -137,28 +184,122 @@ describe('interactive concept demos', () => {
     button(root, '[data-add-cart]').click();
     button(root, '[data-add-cart]').click();
     button(root, '[data-variant="1"]').click();
-    expect(root.querySelector('[data-variant-name]')!.textContent).toBe('Kreide');
+    expect(root.querySelector('[data-variant-name]')!.textContent).toBe('1 g');
     expect(root.querySelectorAll('[data-variant][aria-pressed="true"]')).toHaveLength(1);
     button(root, '[data-add-cart]').click();
     openPanel(root);
     expect(root.querySelectorAll('.demo-cart-line')).toHaveLength(2);
     expect(root.querySelector('[data-cart-count]')!.textContent).toBe('(3)');
-    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('387 €');
+    expect(root.querySelector<HTMLElement>('[data-cart-open-inline]')!.hidden).toBe(false);
+    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('34 €');
     button(root, '[data-cart-variant="0"] [data-less]').click();
-    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('258 €');
+    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('25 €');
     expect(document.activeElement).toBe(button(root, '[data-cart-variant="0"] [data-less]'));
     button(root, '[data-cart-variant="0"] [data-more]').click();
-    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('387 €');
+    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('34 €');
     expect(document.activeElement).toBe(button(root, '[data-cart-variant="0"] [data-more]'));
     button(root, '[data-cart-variant="0"] .demo-cart-remove').click();
-    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('129 €');
+    expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('16 €');
     expect(document.activeElement).toBe(button(root, '[data-cart-variant="1"] .demo-cart-remove'));
     button(root, '[data-cart-variant="1"] [data-less]').click();
     expect(root.querySelectorAll('.demo-cart-line')).toHaveLength(0);
     expect(root.querySelector('[data-cart-count]')!.textContent).toBe('(0)');
     expect(root.querySelector('[data-cart-total]')!.textContent!.replace(/\s/g, ' ')).toBe('0 €');
     expect(root.querySelector('.demo-cart-empty')).not.toBeNull();
+    expect(root.querySelector<HTMLElement>('[data-cart-open-inline]')!.hidden).toBe(true);
     expect(document.activeElement).toBe(button(root, '[data-panel-close]'));
+    expect(button(root, '[data-checkout]').disabled).toBe(true);
+  });
+
+  it('validates product quantities and calculates an editable local order including delivery', () => {
+    const fetchSpy = vi.fn();
+    const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
+    const storageSpy = vi.spyOn(Storage.prototype, 'setItem');
+    vi.stubGlobal('fetch', fetchSpy);
+    const root = demo('sales');
+    for (const value of ['', '0', '-1', '1.5', '100']) {
+      change(root, 'quantity', value);
+      button(root, '[data-add-cart]').click();
+      expect(root.querySelector('[data-cart-count]')!.textContent).toBe('(0)');
+      expect(root.querySelector('.demo-shop-status')!.textContent).toContain('ganze Menge');
+    }
+    change(root, 'quantity', '2');
+    button(root, '[data-variant="2"]').click();
+    button(root, '[data-add-cart]').click();
+    openPanel(root);
+    button(root, '[data-checkout]').click();
+    expect(root.querySelector('[data-order-items]')!.textContent).toContain('2 × Safran · 3 × 1 g');
+    expect(root.querySelector('[data-order-totals]')!.textContent!.replace(/\s/g, ' ')).toContain('88 €');
+    change(root, 'shipping', 'pickup');
+    expect(root.querySelector('[data-order-totals]')!.textContent!.replace(/\s/g, ' ')).toContain('84 €');
+    button(root, '[data-order-confirm]').click();
+    expect(root.querySelector<HTMLElement>('[data-step="complete"]')!.hidden).toBe(false);
+    expect(root.querySelector('.demo-result')!.textContent).toContain('Abholung');
+    button(root, '[data-step="complete"] [data-cart-edit]').click();
+    button(root, '[data-more]').click();
+    button(root, '[data-checkout]').click();
+    button(root, '[data-order-confirm]').click();
+    expect(root.querySelector('[data-order-receipt]')!.textContent!.replace(/\s/g, ' ')).toContain('126 €');
+    expect(root.querySelector('.demo-result')!.textContent).toContain('3 Packungen');
+    button(root, '[data-panel-close]').click();
+    change(root, 'quantity', '99');
+    button(root, '[data-add-cart]').click();
+    expect(root.querySelector('[data-cart-count]')!.textContent).toBe('(99)');
+    expect(root.querySelector('.demo-shop-status')!.textContent).toContain('96 hinzugefügt');
+    openPanel(root);
+    expect(root.querySelector<HTMLElement>('[data-step="edit"]')!.hidden).toBe(false);
+    button(root, '[data-more]').click();
+    expect(root.querySelector('[data-cart-count]')!.textContent).toBe('(99)');
+    expect(root.querySelector('.demo-cart-status')!.textContent).toContain('Maximal 99');
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(xhrSpy).not.toHaveBeenCalled();
+    expect(storageSpy).not.toHaveBeenCalled();
+  });
+
+  it.each(['inquiries', 'bookings', 'sales'] as const)('keeps %s previews inert and disposes live handlers', goal => {
+    const preview = createDemo(goal, { interactive: false });
+    document.body.append(preview);
+    expect(preview.inert).toBe(true);
+    expect(preview.getAttribute('aria-hidden')).toBe('true');
+    button(preview, '[data-panel-open]').click();
+    expect(preview.querySelector<HTMLElement>('.demo-panel')!.hidden).toBe(true);
+    const root = demo(goal);
+    const launcher = button(root, '[data-panel-open]');
+    disposeDemo(root);
+    disposeDemo(root);
+    launcher.click();
+    expect(root.querySelector<HTMLElement>('.demo-panel')!.hidden).toBe(true);
+    expect(root.isConnected).toBe(false);
+    disposeDemo(preview);
+  });
+
+  it('presents an anonymous botanical shop with local assets and independent chapter and package choices', () => {
+    const root = demo('sales');
+    expect(root.textContent).toContain('Fiktive Marke');
+    expect(root.outerHTML).not.toMatch(/royal|herat|afghanistan|shopify|mailto:|tel:/i);
+    for (const image of root.querySelectorAll<HTMLImageElement>('img')) {
+      expect(new URL(image.src).origin).toBe(window.location.origin);
+      expect(new URL(image.src).pathname).toContain('/assets/demos/saffron/');
+    }
+    expect(root.querySelector('form[action], a[href]')).toBeNull();
+    const image = root.querySelector<HTMLImageElement>('[data-ingredient-image]')!;
+    expect(image.alt).toContain('Safranblüte');
+    button(root, '[data-ingredient="1"]').click();
+    expect(image.alt).toContain('Narbenast');
+    expect(root.querySelector('[data-ingredient-caption]')!.textContent).toContain('Nahaufnahme');
+    button(root, '[data-ingredient="2"]').click();
+    expect(image.src).toContain('threads.webp');
+    expect(root.querySelectorAll('[data-ingredient][aria-pressed="true"]')).toHaveLength(1);
+    button(root, '[data-variant="2"]').click();
+    expect(root.querySelector('[data-product-price]')!.textContent!.replace(/\s/g, ' ')).toBe('42 €');
+    expect(root.querySelector('[data-unit-price]')!.textContent!.replace(/\s/g, ' ')).toContain('14 € / g');
+    button(root, '[data-add-cart]').click();
+    openPanel(root);
+    button(root, '[data-checkout]').click();
+    expect(root.querySelector('[data-order-items]')!.textContent).toContain('1 × Safran · 3 × 1 g');
+    button(root, '[data-panel-close]').click();
+    expect(root.querySelector('[data-ingredient="2"]')!.getAttribute('aria-pressed')).toBe('true');
+    expect(root.querySelector('[data-variant="2"]')!.getAttribute('aria-pressed')).toBe('true');
   });
 
   it('closes the inner panel on the first Escape and the modal on the next, restoring focus and page scrolling', () => {
@@ -211,6 +352,7 @@ describe('interactive concept demos', () => {
     expect(scrollIntoView).not.toHaveBeenCalled();
     change(root, 'service', 'Yoga Flow');
     button(root, '[data-panel-close]').click();
+    expect(dialog.scrollTop).toBe(420);
     dialog.scrollTop = 350;
     controller.close();
     controller.open('bookings', liveDemo);
