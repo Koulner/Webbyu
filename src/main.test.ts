@@ -89,7 +89,7 @@ describe('concept demo integration', () => {
   it('keeps browsing isolated and transfers only the explicitly requested goal to the Finder', () => {
     mount();
     const answers = {
-      goal: 'presence' as const, selectedPackage: 'presence' as const,
+      goal: 'presence' as const, selectedPackage: 'start' as const,
       extensions: ['cms'], projectType: 'relaunch', timing: 'soon',
       description: 'Mein Projekt', name: 'Ada', email: 'ada@example.test',
     };
@@ -124,6 +124,41 @@ describe('concept demo integration', () => {
     expect(initScene).toHaveBeenCalledWith({
       container: document.querySelector('#scene'), demoElement: document.querySelector('#hero-demo-slot'),
     });
+  });
+
+  it('keeps the brief goal on package selection and preserves the Finder step through navigation', () => {
+    mount();
+    store.update({ goal: 'sales', description: 'Ein kleiner Shop', name: 'Ada', extensions: ['photos'] });
+    button('[data-package="complete"]').click();
+    expect(store.get()).toMatchObject({ goal: 'sales', selectedPackage: 'complete', description: 'Ein kleiner Shop', extensions: ['photos'] });
+    button('.finder-next').click();
+    button('.finder-next').click();
+    const field = document.querySelector<HTMLTextAreaElement>('[name="description"]')!;
+    field.value = 'Ein kleiner Shop mit Fotoproduktion';
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector<HTMLAnchorElement>('.site-header a[href="#leistungen"]')!.click();
+    document.querySelector<HTMLAnchorElement>('.header-cta')!.click();
+    expect(document.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toBe(field.value);
+    expect(document.querySelector('.finder-progress [aria-current="step"]')!.textContent).toContain('Ihr Projekt');
+    expect(document.activeElement).toBe(document.querySelector('.finder-heading'));
+    expect(store.get().goal).toBe('sales');
+  });
+
+  it('closes mobile navigation with Escape or destination selection and reveals legal placeholders', () => {
+    mount();
+    const menu = button('.mobile-menu-button');
+    menu.click();
+    expect(document.querySelector<HTMLElement>('#mobile-nav')!.hidden).toBe(false);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(menu.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(menu);
+    menu.click();
+    document.querySelector<HTMLAnchorElement>('#mobile-nav a[href="#ueber-uns"]')!.click();
+    expect(document.querySelector<HTMLElement>('#mobile-nav')!.hidden).toBe(true);
+    expect(document.activeElement).toBe(document.querySelector('#about-title'));
+    document.querySelector<HTMLAnchorElement>('.footer-nav a[href="#datenschutz"]')!.click();
+    expect(document.querySelector<HTMLDetailsElement>('#datenschutz')!.open).toBe(true);
+    expect(document.activeElement).toBe(document.querySelector('#datenschutz summary'));
   });
 
   it('keeps cached HTML sessions usable when the lazy scene import fails', async () => {

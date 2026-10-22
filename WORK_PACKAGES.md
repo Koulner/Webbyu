@@ -2,14 +2,14 @@
 
 ## Accepted objective
 
-German local-only studio prototype: a light editorial page with a dark interactive 3D demo gallery. Instrument Sans for UI/body and Instrument Serif for large headings and genuine italic accents, locally served with licenses. Palette: ivory #F5F1EA, ink #241D26, aubergine #513448, gallery #151419, champagne #C7B29A. Body text >=16px, functional labels >=12px. Use a compact typographic introduction, generous dark gallery, clear services/process/finder, restrained contours and considered lighting.
+German agency prototype for two founders in Hamburg / Bad Oldesloe: a light editorial page with a dark interactive 3D demo gallery. Instrument Sans for UI/body and Instrument Serif for large headings and genuine italic accents, locally served with licenses. Palette: ivory #F5F1EA, ink #241D26, aubergine #513448, gallery #151419, champagne #C7B29A. Body text >=16px, functional labels >=12px. Use a compact typographic introduction, generous dark gallery, clear services/process/finder, restrained contours and considered lighting.
 
-Three fictional concepts remain: Klarraum (inquiries), Studio Still (bookings), Safran Atelier (sales, replacing Forma at the user's request in AP3). They are interactive local simulations, not real transactions. The shop adapts the user's supplied project anonymously, without real brand/contact/integration data. No backend, deployment, accounts or style configurator in this release.
+Three fictional concepts remain: Klarraum (inquiries), Studio Still (bookings), Safran Atelier (sales, replacing Forma at the user's request in AP3). They are interactive local simulations, not real transactions. The shop adapts the user's supplied project anonymously, without real brand/contact/integration data. No backend, accounts or style configurator in this release. The user subsequently authorized GitHub Pages for the prototype; AP6 reference content remains local until explicitly released.
 
 ## Delivery state
 
 - Baseline: `693826b` (original prototype, initial Git commit).
-- Integration branch: `codex/webbyu-redesign`.
+- Current integration branch: `dev` (created and pushed in the AP4 chat); earlier coordination used `codex/webbyu-redesign`.
 - Baseline verification: TypeScript, 32 tests and production build pass. Lazy 3D chunk about 646 kB / 183 kB gzip; known Vite warning.
 - Source checkout is the integration workspace. `master` preserves the original baseline until full acceptance.
 
@@ -17,10 +17,10 @@ Three fictional concepts remain: Klarraum (inquiries), Studio Still (bookings), 
 | --- | --- | --- | --- |
 | AP0 baseline and protocol | Coordinator | accepted | 693826b |
 | AP1 foundation | Foundation chat | accepted | 5635540 → 8a368d7 |
-| AP2 editorial page | Editorial chat | accepted, awaiting integration | 6df0c89 from bf9ad4d |
+| AP2 editorial page | Editorial chat + coordinator | accepted, integrated | 6df0c89 → 1f3af87 on dev |
 | AP3 catalogue and demos | Catalogue chat | accepted, integrated | 8910320 from bf9ad4d |
-| AP4 3D gallery | Scene chat | pending | accepted AP1 |
-| AP6 reference content and integration | New integration chat | pending | integrated AP2–AP4 |
+| AP4 3D gallery | Scene chat | accepted, integrated; future story deferred | 7c3adaf → 757509a |
+| AP6 reference content and integration | Current integration chat | complete, integrated locally; independent AP5 pending | integrated AP2–AP4 on dev |
 | AP5 independent QA | QA chat + coordinator | pending | integrated AP2–AP4 |
 
 ## Workflow and ownership
@@ -64,6 +64,10 @@ Reference package drafts: Start €599 (up to three subpages, supplied content, 
 
 Technical orientation: lightweight local navigation, responsive semantic HTML, native disclosures, mobile menu and Escape/focus handling. No reason to adopt WordPress classes, embedded base64 images, inactive form stubs or reference routing bugs. Keep local fonts/licenses, accepted feature contracts and real demo flows. AP6 may change shared data/state/finder, shell and main wiring as necessary for this explicit scope, with coordinated tests; AP4 stays isolated to scene files.
 
+## Current user priority — 2026-10-22
+
+Complete AP2 integration and AP6 content now. The user will develop the 3D story later; do not change scene choreography in AP6. Independent AP5 acceptance remains a separate next package. Preserve the already working catalogue and scene.
+
 ## Required experience
 
 - Labelled concept entries show name, goal and position, immediately selectable.
@@ -88,3 +92,8 @@ Verify immediate try; cached form/booking/cart state across selection, dialog an
 - 2026-10-21: AP1 accepted as a complete package, source `5635540cbc1a558c43ec5e4fbc8d16b04695bb8d`, integrated as `8a368d74f6bea822c6217a5276342f6aca67e236`. Typecheck, 47 tests, build and whitespace checks passed in the package. Exact source integration introduces no implementation changes, so unchanged checks are retained rather than repeated. Scene chunk 601.24 kB / 164.95 kB gzip; known Vite warning. Browser visual acceptance remains for the composed redesign because the AP1 browser could not reach its preview. Fonts, stable contracts and cached demo ownership reviewed. Shared dependencies and interfaces are now frozen.
 - 2026-10-21: Frozen AP2–AP4 base is `bf9ad4d74d220f64657d85206bc98f3f9a80d28a`. AP2 chat `01a15d81-a119-73c2-8d29-2c358f029893` delivered `6df0c891159211fe4c53e0cf16e0938813d2186e`: shell, page/Finder CSS and shell tests only; ownership and composition reviewed. Typecheck, 20 focused tests, build and whitespace passed. Browser acceptance deferred to composed candidate. Integration remains ordered AP3, AP4, AP2.
 - 2026-10-22: AP3 delivered `891032069fc947b271d80280bb21f0a488c8df22`, including user-authorized anonymous Safran Atelier replacement and corresponding sales metadata. Package passed 28 focused tests, typecheck, build, whitespace and browser demo reflow at 360–1440px. Old unassigned MutationObserver messages in the test harness were reported; subsequent real-app run had no new warnings. Integrated as a whole package. AP2 preliminary desktop/390px composition was visually reviewed by coordinator; composed-page QA still remains.
+
+- 2026-10-22: AP4 and GitHub Pages previously integrated into dev as `757509a`; environment fix `ca40ab9` and repository-case fix `0fe947d` followed. AP4 is no longer pending.
+- 2026-10-22: AP2 cherry-picked whole as `1f3af87`. Typecheck, 63 tests and production build passed before AP6 changes. No scene implementation changed.
+- 2026-10-22: AP6 completed in the current chat at the user’s request. Added reference services, two-founder/team and regional copy, Start / Business / Complete draft prices and scopes, native package/FAQ disclosures, ownership/handover terms, contact/legal placeholders and direct section navigation. Catalogue and scene code remain unchanged. Native section links retain the live DOM; Finder navigation preserves the active step, while explicit concept/package handoffs reopen the goal step without erasing answers. Manual package selection preserves the goal. Sales/bookings require individual scope; content needs influence orientation; copied summaries retain price-draft status and exclusions.
+- AP6 validation: TypeScript, all 67 tests in 7 files, production build with `GITHUB_REPOSITORY=Koulner/Webbyu`, and whitespace passed. Browser checked at iframe widths 360/390/768/1024/1440 (15px native scrollbar reduces content width): no horizontal page overflow, package body copy 16px, local fonts loaded. Visually inspected desktop/mobile packages, mobile menu Escape, sales handoff → custom scope → manual Complete → local summary. Automated checks cover retained Finder step/answers, package goal preservation, content recommendations, copied scope exclusions and menu/legal focus. Production preview at `/Webbyu/` renders with no console errors/warnings. Existing font URL build warnings remain (runtime-relative local assets render correctly); lazy scene chunk 526.71 kB / 136.05 kB gzip still triggers Vite’s size warning. These are development checks, not independent AP5 acceptance or real-device testing. No AP6 push/publication in this turn.

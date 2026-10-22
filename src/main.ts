@@ -2,6 +2,7 @@ import './fonts.css';
 import './tokens.css';
 import './styles.css';
 import './scene.css';
+import './content.css';
 import { extensions, packages, type DemoGoal, type PackageId } from './data';
 import type { SceneController, SceneOptions } from './contracts';
 import { briefStore, type BriefStore } from './state';
@@ -28,8 +29,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   let scene: SceneController | undefined;
   let toastTimer = 0;
 
-  function goToFinder() {
-    finder.openAtStart();
+  function goToFinder(restart = true) {
+    if (location.hash !== '#projektfinder') history.pushState(null, '', '#projektfinder');
+    if (restart) finder.openAtStart();
+    else finder.focus();
     mounts.finder.closest('section')?.scrollIntoView({
       behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
     });
@@ -62,12 +65,16 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
     button.addEventListener('click', () => catalogue.open(button.dataset.demo as DemoGoal), listenerOptions);
   });
   root.querySelectorAll<HTMLAnchorElement>('a[href="#projektfinder"]').forEach(link => {
-    link.addEventListener('click', event => { event.preventDefault(); goToFinder(); }, listenerOptions);
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      goToFinder(false);
+    }, listenerOptions);
   });
   root.querySelectorAll<HTMLButtonElement>('[data-package]').forEach(button => {
     button.addEventListener('click', () => {
       const pkg = packages.find(item => item.id === button.dataset.package)!;
-      store.update({ goal: pkg.goal, selectedPackage: pkg.id as PackageId });
+      // A package is a scope preference, never a replacement for the user's goal.
+      store.update({ selectedPackage: pkg.id as PackageId });
       goToFinder();
     }, listenerOptions);
   });
@@ -110,6 +117,24 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
     mobileNav.hidden = !open;
   }, listenerOptions);
   mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu, listenerOptions));
+  root.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(link => {
+    if (link.hash === '#projektfinder') return;
+    link.addEventListener('click', () => {
+      const target = link.hash ? root.querySelector<HTMLElement>(link.hash) : mounts.story;
+      if (!target) return;
+      if (target instanceof HTMLDetailsElement) target.open = true;
+      const focusTarget = target.querySelector<HTMLElement>('h1, h2, summary') ?? target;
+      if (!focusTarget.hasAttribute('tabindex')) focusTarget.tabIndex = -1;
+      focusTarget.focus({ preventScroll: true });
+    }, listenerOptions);
+  });
+  const revealHashTarget = () => {
+    const id = location.hash.slice(1);
+    const target = document.getElementById(id);
+    if (target instanceof HTMLDetailsElement && root.contains(target)) target.open = true;
+  };
+  window.addEventListener('hashchange', revealHashTarget, listenerOptions);
+  revealHashTarget();
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !mobileNav.hidden) { closeMenu(); menuButton.focus(); }
   }, listenerOptions);

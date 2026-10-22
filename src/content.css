@@ -1,0 +1,64 @@
+/* Reference content extends the accepted editorial shell; the gallery owns itself. */
+.services-section { padding-block: 88px 48px; }
+.services-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
+.services-grid article { border-top: 1px solid var(--color-border); padding-top: 24px; }
+.service-number { color: var(--color-aubergine); font-size: 12px; }
+.services-grid h3 { margin-block: 24px 16px; font: 400 36px/1.1 var(--font-serif); }
+.services-grid p, .service-footnote p { color: var(--color-muted); font-size: 16px; line-height: 1.75; }
+.service-footnote { display: flex; align-items: start; gap: 48px; justify-content: space-between; padding-top: 32px; margin-top: 36px; border-top: 1px solid var(--color-border); }
+.service-footnote p { max-width: 72ch; }
+.service-footnote strong { color: var(--color-ink); font-weight: 500; }
+.service-footnote a { flex-shrink: 0; }
+.draft-note { padding: 22px 24px; margin-bottom: 28px; border-left: 2px solid var(--color-aubergine); background: #ece5df; color: var(--color-muted); font-size: 16px; line-height: 1.7; }
+.draft-note strong { color: var(--color-ink); font-weight: 500; }
+.package-action > div { width: 100%; }
+.package-price { display: block; white-space: nowrap; font: 400 36px/1.2 var(--font-serif); color: var(--color-ink); }
+.package-price-note { display: block; margin-top: 8px; font-size: 12px; line-height: 1.6; }
+.package-details { margin-top: 18px; }
+.package-details summary { display: list-item; padding-block: 12px; cursor: pointer; font-size: 14px; color: var(--color-aubergine); }
+.package-intro .package-details p { margin-top: 10px; font-size: 16px; }
+.package-scope-note { margin-top: 24px; max-width: 90ch; font-size: 16px; line-height: 1.75; color: var(--color-muted); }
+.package-faq { display: grid; grid-template-columns: 1fr 1.8fr; gap: 64px; margin-top: 64px; }
+.package-faq h3 { font: 400 40px/1.1 var(--font-serif); }
+.package-faq h3 em { font-weight: 400; color: var(--color-aubergine); }
+.package-faq details { border-top: 1px solid var(--color-border); }
+.package-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 64px; padding-block: 16px; list-style: none; cursor: pointer; font-size: 16px; line-height: 1.5; }
+.package-faq summary::-webkit-details-marker { display: none; }
+.package-faq summary > span { font-size: 24px; color: var(--color-aubergine); }
+.package-faq details[open] summary > span { transform: rotate(45deg); }
+.package-faq details p { padding-bottom: 24px; font-size: 16px; line-height: 1.75; color: var(--color-muted); }
+.finder-scope-note { margin-block: 0 24px; font-size: 16px; line-height: 1.75; color: var(--color-muted); }
+.finder-section .finder-price { display: block; line-height: 1.7; }
+.footer-nav { display: flex; flex-wrap: wrap; gap: 8px 28px; border-top: 1px solid var(--color-border); padding-block: 18px; }
+.footer-nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+.footer-nav a:hover { color: var(--color-aubergine); text-decoration: underline; text-underline-offset: 5px; }
+.legal-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding-bottom: 24px; }
+.legal-notes summary { cursor: pointer; padding-block: 14px; font-size: 14px; color: var(--color-muted); }
+.legal-notes p { max-width: 64ch; padding-block: 8px 16px; font-size: 16px; line-height: 1.75; color: var(--color-muted); }
+@media (min-width: 601px) and (max-width: 1100px) {
+  .site-header { gap: 16px; }
+  .site-header nav { gap: 18px; }
+  .header-cta { display: none; }
+}
+@media (max-width: 1100px) {
+  .package-action > div { max-width: 330px; }
+  .package-price-note { margin-top: 4px; }
+}
+@media (max-width: 900px) {
+  .services-grid { gap: 24px; }
+  .services-grid h3 { font-size: 30px; }
+  .service-footnote { flex-direction: column; gap: 16px; }
+  .package-faq { gap: 32px; grid-template-columns: 1fr 1.6fr; }
+}
+@media (max-width: 600px) {
+  .services-section { padding-block: 52px 12px; }
+  .services-grid { grid-template-columns: 1fr; gap: 28px; }
+  .services-grid h3 { margin-block: 16px 12px; font-size: 32px; }
+  .draft-note { padding: 18px; }
+  .package-action > div { max-width: 230px; }
+  .package-action .round-arrow { flex-shrink: 0; }
+  .package-faq { margin-top: 40px; grid-template-columns: 1fr; gap: 24px; }
+  .package-faq h3 { font-size: 36px; }
+  .legal-notes { grid-template-columns: 1fr; gap: 0; }
+  .mobile-nav { max-height: calc(100svh - 72px); overflow-y: auto; }
+}

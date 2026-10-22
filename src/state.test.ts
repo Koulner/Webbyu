@@ -3,12 +3,19 @@ import { createBriefStore, recommendPackage } from './state';
 
 describe('project brief state', () => {
   it.each([
-    ['presence', 'presence'],
+    ['presence', 'start'],
     ['inquiries', 'business'],
-    ['bookings', 'business'],
-    ['sales', 'shop'],
+    ['bookings', 'custom'],
+    ['sales', 'custom'],
   ] as const)('recommends %s → %s', (goal, expected) => {
     expect(recommendPackage(goal)).toBe(expected);
+  });
+
+  it('accounts for content production without folding a shop or booking into Complete', () => {
+    expect(recommendPackage('presence', ['photos'])).toBe('business');
+    expect(recommendPackage('inquiries', ['videos'])).toBe('complete');
+    expect(recommendPackage('sales', ['videos', 'photos'])).toBe('custom');
+    expect(recommendPackage('presence', ['booking', 'videos'])).toBe('custom');
   });
 
   it('preserves project and contact inputs when the hero changes its goal', () => {

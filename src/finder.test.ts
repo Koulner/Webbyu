@@ -39,7 +39,7 @@ describe('project finder', () => {
     next();
     change('name', 'Ada Beispiel');
     change('email', 'ada@example.com');
-    change('selectedPackage', 'shop');
+    change('selectedPackage', 'complete');
     container.querySelector<HTMLButtonElement>('[data-action="back"]')!.click();
     expect(container.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toBe('Ein Atelier mit Terminbuchung.');
     next();
@@ -55,36 +55,36 @@ describe('project finder', () => {
     next();
     expect(container.querySelector<HTMLInputElement>('[name="name"]')!.value).toBe('Ada Beispiel');
     expect(container.querySelector<HTMLInputElement>('[name="email"]')!.value).toBe('ada@example.com');
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('shop');
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('complete');
   });
 
   it('reflects external hero and package choices without erasing inputs', () => {
-    store.update({ goal: 'sales', selectedPackage: 'shop', description: 'Unsere Idee' });
+    store.update({ goal: 'sales', selectedPackage: 'complete', description: 'Unsere Idee' });
     expect(container.querySelector<HTMLInputElement>('[value="sales"]')!.checked).toBe(true);
     next(); next(); next();
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('shop');
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('complete');
     store.update({ goal: 'presence', selectedPackage: null });
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('presence');
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('start');
     expect(store.get().description).toBe('Unsere Idee');
   });
 
   it.each([
-    ['presence', 'presence'],
+    ['presence', 'start'],
     ['inquiries', 'business'],
-    ['bookings', 'business'],
-    ['sales', 'shop'],
+    ['bookings', 'custom'],
+    ['sales', 'custom'],
   ])('takes the %s route to its recommendation and allows a manual choice', (goal, recommendation) => {
     choose(goal);
     next(); next(); next();
     expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(recommendation);
-    change('selectedPackage', recommendation === 'shop' ? 'presence' : 'shop');
+    change('selectedPackage', recommendation === 'complete' ? 'start' : 'complete');
     expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Ihre Paketauswahl');
     finder.openAtStart();
     expect(document.activeElement).toBe(container.querySelector('.finder-heading'));
     choose(goal === 'sales' ? 'presence' : 'sales');
     next(); next(); next();
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(goal === 'sales' ? 'presence' : 'shop');
-    expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Meine Empfehlung');
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(goal === 'sales' ? 'start' : 'custom');
+    expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Unsere erste Orientierung');
   });
 
   it('requires valid contact data and safely displays the complete local summary without a request', () => {
@@ -92,7 +92,7 @@ describe('project finder', () => {
     const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
     const storageSpy = vi.spyOn(Storage.prototype, 'setItem');
     vi.stubGlobal('fetch', fetchSpy);
-    store.update({ goal: 'sales', extensions: ['cms', '3d'], projectType: 'existing', timing: 'soon', description: '<img src=x onerror="alert(1)">', selectedPackage: 'shop' });
+    store.update({ goal: 'sales', extensions: ['cms', '3d'], projectType: 'existing', timing: 'soon', description: '<img src=x onerror="alert(1)">', selectedPackage: 'complete' });
     next(); next(); next();
     next();
     expect(container.querySelector('[data-summary]')).toBeNull();
@@ -106,7 +106,7 @@ describe('project finder', () => {
     const summary = container.querySelector('[data-summary]')!;
     expect(summary).not.toBeNull();
     expect(summary.textContent).toContain('Produkte verkaufen');
-    expect(summary.textContent).toContain('Shop & Produkte');
+    expect(summary.textContent).toContain('Webbyu Complete');
     expect(summary.textContent).toContain('Inhalte selbst pflegen');
     expect(summary.textContent).toContain('Etwas Besonderes erleben');
     expect(summary.textContent).toContain('Eine bestehende Website erneuern');
@@ -135,6 +135,25 @@ describe('project finder', () => {
     expect(writeText.mock.calls[0][0]).toContain('Ihre Idee: Ein neuer Auftritt.');
     expect(writeText.mock.calls[0][0]).toContain('Lokaler Prototyp – nichts versendet.');
     expect(container.querySelector('.finder-copy-status')!.textContent).toContain('wurde kopiert');
+  });
+
+  it('retains a sales goal and scope exclusions when Complete is manually requested and copied', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    store.update({ goal: 'sales', extensions: ['videos'], name: 'Ada', email: 'ada@example.com' });
+    next(); next(); next();
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('custom');
+    expect(container.querySelector('.finder-recommendation')!.textContent).toContain('in keinem der drei Website-Pakete');
+    change('selectedPackage', 'complete');
+    expect(store.get().goal).toBe('sales');
+    expect(container.querySelector('.finder-scope-note')!.textContent).toContain('eigenes Angebot');
+    next();
+    container.querySelector<HTMLButtonElement>('[data-action="copy"]')!.click();
+    await Promise.resolve();
+    expect(writeText.mock.calls[0][0]).toContain('Paketwunsch: Webbyu Complete');
+    expect(writeText.mock.calls[0][0]).toContain('Steuerbasis noch offen');
+    expect(writeText.mock.calls[0][0]).toContain('Shops, komplexe Buchungen');
+    expect(writeText.mock.calls[0][0]).toContain('Produkte verkaufen');
   });
 
   it('keeps the briefing available when clipboard access is unavailable', async () => {

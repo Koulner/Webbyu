@@ -1,4 +1,4 @@
-import { extensions, goals, packages, type Goal, type PackageId } from './data';
+import { extensions, goals, packages, priceDraftNotice, scopeNotice, type Goal, type PackageChoice } from './data';
 import { recommendPackage, type BriefState, type BriefStore } from './state';
 import './finder.css';
 
@@ -8,8 +8,8 @@ const timingNames: Record<string, string> = { flexible: 'Zeitlich flexibel', soo
 const reasons: Record<Goal, string> = {
   presence: 'Sie möchten sichtbar werden. Ein präziser Unternehmensauftritt stellt Ihr Angebot vor und macht den Kontakt einfach.',
   inquiries: 'Sie möchten aus Interesse konkrete Anfragen machen. Klare Besucherführung und passende Anfragewege unterstützen dieses Ziel.',
-  bookings: 'Sie möchten den Weg zum Termin erleichtern. Eine passende Buchungsintegration verbindet Ihre Leistungen mit dem nächsten freien Platz.',
-  sales: 'Sie möchten Produkte verkaufen. Ein individuell gestalteter Shopify-Auftritt gibt Ihrem Sortiment eine passende Bühne.',
+  bookings: 'Sie möchten den Weg zum Termin erleichtern. Wir klären zuerst den Buchungsablauf und die nötige Integration. Dafür ist ein gesondertes Angebot erforderlich.',
+  sales: 'Sie möchten Produkte verkaufen. Sortiment, Kaufablauf und technische Anbindung bestimmen den Umfang. Ein Shop ist in keinem der drei Website-Pakete pauschal enthalten.',
 };
 
 function escape(value: string): string {
@@ -22,13 +22,25 @@ function extensionNames(state: BriefState): string {
 }
 
 function selectedPackage(state: BriefState) {
-  return packages.find(item => item.id === (state.selectedPackage ?? recommendPackage(state.goal)))!;
+  return packages.find(item => item.id === (state.selectedPackage ?? recommendPackage(state.goal, state.extensions)));
+}
+
+function scopeNotes(state: BriefState): string {
+  const notes = [scopeNotice];
+  const chosen = selectedPackage(state);
+  if (state.extensions.includes('videos') && chosen?.id !== 'complete') notes.push('Foto-, Video- und Textproduktion ist für dieses Paket zusätzlich abzustimmen.');
+  if (state.extensions.includes('photos') && chosen?.id === 'start') notes.push('Eigene Fotoproduktion ist in Start nicht enthalten.');
+  if (state.extensions.some(id => ['cms', 'seo', 'maps', 'wizard', '3d'].includes(id))) notes.push('Vorgemerkte Erweiterungen sind Wünsche; Umfang und mögliche Zusatzkosten werden separat abgestimmt.');
+  return notes.join(' ');
 }
 
 function summaryEntries(state: BriefState): [string, string][] {
+  const chosen = selectedPackage(state);
   return [
     ['Ihr Ziel', goals.find(item => item.id === state.goal)!.label],
-    ['Paket', selectedPackage(state).name],
+    ['Paketwunsch', chosen?.name ?? 'Individuellen Umfang klären'],
+    ['Preisrahmen', chosen ? `${chosen.price} – ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'],
+    ['Leistungsabgrenzung', scopeNotes(state)],
     ['Erweiterungen', extensionNames(state)],
     ['Projekt', projectNames[state.projectType] ?? state.projectType],
     ['Gewünschter Start', timingNames[state.timing] ?? state.timing],
@@ -38,7 +50,7 @@ function summaryEntries(state: BriefState): [string, string][] {
   ];
 }
 
-export function mountFinder(container: HTMLElement, store: BriefStore): { openAtStart(): void; dispose(): void } {
+export function mountFinder(container: HTMLElement, store: BriefStore): { openAtStart(): void; focus(): void; dispose(): void } {
   let step = 0;
   let completed = false;
   let localUpdate = false;
@@ -92,11 +104,16 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           </div>`;
       } else {
         const chosen = selectedPackage(state);
-        const isRecommended = chosen.id === recommendPackage(state.goal);
+        const choice = state.selectedPackage ?? recommendPackage(state.goal, state.extensions);
+        const isRecommended = state.selectedPackage === null;
+        const reason = choice === 'custom'
+          ? (state.goal === 'sales' || state.goal === 'bookings' ? reasons[state.goal] : 'Wir klären Funktionen, Inhalte und technische Anbindungen gemeinsam und stellen daraus einen individuellen Umfang zusammen.')
+          : chosen!.description;
         body = `<p class="finder-eyebrow">04 / Ein Vorschlag für Ihren Auftritt.</p>
-          <h3 class="finder-heading" tabindex="-1">Das passt<br>zu Ihrem Vorhaben.</h3>
-          <div class="finder-recommendation"><span class="finder-recommendation-label">${isRecommended ? 'Meine Empfehlung' : 'Ihre Paketauswahl'}</span><h4>${chosen.name}</h4><p>${isRecommended ? reasons[state.goal] : chosen.description}</p><span class="finder-price">Preis nach Briefing</span></div>
-          <label class="finder-field finder-package-field">Paket selbst wählen<select name="selectedPackage" data-focus="selectedPackage">${packages.map(item => `<option value="${item.id}" ${chosen.id === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select></label>
+          <h3 class="finder-heading" tabindex="-1">Ein erster Rahmen<br>für Ihr Vorhaben.</h3>
+          <div class="finder-recommendation"><span class="finder-recommendation-label">${isRecommended ? 'Unsere erste Orientierung' : 'Ihre Paketauswahl'}</span><h4>${chosen?.name ?? 'Individuellen Umfang klären'}</h4><p>${reason}</p><span class="finder-price">${chosen ? `${chosen.price} · ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'}</span></div>
+          <label class="finder-field finder-package-field">Paketwunsch selbst wählen<select name="selectedPackage" data-focus="selectedPackage"><option value="custom" ${choice === 'custom' ? 'selected' : ''}>Individuellen Umfang klären</option>${packages.map(item => `<option value="${item.id}" ${choice === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select></label>
+          <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>
           <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">*</span><input type="text" name="name" data-focus="name" autocomplete="name" required maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">*</span><input type="email" name="email" data-focus="email" autocomplete="email" required maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-business.de"></label></div>
           <p class="finder-privacy">* Erforderlich für Ihre Zusammenfassung. Dieser lokale Prototyp versendet keine Daten. Ihre Angaben bleiben nur bis zum Neuladen in dieser Seite.</p>`;
@@ -138,7 +155,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
     } else if (target.name === 'projectType' || target.name === 'timing') {
       update({ [target.name]: target.value });
     } else if (target.name === 'selectedPackage') {
-      update({ selectedPackage: target.value as PackageId });
+      update({ selectedPackage: target.value as PackageChoice });
       render();
     }
   }
@@ -204,6 +221,9 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
   render();
 
   return {
+    focus() {
+      container.querySelector<HTMLElement>('.finder-heading')?.focus({ preventScroll: true });
+    },
     openAtStart() {
       completed = false;
       step = 0;

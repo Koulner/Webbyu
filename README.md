@@ -1,6 +1,6 @@
 # Webbyu
 
-Lokaler, deutschsprachiger Website-Prototyp für ein unabhängiges Webdesign-Atelier. Vite, TypeScript, Three.js und GSAP; ohne Backend oder externe Laufzeit-APIs.
+Lokaler, deutschsprachiger Website-Prototyp für die von zwei Gründern aufgebaute Digitalagentur Webbyu in Hamburg / Bad Oldesloe. Vite, TypeScript, Three.js und GSAP; ohne Backend oder externe Laufzeit-APIs.
 
 ## Starten
 
@@ -45,28 +45,27 @@ node node_modules/vite/bin/vite.js build
 node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-## Geprüfter Stand · 19. Oktober 2026
+## Aktueller Stand · 22. Oktober 2026
 
-- TypeScript-Prüfung und Produktionsbuild erfolgreich; 32 Tests in 5 Dateien bestanden.
-- Desktop-Scrollgeschichte mit Ebenen, interaktiver HTML-Demo, Rückwärtsscrollen und Zielerhalt geprüft. Ab 999 px Breite abwärts wechselt der Hero in ein statisches, bedienbares Layout.
-- Browserprüfung bei 360, 390, 768, 1024 und 1440 px Breite: responsive Darstellung, Zielübergabe, Paketwahl und Finder; kein horizontaler Seitenüberlauf in den geprüften Zuständen.
-- Drei Konzeptdemos einschließlich Formularvalidierung, Terminwahl, Varianten, Warenkorbmengen, Fokus, Escape und mobilem Dialog-Scrollreset geprüft.
-- Finder einschließlich exklusiver „Unsicher“-Auswahl, Rücknavigation mit Eingabeerhalt, manueller Paketwahl und lokaler Zusammenfassung geprüft.
-- Reduced Motion, WebGL-Initialisierungsfehler und Kontextverlust sind automatisiert geprüft; diese Fehlerzustände wurden nicht im echten Browser erzwungen. Die Browserprüfung verwendet simulierte Bildschirmgrößen, keine realen Mobilgeräte.
-- Die Browserkonsole zeigte bei der abschließenden Produktionsvorschau keine Fehler oder Warnungen.
+AP2 ist integriert. AP6 übernimmt Inhalte und Struktur der bereitgestellten HTML-Referenz in die bestehende helle Editorial-Seite. Die dunkle 3D-Galerie und die drei interaktiven Demos bleiben erhalten; die weitere 3D-Story folgt später.
 
-Vite meldet für das separat nachgeladene 3D-Modul eine Größenwarnung (ca. 646 kB, komprimiert ca. 183 kB). Der Build ist erfolgreich; die Größenwarnung bleibt als bekannte Grenze bestehen.
+- Leistungen, Start / Business / Complete, Team, Zusammenarbeit und Kontakt sind über direkte Abschnittslinks erreichbar. Eingaben und Demo-Sitzungen bleiben beim Navigieren erhalten.
+- 599 €, 1.099 € und 2.499 € sind **interne Preisentwürfe mit offener Steuerbasis**. Seitenzählung, Zusatzseitenpreise und mehrere Produktionsdetails bleiben abzustimmen. Ablauf und Grenzen sind in aufklappbaren Details beschrieben.
+- Foto- und Content-Wünsche fließen in die Paketorientierung ein. Verkauf und Buchung führen zur individuellen Umfangsklärung. Eine manuelle Paketwahl überschreibt das Geschäftsziel nicht; die kopierbare Zusammenfassung enthält Preisstatus und Leistungsabgrenzung.
+- Kontaktadressen, Impressum und Datenschutz sind ausdrücklich Platzhalter. Der Finder erstellt ausschließlich ein lokales Briefing.
+- AP5, die unabhängige Gesamt-Abnahme, bleibt offen. Die technischen Prüfbelege für AP6 stehen in `WORK_PACKAGES.md`.
 
-Prüfbilder liegen lokal in `artifacts/` und werden nicht von Git erfasst.
+Prüfbilder und der responsive Prüfstand liegen lokal in `artifacts/ap6-preview/` und werden nicht von Git erfasst.
 
 ## Inhalte und Grenzen
 
-- `src/data.ts`: Ziele, Pakete, Erweiterungen und Konzeptbeschreibungen.
+- `src/shell.ts` / `src/content.css`: Seitenstruktur und Darstellung der AP6-Inhalte.
+- `src/data.ts`: Ziele, Paketentwürfe, Leistungen, FAQ, Erweiterungen und Konzeptbeschreibungen.
 - `src/state.ts`: gemeinsamer, flüchtiger Projektzustand und Paketempfehlungen.
-- `src/scene.ts`: 3D-Rahmen, Scrollgeschichte und Ersatzdarstellungen.
+- `src/scene.ts`: 3D-Galerie, explizite Ansichtsmodi und Ersatzdarstellungen.
 - `src/demos.ts`: drei fiktive, lokal bedienbare Konzeptarbeiten.
 - `src/finder.ts`: Projektfinder und sichtbare Anfragezusammenfassung.
 
 Alle Konzeptmarken sind fiktive Designstudien. Es werden keine Anfragen verschickt, Termine gebucht oder Bestellungen ausgeführt. Angaben im Projektfinder bleiben ausschließlich im Arbeitsspeicher des geöffneten Browsers und werden beim Neuladen verworfen. Schriften werden lokal ausgeliefert.
 
-Vor einer öffentlichen Veröffentlichung müssen Kontaktversand, endgültige Leistungsumfänge und Preise, geschäftliche Angaben sowie rechtliche Inhalte separat ergänzt werden. Der Pages-Workflow veröffentlicht weiterhin nur den lokalen Prototyp ohne Backend.
+Vor Freigabe als geschäftlicher Auftritt müssen Kontaktversand, endgültige Leistungsumfänge und Preise, geschäftliche Angaben sowie rechtliche Inhalte separat ergänzt werden. Der Pages-Workflow veröffentlicht weiterhin nur den lokalen Prototyp ohne Backend.

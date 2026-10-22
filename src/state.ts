@@ -1,4 +1,4 @@
-import type { Goal, PackageId } from './data';
+import type { Goal, PackageChoice } from './data';
 
 export interface BriefState {
   goal: Goal;
@@ -8,11 +8,14 @@ export interface BriefState {
   description: string;
   name: string;
   email: string;
-  selectedPackage: PackageId | null;
+  selectedPackage: PackageChoice | null;
 }
 
-export function recommendPackage(goal: Goal): PackageId {
-  return goal === 'sales' ? 'shop' : goal === 'presence' ? 'presence' : 'business';
+export function recommendPackage(goal: Goal, extensions: string[] = []): PackageChoice {
+  if (goal === 'sales' || goal === 'bookings' || extensions.includes('booking')) return 'custom';
+  if (extensions.includes('videos')) return 'complete';
+  if (extensions.includes('photos')) return 'business';
+  return goal === 'presence' ? 'start' : 'business';
 }
 
 export function createBriefStore() {
