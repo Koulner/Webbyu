@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { initScene } from './scene';
 
 type Renderer = {
@@ -12,6 +13,7 @@ type Renderer = {
 const mocks = vi.hoisted(() => ({
   failRenderer: false,
   failEnvironment: false,
+  failGenerator: false,
   renderers: [] as Renderer[],
   environmentDispose: vi.fn(),
 }));
@@ -24,6 +26,7 @@ vi.mock('three', async (importOriginal) => {
     WebGLRenderer: class {
       domElement = document.createElement('canvas');
       dispose = vi.fn();
+      forceContextLoss = vi.fn();
       setSize = vi.fn();
       render = vi.fn();
       setClearColor = vi.fn();
@@ -35,6 +38,7 @@ vi.mock('three', async (importOriginal) => {
     },
     PMREMGenerator: class {
       dispose = vi.fn();
+      constructor() { if (mocks.failGenerator) throw new Error('Generator unavailable'); }
       fromScene() {
         if (mocks.failEnvironment) throw new Error('Environment unavailable');
         return { texture: new actual.Texture(), dispose: mocks.environmentDispose };
@@ -42,16 +46,6 @@ vi.mock('three', async (importOriginal) => {
     },
   };
 });
-
-vi.mock('gsap', () => ({
-  gsap: {
-    killTweensOf: vi.fn(),
-    to: vi.fn((target: { angle: number }, options: { angle: number; onUpdate: () => void }) => {
-      target.angle = options.angle;
-      options.onUpdate();
-    }),
-  },
-}));
 
 type Media = ReturnType<typeof createMedia>;
 function createMedia(initial: boolean) {
@@ -82,7 +76,7 @@ function flushFrames() {
   pending.forEach((callback) => callback(0));
 }
 
-async function mount() {
+async function mount(visible = true) {
   document.body.innerHTML = '<div id="scene"></div><div id="original"><div id="slot" style="color: red"><div class="demo"><input value="Erhalten"></div></div><span id="after"></span></div>';
   const container = document.querySelector<HTMLElement>('#scene')!;
   const slot = document.querySelector<HTMLElement>('#slot')!;
@@ -94,6 +88,7 @@ async function mount() {
   });
   const controller = await initScene({ container, demoElement: slot });
   controllers.push(controller);
+  if (visible) intersectionObservers.at(-1)?.callback([{ isIntersecting: true }]);
   flushFrames();
   return { container, slot, input, controller };
 }
@@ -101,6 +96,7 @@ async function mount() {
 beforeEach(() => {
   mocks.failRenderer = false;
   mocks.failEnvironment = false;
+  mocks.failGenerator = false;
   mocks.renderers.length = 0;
   mocks.environmentDispose.mockClear();
   mobile = createMedia(false);
@@ -206,10 +202,117 @@ describe('scene modes and lifecycle', () => {
     expect(mocks.renderers[0].dispose).toHaveBeenCalledTimes(1);
     expect(container.querySelector('.precision-webgl')).toBeNull();
     expect(container.querySelector('.precision-css3d')).toBeNull();
-    expect(container.querySelector('.precision-layers')).toBeNull();
+    expect(container.querySelector<HTMLElement>('.precision-layers')!.hidden).toBe(true);
     expect(container.querySelectorAll('.precision-static-frame')).toHaveLength(1);
     expect(container.contains(slot)).toBe(true);
     expect(slot.inert).toBe(false);
+  });
+
+  it('releases the room even if the environment generator constructor fails', async () => {
+    const roomDispose = vi.spyOn(RoomEnvironment.prototype, 'dispose');
+    mocks.failGenerator = true;
+    const { container, slot } = await mount();
+    expect(roomDispose).toHaveBeenCalledTimes(1);
+    expect(mocks.renderers[0].dispose).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('.precision-webgl')).toBeNull();
+    expect(slot.inert).toBe(false);
+    expect(container.contains(slot)).toBe(true);
+  });
+
+  it('recovers from a later drawing failure and cancels queued GPU work', async () => {
+    const { container, slot, input, controller } = await mount();
+    const renderer = mocks.renderers[0];
+    input.value = 'Auch nach Zeichenfehler';
+    renderer.render.mockImplementationOnce(() => { throw new Error('Draw failed'); });
+    controller.setMode('layers');
+    flushFrames();
+    expect(renderer.dispose).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('.precision-webgl')).toBeNull();
+    expect(container.querySelectorAll('.precision-static-frame')).toHaveLength(1);
+    expect(slot.querySelector('input')).toBe(input);
+    expect(input.value).toBe('Auch nach Zeichenfehler');
+    expect(slot.inert).toBe(false);
+    expect(frames.size).toBe(0);
+  });
+
+  it('does not draw until the stage enters the viewport, including after resizing', async () => {
+    const { container, slot, controller } = await mount(false);
+    const renderer = mocks.renderers[0];
+    expect(container.contains(slot)).toBe(true);
+    for (let i = 0; i < 4; i++) {
+      controller.setGoal(i % 2 ? 'sales' : 'bookings');
+      resizeObservers[0].callback();
+    }
+    expect(frames.size).toBe(0);
+    expect(renderer.render).not.toHaveBeenCalled();
+    intersectionObservers[0].callback([{ isIntersecting: true }]);
+    expect(frames.size).toBe(1);
+    flushFrames();
+    expect(renderer.render).toHaveBeenCalledTimes(1);
+    expect(mocks.renderers).toHaveLength(1);
+  });
+
+  it.each(['presentation', 'layers'] as const)('aligns all four HTML corners with the physical opening in %s', async mode => {
+    const { container, controller } = await mount();
+    controller.setMode(mode);
+    Object.defineProperty(container, 'clientWidth', { configurable: true, value: 1280 });
+    resizeObservers[0].callback();
+    flushFrames();
+    const [scene, camera] = mocks.renderers[0].render.mock.calls.at(-1)! as [THREE.Scene, THREE.PerspectiveCamera];
+    scene.updateMatrixWorld(true);
+    const frame = scene.getObjectByName('gallery-frame')!;
+    const front = frame.children[0];
+    const surface = container.querySelector<HTMLElement>('.precision-css-surface')!;
+    const cssValues = surface.style.transform.match(/matrix3d\(([^)]+)\)/)![1].split(',').map(Number);
+    // Undo CSS's downward Y axis to compare with the physical world matrix.
+    for (let i = 4; i < 8; i++) cssValues[i] *= -1;
+    const cssWorld = new THREE.Matrix4().fromArray(cssValues);
+    for (const x of [-360, 360]) for (const y of [-288, 288]) {
+      const html = new THREE.Vector3(x, y, 0).applyMatrix4(cssWorld).project(camera);
+      const physical = new THREE.Vector3(.12 + x * .01, .1 + y * .01, .382)
+        .applyMatrix4(front.matrixWorld).project(camera);
+      expect(html.distanceTo(physical)).toBeLessThan(1e-10);
+    }
+    expect(container.querySelector<HTMLElement>('.precision-css3d')!.style.width).toBe('1280px');
+    expect(mocks.renderers[0].setSize).toHaveBeenLastCalledWith(1280, 600);
+  });
+
+  it('preserves native scroll and input focus through notifications, mode and media changes', async () => {
+    const { container, slot, input, controller } = await mount();
+    controller.setMode('interactive');
+    const native = container.querySelector<HTMLElement>('.precision-static-surface')!;
+    native.scrollTop = 320;
+    input.focus();
+    controller.setGoal('inquiries');
+    controller.setMode('interactive');
+    expect(native.scrollTop).toBe(320);
+    expect(document.activeElement).toBe(input);
+    controller.setMode('layers');
+    controller.setMode('interactive');
+    expect(native.scrollTop).toBe(320);
+    mobile.change(true);
+    expect(native.scrollTop).toBe(320);
+    expect(slot.parentElement).toBe(native);
+    controller.setGoal('bookings');
+    expect(native.scrollTop).toBe(0);
+  });
+
+  it('updates restored slot children without modifying a session while it is in a dialog', async () => {
+    const { slot, controller } = await mount();
+    const demo = slot.querySelector<HTMLElement>('.demo')!;
+    const dialog = document.createElement('div');
+    document.body.append(dialog);
+    dialog.append(demo);
+    demo.classList.add('demo--responsive');
+    await Promise.resolve();
+    controller.setMode('layers');
+    expect(demo.classList.contains('demo--responsive')).toBe(true);
+    slot.append(demo);
+    await Promise.resolve();
+    expect(demo.classList.contains('demo--responsive')).toBe(false);
+    controller.setMode('interactive');
+    expect(demo.classList.contains('demo--responsive')).toBe(true);
+    expect(slot.querySelector('.demo')).toBe(demo);
   });
 
   it('switches explicit desktop poses and keeps interaction enabled while scrolling', async () => {
@@ -224,28 +327,31 @@ describe('scene modes and lifecycle', () => {
     const layersTransform = surface.style.transform;
     const legend = container.querySelector<HTMLElement>('.precision-layers')!;
     expect(layersTransform).toContain('matrix3d');
-    expect(legend.style.opacity).toBe('1');
+    expect(legend.hidden).toBe(false);
     controller.setMode('interactive');
     flushFrames();
     expect(slot.inert).toBe(false);
     expect(slot.style.pointerEvents).toBe('auto');
-    const interactiveTransform = surface.style.transform;
-    expect(interactiveTransform).not.toBe(layersTransform);
-    expect(legend.style.opacity).toBe('0');
-    const webglScene = mocks.renderers[0].render.mock.calls.at(-1)![0] as THREE.Scene;
-    const object = webglScene.children.find(node => node.type === 'Group')!;
-    expect(object.rotation.toArray().slice(0, 3)).toEqual([0, 0, 0]);
+    expect(slot.parentElement!.className).toBe('precision-static-surface');
+    expect(slot.style.transform).toBe('');
+    expect(slot.style.width).toBe('100%');
+    expect(slot.classList.contains('demo--responsive')).toBe(true);
+    expect(legend.hidden).toBe(true);
+    expect(container.querySelector<HTMLElement>('.precision-webgl')!.hidden).toBe(true);
+    const drawCount = mocks.renderers[0].render.mock.calls.length;
     input.value = 'Nicht neu erzeugen';
     window.dispatchEvent(new Event('scroll'));
     controller.setGoal('sales');
     flushFrames();
     expect(slot.inert).toBe(false);
-    expect(surface.style.transform).toBe(interactiveTransform);
+    expect(mocks.renderers[0].render).toHaveBeenCalledTimes(drawCount);
     expect(container.dataset.mode).toBe('interactive');
     controller.setMode('layers');
     flushFrames();
     expect(slot.inert).toBe(true);
     expect(surface.style.transform).toBe(layersTransform);
+    expect(slot.parentElement).toBe(surface);
+    expect(mocks.renderers).toHaveLength(1);
     expect(input.value).toBe('Nicht neu erzeugen');
   });
 
@@ -262,20 +368,22 @@ describe('scene modes and lifecycle', () => {
     mobile.change(false);
     expect(mocks.renderers).toHaveLength(1);
     reduced.change(false);
+    intersectionObservers.at(-1)!.callback([{ isIntersecting: true }]);
     flushFrames();
     expect(mocks.renderers).toHaveLength(2);
     expect(container.querySelectorAll('.precision-webgl')).toHaveLength(1);
     expect(container.querySelectorAll('.precision-css3d')).toHaveLength(1);
-    expect(container.querySelector('.precision-static-frame')).toBeNull();
+    expect(container.querySelector<HTMLElement>('.precision-static-frame')!.hidden).toBe(false);
     expect(container.dataset.goal).toBe('sales');
     expect(container.dataset.mode).toBe('interactive');
     expect(slot.inert).toBe(false);
     expect(container.style.getPropertyValue('--scene-dial-angle')).toBe('0.72rad');
-    expect(slot.querySelector('.demo')!.classList.contains('demo--responsive')).toBe(false);
+    expect(slot.querySelector('.demo')!.classList.contains('demo--responsive')).toBe(true);
     expect(slot.querySelector('input')).toBe(input);
     expect(input.value).toBe('Auswahl bleibt');
     Object.defineProperty(container, 'clientWidth', { configurable: true, value: 1100 });
     resizeObservers.at(-1)!.callback();
+    controller.setMode('presentation');
     flushFrames();
     expect(mocks.renderers.at(-1)!.setSize).toHaveBeenLastCalledWith(1100, 600);
     const camera = mocks.renderers.at(-1)!.render.mock.calls.at(-1)![1] as THREE.PerspectiveCamera;
@@ -285,7 +393,7 @@ describe('scene modes and lifecycle', () => {
   it('switches permanently to accessible HTML on context loss without losing state', async () => {
     const { container, slot, input, controller } = await mount();
     controller.setGoal('bookings');
-    controller.setMode('interactive');
+    controller.setMode('presentation');
     input.value = 'Wieder verfügbar';
     const renderer = mocks.renderers[0];
     const lost = new Event('webglcontextlost', { cancelable: true });
@@ -298,7 +406,7 @@ describe('scene modes and lifecycle', () => {
     expect(slot.querySelector('input')).toBe(input);
     expect(input.value).toBe('Wieder verfügbar');
     expect(container.dataset.goal).toBe('bookings');
-    expect(container.dataset.mode).toBe('interactive');
+    expect(container.dataset.mode).toBe('presentation');
     mobile.change(true);
     mobile.change(false);
     expect(mocks.renderers).toHaveLength(1);
@@ -319,14 +427,14 @@ describe('scene modes and lifecycle', () => {
     expect(container.dataset.mode).toBe('layers');
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
     document.dispatchEvent(new Event('visibilitychange'));
-    controller.setMode('interactive');
+    controller.setMode('presentation');
     flushFrames();
     expect(renderer.render).toHaveBeenCalledTimes(1);
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     document.dispatchEvent(new Event('visibilitychange'));
     flushFrames();
     expect(renderer.render).toHaveBeenCalledTimes(2);
-    expect(container.dataset.mode).toBe('interactive');
+    expect(container.dataset.mode).toBe('presentation');
     expect(frames.size).toBe(0);
   });
 

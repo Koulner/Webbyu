@@ -2,44 +2,69 @@ import * as THREE from 'three';
 import { CSS3DObject, CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { gsap } from 'gsap';
 import type { DemoGoal } from './data';
 import type { SceneController, SceneMode, SceneOptions } from './contracts';
 import './scene.css';
 
 const GOAL_ANGLE: Record<DemoGoal, number> = { inquiries: -.72, bookings: 0, sales: .72 };
 const GOAL_ACCENT: Record<DemoGoal, string> = {
-  inquiries: '#2558ee', bookings: '#7a8764', sales: '#ac6344',
+  inquiries: '#c7b29a', bookings: '#b598b0', sales: '#cfa477',
 };
-const clamp = (n: number) => Math.min(1, Math.max(0, n));
-const ease = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * t); };
+const SCREEN = { width: 720, height: 576, scale: .01, x: .12, y: .1, z: .382 };
 
-/** A physical, open aluminium frame around a real, accessible HTML example. */
-export async function initScene(options: SceneOptions): Promise<SceneController> {
-  const { container, demoElement } = options;
+/** Projects one caller-owned slot. The catalogue alone owns the live demos. */
+export async function initScene({ container, demoElement }: SceneOptions): Promise<SceneController> {
   const originalParent = demoElement.parentNode;
   const originalNextSibling = demoElement.nextSibling;
   const originalStyle = demoElement.getAttribute('style');
-  const originallyResponsive = demoElement.classList.contains('demo--responsive');
   const originalInert = demoElement.inert;
+  const originalResponsive = demoElement.classList.contains('demo--responsive');
+  const originalSlotClass = demoElement.classList.contains('precision-demo-slot');
+  const originalGoal = container.getAttribute('data-goal');
+  const originalMode = container.getAttribute('data-mode');
+  const originalAccent = container.style.getPropertyValue('--scene-goal-accent');
+  const originalAngle = container.style.getPropertyValue('--scene-dial-angle');
   const responsiveClasses = new Map<HTMLElement, boolean>();
   const mobileMedia = window.matchMedia('(max-width: 999px)');
   const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
   let currentGoal: DemoGoal = 'inquiries';
   let currentMode: SceneMode = 'presentation';
-  let modeCleanup: (() => void) | undefined;
   let responsiveMode = false;
-  let webglUnavailable = false;
+  let unavailable = false;
   let disposed = false;
+  let nativeScroll = 0;
+  let cleanupProjection: (() => void) | undefined;
+  let projection: {
+    surface: HTMLElement;
+    setPose: (mode: SceneMode) => void;
+    setGoal: (goal: DemoGoal) => void;
+    setEnabled: (enabled: boolean) => void;
+  } | undefined;
 
   container.classList.add('precision-scene');
-  container.dataset.goal = currentGoal;
-  container.dataset.mode = currentMode;
+  demoElement.classList.add('precision-demo-slot');
 
-  // Callers may supply either the demo itself or a persistent slot whose child
-  // changes with the chosen goal. Both need the same layout mode immediately.
+  // Native HTML is also the desktop interaction surface: no perspective or
+  // downscaled type, and long panels remain reachable through normal scrolling.
+  const nativeFrame = document.createElement('div');
+  nativeFrame.className = 'precision-static-frame';
+  const nativeSurface = document.createElement('div');
+  nativeSurface.className = 'precision-static-surface';
+  const trim = document.createElement('div');
+  trim.className = 'precision-static-trim';
+  trim.setAttribute('aria-hidden', 'true');
+  const dial = document.createElement('span');
+  dial.className = 'precision-static-dial';
+  dial.setAttribute('aria-hidden', 'true');
+  const legend = document.createElement('div');
+  legend.className = 'precision-layers';
+  legend.innerHTML = '<span><i>01</i> Gestaltung</span><span><i>02</i> Inhalt</span><span><i>03</i> Funktion</span>';
+  nativeFrame.append(nativeSurface, trim, dial);
+  container.append(nativeFrame, legend);
+
   const syncDemoLayout = () => {
     const demos = demoElement.matches('.demo') ? [demoElement] : [...demoElement.querySelectorAll<HTMLElement>(':scope > .demo')];
+    // Do not retain or mutate sessions that the catalogue moved to its dialog/cache.
     for (const demo of responsiveClasses.keys()) if (!demos.includes(demo)) responsiveClasses.delete(demo);
     for (const demo of demos) {
       if (!responsiveClasses.has(demo)) responsiveClasses.set(demo, demo.classList.contains('demo--responsive'));
@@ -48,128 +73,90 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
     demoElement.classList.toggle('demo--responsive', responsiveMode);
   };
 
-  const setDemoInteractive = (interactive: boolean) => {
-    demoElement.inert = !interactive;
-    demoElement.style.pointerEvents = interactive ? 'auto' : 'none';
-    container.classList.toggle('precision-scene--interactive', interactive);
+  const moveSlot = (parent: HTMLElement) => {
+    if (demoElement.parentElement === parent) return;
+    const focus = demoElement.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+    parent.append(demoElement);
+    if (!demoElement.inert) focus?.focus({ preventScroll: true });
   };
 
-  // The fallback is also the mobile presentation. It keeps the full HTML and
-  // permits real reflow instead of shrinking controls into an unreadable image.
-  const createStatic = (mobile: boolean) => {
-    container.classList.add('precision-scene--static');
-    container.classList.toggle('precision-scene--mobile', mobile);
-    const frame = document.createElement('div');
-    frame.className = 'precision-static-frame';
-    const trim = document.createElement('div');
-    trim.className = 'precision-static-trim';
-    trim.setAttribute('aria-hidden', 'true');
-    const dial = document.createElement('span');
-    dial.className = 'precision-static-dial';
-    dial.setAttribute('aria-hidden', 'true');
-    const surface = document.createElement('div');
-    surface.className = 'precision-static-surface';
-    responsiveMode = true;
-    syncDemoLayout();
-    demoElement.style.width = '100%';
-    demoElement.style.height = 'auto';
-    demoElement.style.transform = '';
-    surface.append(demoElement);
-    frame.append(trim, surface, dial);
-    const legend = document.createElement('p');
-    legend.className = 'precision-static-legend';
-    legend.textContent = '01 Gestaltung · 02 Inhalt · 03 Funktion';
-    frame.append(legend);
-    container.append(frame);
-    setDemoInteractive(true);
-    return () => frame.remove();
+  const failProjection = (error?: unknown) => {
+    unavailable = true;
+    cleanupProjection?.();
+    cleanupProjection = undefined;
+    projection = undefined;
+    applyMode();
+    if (error) console.info('Webbyu: HTML-Galerie ohne WebGL aktiv.', error);
   };
 
-  let updateGoal: ((goal: DemoGoal) => void) | undefined;
-  let updateMode: ((mode: SceneMode) => void) | undefined;
-
-  const createWebGL = () => {
-    const cleanupTasks: (() => void)[] = [];
-    let cleaned = false;
-    const cleanup = () => {
-      if (cleaned) return;
-      cleaned = true;
-      for (const task of cleanupTasks.reverse()) task();
-      updateGoal = undefined;
-      updateMode = undefined;
+  const createProjection = () => {
+    const cleanups: (() => void)[] = [];
+    let alive = true;
+    let enabled = true;
+    let visible = false;
+    let frameRequest = 0;
+    // Register each resource when acquired, including resources that have not
+    // reached the scene graph yet. Partial initialization uses this same path.
+    const own = <T extends { dispose(): void }>(resource: T): T => {
+      cleanups.push(() => resource.dispose());
+      return resource;
     };
-    // Register partial cleanup before WebGL creation: a context/environment
-    // failure partway through initialization must not leave a second renderer.
-    modeCleanup = cleanup;
+    cleanupProjection = () => {
+      if (!alive) return;
+      alive = false;
+      if (frameRequest) cancelAnimationFrame(frameRequest);
+      for (const cleanup of cleanups.reverse()) {
+        try { cleanup(); } catch (error) { console.info('Webbyu: Szene-Ressource freigeben.', error); }
+      }
+    };
+
     const scene = new THREE.Scene();
     const htmlScene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, .1, 100);
-    camera.position.set(0, .08, 17.7);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
-    cleanupTasks.push(() => renderer.dispose());
-    cleanupTasks.push(() => {
-      const geometries = new Set<THREE.BufferGeometry>();
-      const materials = new Set<THREE.Material>();
-      scene.traverse((node) => {
-        if (node instanceof THREE.Mesh || node instanceof THREE.Line) {
-          geometries.add(node.geometry);
-          for (const material of Array.isArray(node.material) ? node.material : [node.material]) materials.add(material);
-        }
-      });
-      geometries.forEach((geometry) => geometry.dispose());
-      materials.forEach((material) => material.dispose());
-    });
+    cleanups.push(() => { renderer.dispose(); renderer.forceContextLoss(); });
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.02;
+    renderer.toneMappingExposure = 1.12;
     renderer.domElement.className = 'precision-webgl';
     renderer.domElement.setAttribute('aria-hidden', 'true');
     const cssRenderer = new CSS3DRenderer();
     cssRenderer.domElement.className = 'precision-css3d';
     container.append(renderer.domElement, cssRenderer.domElement);
-    cleanupTasks.push(() => { renderer.domElement.remove(); cssRenderer.domElement.remove(); });
-
-    const layerLegend = document.createElement('div');
-    layerLegend.className = 'precision-layers';
-    layerLegend.setAttribute('aria-hidden', 'true');
-    layerLegend.innerHTML = '<span><i>01</i> Gestaltung</span><span><i>02</i> Inhalt</span><span><i>03</i> Funktion</span>';
-    container.append(layerLegend);
-    cleanupTasks.push(() => layerLegend.remove());
+    cleanups.push(() => { renderer.domElement.remove(); cssRenderer.domElement.remove(); });
 
     const environment = new RoomEnvironment();
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    let environmentTarget: THREE.WebGLRenderTarget;
-    // Keep the initial blur within PMREM's 20-sample kernel at its default size.
-    try { environmentTarget = pmrem.fromScene(environment, .035); }
-    finally { environment.dispose(); pmrem.dispose(); }
-    cleanupTasks.push(() => environmentTarget.dispose());
-    scene.environment = environmentTarget.texture;
-    scene.environmentIntensity = 1.05;
-
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xbab9b1, 1.15));
-    const key = new THREE.DirectionalLight(0xfffcf3, 2.5);
+    let pmrem: THREE.PMREMGenerator | undefined;
+    try {
+      pmrem = new THREE.PMREMGenerator(renderer);
+      const target = own(pmrem.fromScene(environment, .035));
+      scene.environment = target.texture;
+    } finally { environment.dispose(); pmrem?.dispose(); }
+    scene.environmentIntensity = .85;
+    scene.add(new THREE.HemisphereLight(0xe9dbcd, 0x241927, 1.6));
+    const key = new THREE.DirectionalLight(0xffe2bc, 3.2);
     key.position.set(-5, 8, 10);
-    scene.add(key);
-    const rim = new THREE.DirectionalLight(0xe5ecff, 1.3);
-    rim.position.set(7, 2, -2);
-    scene.add(rim);
+    const rim = new THREE.DirectionalLight(0xc9a0bc, 2.4);
+    rim.position.set(7, 3, -2);
+    scene.add(key, rim);
 
     const object = new THREE.Group();
     const htmlObject = new THREE.Group();
+    object.name = 'gallery-frame';
     scene.add(object);
     htmlScene.add(htmlObject);
     const front = new THREE.Group();
     object.add(front);
-
-    const metal = new THREE.MeshStandardMaterial({ color: 0xbfc4c2, metalness: .82, roughness: .43 });
-    const paleMetal = new THREE.MeshStandardMaterial({ color: 0xcdd1cd, metalness: .72, roughness: .5 });
-    const darkMetal = new THREE.MeshStandardMaterial({ color: 0x626b70, metalness: .72, roughness: .45 });
-    const paper = new THREE.MeshStandardMaterial({ color: 0xf8f7f1, metalness: .08, roughness: .86 });
-    const blue = new THREE.MeshStandardMaterial({ color: 0x153cdb, metalness: .08, roughness: .43 });
-    const marking = new THREE.MeshStandardMaterial({ color: 0x868b89, metalness: .25, roughness: .65 });
-    const accent = new THREE.MeshStandardMaterial({ color: GOAL_ACCENT[currentGoal], metalness: .12, roughness: .5 });
+    const metal = own(new THREE.MeshStandardMaterial({ color: 0x474249, metalness: .8, roughness: .32 }));
+    const edge = own(new THREE.MeshStandardMaterial({ color: 0xa18e7b, metalness: .75, roughness: .38 }));
+    const back = own(new THREE.MeshStandardMaterial({ color: 0x3d2938, metalness: .45, roughness: .52 }));
+    const dark = own(new THREE.MeshStandardMaterial({ color: 0x242128, metalness: .65, roughness: .4 }));
+    const accent = own(new THREE.MeshStandardMaterial({ color: GOAL_ACCENT[currentGoal], metalness: .6, roughness: .35 }));
+    const marking = own(new THREE.MeshStandardMaterial({ color: 0x9b8e82, metalness: .55, roughness: .5 }));
+    const makeBox = (w: number, h: number, d: number, material: THREE.Material, radius = .035) =>
+      new THREE.Mesh(own(new RoundedBoxGeometry(w, h, d, 2, radius)), material);
 
     const roundedRect = (path: THREE.Shape | THREE.Path, x: number, y: number, w: number, h: number, r: number) => {
       path.moveTo(x + r, y);
@@ -182,292 +169,241 @@ export async function initScene(options: SceneOptions): Promise<SceneController>
       path.lineTo(x, y + r);
       path.quadraticCurveTo(x, y, x + r, y);
     };
-
-    // 8.2 × 6.56 outer proportions are precisely 5:4. The opening is shifted
-    // up/right so that the lower and left borders have deliberate visual weight.
-    const shape = new THREE.Shape();
-    roundedRect(shape, -4.1, -3.28, 8.2, 6.56, .12);
+    const frameShape = new THREE.Shape();
+    roundedRect(frameShape, -4.1, -3.28, 8.2, 6.56, .12);
     const hole = new THREE.Path();
     roundedRect(hole, -3.5, -2.8, 7.24, 5.8, .055);
-    shape.holes.push(hole);
-    const frameGeometry = new THREE.ExtrudeGeometry(shape, {
+    frameShape.holes.push(hole);
+    const frame = new THREE.Mesh(own(new THREE.ExtrudeGeometry(frameShape, {
       depth: .24, bevelEnabled: true, bevelThickness: .035,
       bevelSize: .035, bevelSegments: 3, steps: 1, curveSegments: 10,
-    });
-    const frame = new THREE.Mesh(frameGeometry, metal);
+    })), metal);
     frame.position.z = .1;
     front.add(frame);
 
-    const makeBox = (w: number, h: number, d: number, mat: THREE.Material, radius = .04) =>
-      new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 3, radius), mat);
-
-    const backPlate = makeBox(8.02, 6.4, .15, paleMetal, .07);
-    backPlate.position.z = -.3;
-    object.add(backPlate);
-    const middlePlate = makeBox(8.08, 6.46, .1, darkMetal, .035);
-    middlePlate.position.z = -.1;
-    object.add(middlePlate);
-    const faceBacking = makeBox(7.26, 5.82, .08, paper, .05);
-    faceBacking.position.set(.12, .1, .275);
-    front.add(faceBacking);
-
-    // Fine physical details: the register scale, screw heads and one enamel bar.
-    for (let i = 0; i < 31; i++) {
-      const tick = new THREE.Mesh(new THREE.BoxGeometry(.009, i % 5 === 0 ? .09 : .042, .007), marking);
-      tick.position.set(-3.25 + i * .105, -3.063, .378);
+    const backPlate = makeBox(8.02, 6.4, .14, back, .065);
+    const middlePlate = makeBox(8.08, 6.46, .1, edge);
+    const backing = makeBox(7.25, 5.81, .08, dark);
+    backing.position.set(SCREEN.x, SCREEN.y, .275);
+    object.add(backPlate, middlePlate);
+    front.add(backing);
+    const tickGeometry = own(new THREE.BoxGeometry(.009, .045, .008));
+    for (let i = 0; i < 23; i++) {
+      const tick = new THREE.Mesh(tickGeometry, marking);
+      tick.scale.y = i % 5 === 0 ? 2 : 1;
+      tick.position.set(-3.24 + i * .1, -3.063, .38);
       front.add(tick);
     }
-    const enamel = makeBox(.56, .038, .015, accent, .006);
+    const enamel = makeBox(.54, .032, .014, accent, .005);
     enamel.position.set(2.82, -3.063, .383);
     front.add(enamel);
+    const screwGeometry = own(new THREE.CylinderGeometry(.026, .026, .012, 12));
     for (const [x, y] of [[-3.85, 3.03], [-3.85, -3.03], [3.86, 3.03], [3.86, -3.03]]) {
-      const screw = new THREE.Mesh(new THREE.CylinderGeometry(.039, .039, .01, 16), marking);
+      const screw = new THREE.Mesh(screwGeometry, marking);
       screw.rotation.x = Math.PI / 2;
-      screw.position.set(x, y, .378);
+      screw.position.set(x, y, .38);
       front.add(screw);
-      const slot = new THREE.Mesh(new THREE.BoxGeometry(.039, .005, .004), paleMetal);
-      slot.rotation.z = .4;
-      slot.position.set(x, y, .385);
-      front.add(slot);
     }
 
-    const dialMount = new THREE.Mesh(new THREE.CylinderGeometry(.43, .43, .09, 64), darkMetal);
-    dialMount.rotation.x = Math.PI / 2;
-    dialMount.position.set(4.095, -1.96, .22);
-    front.add(dialMount);
-    const dial = new THREE.Group();
-    dial.position.set(4.095, -1.96, .32);
-    front.add(dial);
-    const dialBody = new THREE.Mesh(new THREE.CylinderGeometry(.365, .385, .22, 80), blue);
-    dialBody.rotation.x = Math.PI / 2;
-    dial.add(dialBody);
-    const teeth = new THREE.InstancedMesh(new THREE.BoxGeometry(.018, .043, .17), blue, 56);
-    const tooth = new THREE.Object3D();
-    for (let i = 0; i < 56; i++) {
-      const a = i / 56 * Math.PI * 2;
-      tooth.position.set(Math.sin(a) * .372, Math.cos(a) * .372, 0);
-      tooth.rotation.z = -a;
-      tooth.updateMatrix();
-      teeth.setMatrixAt(i, tooth.matrix);
-    }
-    dial.add(teeth);
-    const dialInset = new THREE.Mesh(new THREE.CylinderGeometry(.278, .278, .009, 64), blue);
-    dialInset.rotation.x = Math.PI / 2;
-    dialInset.position.z = .117;
-    dial.add(dialInset);
-    const dialMarker = makeBox(.028, .09, .009, paper, .007);
-    dialMarker.position.set(0, .21, .126);
-    dial.add(dialMarker);
-
-    // Hand-drawn maker's mark, placed on the substantial left edge.
-    const makerPoints = [new THREE.Vector3(-3.98, .15, .38), new THREE.Vector3(-3.91, -.14, .38),
-      new THREE.Vector3(-3.83, .04, .38), new THREE.Vector3(-3.75, -.14, .38), new THREE.Vector3(-3.68, .15, .38)];
-    const maker = new THREE.Line(new THREE.BufferGeometry().setFromPoints(makerPoints),
-      new THREE.LineBasicMaterial({ color: 0x777e7d, transparent: true, opacity: .8 }));
-    front.add(maker);
-
-    const shadowCanvas = document.createElement('canvas');
-    shadowCanvas.width = 256;
-    shadowCanvas.height = 256;
-    const context = shadowCanvas.getContext('2d');
-    let shadowTexture: THREE.CanvasTexture | undefined;
-    if (context) {
-      const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 125);
-      gradient.addColorStop(0, 'rgba(60,58,48,.32)');
-      gradient.addColorStop(.35, 'rgba(60,58,48,.15)');
-      gradient.addColorStop(1, 'rgba(60,58,48,0)');
-      context.fillStyle = gradient;
-      context.fillRect(0, 0, 256, 256);
-      shadowTexture = new THREE.CanvasTexture(shadowCanvas);
-      cleanupTasks.push(() => shadowTexture?.dispose());
-      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(11, 5),
-        new THREE.MeshBasicMaterial({ map: shadowTexture, transparent: true, depthWrite: false, opacity: .65 }));
-      shadow.rotation.x = -Math.PI / 2;
-      shadow.position.set(.2, -3.65, -.4);
-      scene.add(shadow);
-    }
+    const knob = new THREE.Group();
+    knob.position.set(4.09, -1.96, .29);
+    front.add(knob);
+    const knobBody = new THREE.Mesh(own(new THREE.CylinderGeometry(.29, .32, .22, 48)), back);
+    knobBody.rotation.x = Math.PI / 2;
+    knob.add(knobBody);
+    const knobFace = new THREE.Mesh(own(new THREE.CylinderGeometry(.25, .25, .014, 48)), accent);
+    knobFace.rotation.x = Math.PI / 2;
+    knobFace.position.z = .118;
+    knob.add(knobFace);
+    const knobMarker = makeBox(.018, .075, .008, dark, .003);
+    knobMarker.position.set(0, .16, .13);
+    knob.add(knobMarker);
 
     const surface = document.createElement('div');
     surface.className = 'precision-css-surface';
-    surface.style.width = '720px';
-    surface.style.height = '576px';
-    responsiveMode = false;
-    syncDemoLayout();
-    demoElement.style.width = '720px';
-    demoElement.style.height = '576px';
-    surface.append(demoElement);
+    surface.style.width = `${SCREEN.width}px`;
+    surface.style.height = `${SCREEN.height}px`;
+    // Keep the persistent slot connected even before the first visible render.
+    // CSS3DRenderer moves this surface into its camera element when it draws.
+    cssRenderer.domElement.append(surface);
     const cssObject = new CSS3DObject(surface);
-    cssObject.scale.setScalar(.01);
-    cssObject.position.set(.12, .1, .382);
+    cssObject.scale.setScalar(SCREEN.scale);
+    cssObject.position.set(SCREEN.x, SCREEN.y, SCREEN.z);
     htmlObject.add(cssObject);
 
-    let frameRequest = 0;
-    let visible = true;
-    let hidden = document.hidden;
-    let alive = true;
-    const knobState = { angle: GOAL_ANGLE[currentGoal] };
-    cleanupTasks.push(() => {
-      alive = false;
+    const cancelRender = () => {
       if (frameRequest) cancelAnimationFrame(frameRequest);
-      gsap.killTweensOf(knobState);
-    });
-
+      frameRequest = 0;
+    };
     const render = () => {
       frameRequest = 0;
-      if (!alive || !visible || hidden) return;
-      renderer.render(scene, camera);
-      cssRenderer.render(htmlScene, camera);
+      if (!alive || !enabled || !visible || document.hidden) return;
+      try {
+        renderer.render(scene, camera);
+        cssRenderer.render(htmlScene, camera);
+      } catch (error) { failProjection(error); }
     };
     const requestRender = () => {
-      if (alive && visible && !hidden && !frameRequest) frameRequest = window.requestAnimationFrame(render);
+      if (alive && enabled && visible && !document.hidden && !frameRequest) frameRequest = requestAnimationFrame(render);
     };
-    updateMode = (mode) => {
-      // Explicit poses share the original geometry and HTML projection. No
-      // scroll position can change the user's chosen interaction mode.
-      const progress = mode === 'interactive' ? 1 : mode === 'layers' ? .5 : 0;
-      const opening = Math.sin(Math.PI * ease(progress)) ** 2;
-      const ending = ease((progress - .56) / .35);
-      object.rotation.set(
-        THREE.MathUtils.lerp(.035 + opening * .055, 0, ending),
-        THREE.MathUtils.lerp(-.25 - opening * .4, 0, ending),
-        THREE.MathUtils.lerp(-.024, 0, ending),
-      );
-      object.position.set(-.08 * (1 - ending), .06 + opening * .06, 0);
-      object.scale.setScalar(1 - opening * .025);
-      // Positive lateral offsets reinforce the projection of the negative
-      // depth: each layer reveals a broad face to the right, away from the copy.
-      backPlate.position.set(opening * .72, opening * .12, -.3 - opening * 1.65);
-      middlePlate.position.set(opening * .36, opening * .06, -.1 - opening * .82);
-      front.position.z = opening * .09;
+    const setPose = (mode: SceneMode) => {
+      const layers = mode === 'layers';
+      object.rotation.set(layers ? .075 : .055, layers ? -.48 : -.24, layers ? -.025 : -.018);
+      object.position.set(layers ? -.38 : -.06, .08, 0);
+      backPlate.position.set(layers ? .48 : 0, layers ? .14 : 0, layers ? -1.85 : -.27);
+      middlePlate.position.set(layers ? .24 : 0, layers ? .07 : 0, layers ? -.9 : -.08);
+      front.position.z = layers ? .1 : 0;
+      // A single transform and camera feed both renderers. The HTML sits just
+      // inside the beveled opening, in world units (720px = 7.2 units).
       htmlObject.position.copy(object.position);
-      htmlObject.rotation.copy(object.rotation);
+      htmlObject.quaternion.copy(object.quaternion);
       htmlObject.scale.copy(object.scale);
-      cssObject.position.z = .382 + front.position.z;
-      layerLegend.style.opacity = String(ease((progress - .19) / .13) * (1 - ease((progress - .66) / .14)));
-      layerLegend.style.transform = `translateY(${(1 - opening) * 6}px)`;
-      setDemoInteractive(mode === 'interactive');
+      cssObject.position.z = SCREEN.z + front.position.z;
       requestRender();
     };
-
-    updateGoal = (goal) => {
+    const setGoal = (goal: DemoGoal) => {
       accent.color.set(GOAL_ACCENT[goal]);
-      gsap.killTweensOf(knobState);
-      gsap.to(knobState, {
-        angle: GOAL_ANGLE[goal], duration: .65, ease: 'power2.out',
-        onUpdate: () => { dial.rotation.z = knobState.angle; requestRender(); },
-      });
+      knob.rotation.z = GOAL_ANGLE[goal];
+      requestRender();
     };
-    dial.rotation.z = knobState.angle;
-
     const resize = () => {
+      if (!alive) return;
       const width = Math.max(1, container.clientWidth);
       const height = Math.max(1, container.clientHeight);
       camera.aspect = width / height;
-      // Fit both dimensions, with breathing room for the prominent side dial.
-      const halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
-      const fitHeight = 7.65 / (2 * Math.tan(halfFov));
-      const fitWidth = 9.7 / (2 * Math.tan(halfFov) * camera.aspect);
-      camera.position.z = Math.max(fitHeight, fitWidth);
+      const fov = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      camera.position.set(0, 0, Math.max(7.65 / (2 * fov), 10 / (2 * fov * camera.aspect)));
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
       cssRenderer.setSize(width, height);
       requestRender();
     };
-    const resizeObserver = new ResizeObserver(resize);
-    cleanupTasks.push(() => resizeObserver.disconnect());
+    const resizeObserver = new ResizeObserver(() => {
+      try { resize(); } catch (error) { failProjection(error); }
+    });
+    cleanups.push(() => resizeObserver.disconnect());
     resizeObserver.observe(container);
-    const intersectionObserver = new IntersectionObserver((entries) => {
-      visible = entries[0]?.isIntersecting ?? true;
+    const intersectionObserver = new IntersectionObserver(entries => {
+      visible = entries[0]?.isIntersecting ?? false;
       if (visible) requestRender();
-      else if (frameRequest) { cancelAnimationFrame(frameRequest); frameRequest = 0; }
-    }, { rootMargin: '180px' });
-    cleanupTasks.push(() => intersectionObserver.disconnect());
+      else cancelRender();
+    });
+    cleanups.push(() => intersectionObserver.disconnect());
     intersectionObserver.observe(container);
-    const onVisibility = () => {
-      hidden = document.hidden;
-      if (hidden && frameRequest) { cancelAnimationFrame(frameRequest); frameRequest = 0; }
-      else requestRender();
-    };
+    const onVisibility = () => { if (document.hidden) cancelRender(); else requestRender(); };
     document.addEventListener('visibilitychange', onVisibility);
-    cleanupTasks.push(() => document.removeEventListener('visibilitychange', onVisibility));
-
+    cleanups.push(() => document.removeEventListener('visibilitychange', onVisibility));
     const onContextLost = (event: Event) => {
       event.preventDefault();
-      if (alive && !disposed) {
-        webglUnavailable = true;
-        switchMode();
-      }
+      if (alive && !disposed) failProjection();
     };
     renderer.domElement.addEventListener('webglcontextlost', onContextLost);
-    cleanupTasks.push(() => renderer.domElement.removeEventListener('webglcontextlost', onContextLost));
+    cleanups.push(() => renderer.domElement.removeEventListener('webglcontextlost', onContextLost));
     resize();
-    updateMode(currentMode);
-
-    return cleanup;
+    return {
+      surface, setPose, setGoal,
+      setEnabled(value: boolean) {
+        enabled = value;
+        renderer.domElement.hidden = !value;
+        cssRenderer.domElement.hidden = !value;
+        if (value) requestRender(); else cancelRender();
+      },
+    };
   };
 
-  const switchMode = () => {
-    modeCleanup?.();
-    modeCleanup = undefined;
-    updateGoal = undefined;
-    updateMode = undefined;
-    container.classList.remove('precision-scene--static', 'precision-scene--mobile');
-    if (webglUnavailable || mobileMedia.matches || motionMedia.matches) {
-      modeCleanup = createStatic(mobileMedia.matches);
-    } else {
-      try {
-        modeCleanup = createWebGL();
-      } catch (error) {
-        // No part of the demo is dependent on WebGL availability.
-        modeCleanup?.();
-        webglUnavailable = true;
-        container.querySelectorAll('.precision-webgl, .precision-css3d').forEach((element) => element.remove());
-        modeCleanup = createStatic(false);
-        console.info('Webbyu: using the accessible static frame.', error);
-      }
+  function applyMode() {
+    if (disposed) return;
+    if (demoElement.parentElement === nativeSurface && !nativeFrame.hidden) nativeScroll = nativeSurface.scrollTop;
+    const fallback = unavailable || mobileMedia.matches || motionMedia.matches;
+    const native = fallback || currentMode === 'interactive';
+    if (fallback && projection) {
+      cleanupProjection?.();
+      cleanupProjection = undefined;
+      projection = undefined;
     }
+    if (!fallback && !projection) {
+      try { projection = createProjection(); }
+      catch (error) { failProjection(error); return; }
+    }
+    container.dataset.goal = currentGoal;
+    container.dataset.mode = currentMode;
+    container.classList.toggle('precision-scene--static', fallback);
+    container.classList.toggle('precision-scene--mobile', mobileMedia.matches);
+    container.classList.toggle('precision-scene--native', native);
+    container.classList.toggle('precision-scene--interactive', native);
+    nativeFrame.hidden = !native;
+    legend.hidden = currentMode !== 'layers';
+    responsiveMode = native;
+    syncDemoLayout();
+    demoElement.inert = !native;
+    demoElement.style.pointerEvents = native ? 'auto' : 'none';
+    demoElement.style.width = native ? '100%' : `${SCREEN.width}px`;
+    demoElement.style.height = native ? 'auto' : `${SCREEN.height}px`;
+    if (native) {
+      moveSlot(nativeSurface);
+      nativeSurface.scrollTop = nativeScroll;
+    } else {
+      moveSlot(projection!.surface);
+    }
+    projection?.setEnabled(!native);
+    projection?.setPose(currentMode);
+    projection?.setGoal(currentGoal);
+  }
+
+  const updateAccent = () => {
     container.style.setProperty('--scene-goal-accent', GOAL_ACCENT[currentGoal]);
     container.style.setProperty('--scene-dial-angle', `${GOAL_ANGLE[currentGoal]}rad`);
   };
-  const onModeChange = () => { if (!disposed) switchMode(); };
-  mobileMedia.addEventListener('change', onModeChange);
-  motionMedia.addEventListener('change', onModeChange);
-  switchMode();
+  const onMediaChange = () => applyMode();
+  mobileMedia.addEventListener('change', onMediaChange);
+  motionMedia.addEventListener('change', onMediaChange);
+  // Synchronize slot children restored by the catalogue/dialog, without taking
+  // ownership of them or listening to application/shell events.
+  const slotObserver = new MutationObserver(syncDemoLayout);
+  slotObserver.observe(demoElement, { childList: true });
+  updateAccent();
+  applyMode();
 
   return {
     setGoal(goal) {
       if (disposed) return;
+      if (currentGoal !== goal) { nativeScroll = 0; nativeSurface.scrollTop = 0; }
       currentGoal = goal;
       container.dataset.goal = goal;
-      container.style.setProperty('--scene-goal-accent', GOAL_ACCENT[goal]);
-      container.style.setProperty('--scene-dial-angle', `${GOAL_ANGLE[goal]}rad`);
+      updateAccent();
       syncDemoLayout();
-      updateGoal?.(goal);
+      projection?.setGoal(goal);
     },
     setMode(mode) {
       if (disposed) return;
+      // Repeated catalogue notifications must not reset a long form's scroll.
+      if (currentMode === mode) { syncDemoLayout(); return; }
+      if (demoElement.parentElement === nativeSurface) nativeScroll = nativeSurface.scrollTop;
       currentMode = mode;
-      container.dataset.mode = mode;
-      syncDemoLayout();
-      updateMode?.(mode);
+      applyMode();
     },
     dispose() {
       if (disposed) return;
       disposed = true;
-      modeCleanup?.();
-      mobileMedia.removeEventListener('change', onModeChange);
-      motionMedia.removeEventListener('change', onModeChange);
-      container.classList.remove('precision-scene', 'precision-scene--static', 'precision-scene--mobile', 'precision-scene--interactive');
-      container.style.removeProperty('--scene-goal-accent');
-      container.style.removeProperty('--scene-dial-angle');
-      delete container.dataset.goal;
-      delete container.dataset.mode;
-      for (const [demo, wasResponsive] of responsiveClasses) demo.classList.toggle('demo--responsive', wasResponsive);
+      slotObserver.disconnect();
+      cleanupProjection?.();
+      mobileMedia.removeEventListener('change', onMediaChange);
+      motionMedia.removeEventListener('change', onMediaChange);
+      nativeFrame.remove();
+      legend.remove();
+      container.classList.remove('precision-scene', 'precision-scene--static', 'precision-scene--mobile', 'precision-scene--native', 'precision-scene--interactive');
+      for (const [key, value] of [['data-goal', originalGoal], ['data-mode', originalMode]]) {
+        if (value === null) container.removeAttribute(key!); else container.setAttribute(key!, value!);
+      }
+      for (const [key, value] of [['--scene-goal-accent', originalAccent], ['--scene-dial-angle', originalAngle]]) {
+        if (value) container.style.setProperty(key, value); else container.style.removeProperty(key);
+      }
+      for (const [demo, responsive] of responsiveClasses) demo.classList.toggle('demo--responsive', responsive);
       responsiveClasses.clear();
-      demoElement.classList.toggle('demo--responsive', originallyResponsive);
+      demoElement.classList.toggle('demo--responsive', originalResponsive);
+      demoElement.classList.toggle('precision-demo-slot', originalSlotClass);
       demoElement.inert = originalInert;
-      if (originalStyle === null) demoElement.removeAttribute('style');
-      else demoElement.setAttribute('style', originalStyle);
+      if (originalStyle === null) demoElement.removeAttribute('style'); else demoElement.setAttribute('style', originalStyle);
       if (originalParent) {
         if (originalNextSibling?.parentNode === originalParent) originalParent.insertBefore(demoElement, originalNextSibling);
         else originalParent.appendChild(demoElement);
