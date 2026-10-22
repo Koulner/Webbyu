@@ -1,12 +1,28 @@
 .precision-scene {
-  --scene-goal-accent: #2558ee;
+  --scene-goal-accent: #c7b29a;
   --scene-dial-angle: -.72rad;
   position: relative;
   isolation: isolate;
   width: 100%;
-  overflow: visible;
+  height: clamp(440px, 48vw, 660px);
+  min-width: 0;
+  color: #e5dcd4;
+  background: radial-gradient(ellipse at 52% 38%, #51344835, transparent 65%), #151419;
 }
 
+.precision-scene::before {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 18%;
+  bottom: 5%;
+  height: 8%;
+  border-radius: 50%;
+  background: #08070bc7;
+  filter: blur(18px);
+  pointer-events: none;
+}
+.precision-scene [hidden] { display: none !important; }
 .precision-webgl,
 .precision-css3d {
   position: absolute;
@@ -15,97 +31,89 @@
   height: 100%;
   pointer-events: none;
 }
-
 .precision-webgl { z-index: 1; }
 .precision-css3d { z-index: 2; }
-
 .precision-css-surface {
   overflow: hidden;
   border-radius: 5px;
-  background: #f8f7f1;
+  background: #f5f1ea;
   backface-visibility: hidden;
-  pointer-events: none;
+  pointer-events: none !important;
   contain: layout paint;
 }
-
 .precision-css-surface > * { margin: 0; }
-.precision-scene--interactive .precision-css-surface { pointer-events: auto; }
-
+.precision-demo-slot { min-width: 0; }
 .precision-layers {
   position: absolute;
   z-index: 3;
-  inset-inline: 7%;
-  bottom: 2%;
+  inset-inline: 12px;
+  bottom: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 22px;
+  gap: 12px 28px;
   pointer-events: none;
-  opacity: 0;
-  color: #52574f;
-  font-size: 12px;
-  letter-spacing: .015em;
+  color: #e5dcd4;
+  font: 400 12px/1.5 var(--font-sans, 'Instrument Sans', sans-serif);
+  letter-spacing: .025em;
 }
-.precision-layers span { display: inline-flex; align-items: center; gap: 7px; }
-.precision-layers i { font-style: normal; font-size: 12px; color: #244bff; }
+.precision-layers span { display: inline-flex; align-items: center; gap: 8px; }
+.precision-layers i { color: #c7b29a; font-style: normal; font-variant-numeric: tabular-nums; }
 
-.precision-scene--static {
-  height: auto !important;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 30px 26px 35px 10px;
-}
-
+/* A native, unscaled screen for interaction. The surrounding material echoes
+   the WebGL frame; the surface scrolls normally, including deep demo panels. */
 .precision-static-frame {
   position: relative;
-  width: 100%;
-  max-width: 780px;
-  padding: 19px 15px 33px 33px;
-  border: 1px solid #c9cecb;
-  border-radius: 11px;
-  background: linear-gradient(125deg, #f8f9f6 0%, #d4d7d3 20%, #eceee9 45%, #c4c8c5 100%);
-  box-shadow: 0 1px 0 #fff inset, 2px 3px 0 #b1b7b4, 5px 7px 0 #dedfd9,
-    6px 8px 0 #c4c8c2, 16px 27px 35px -27px #2c302f66;
-  transform-origin: 50% 50%;
+  top: 24px;
+  z-index: 2;
+  box-sizing: border-box;
+  width: calc(100% - 64px);
+  max-width: 960px;
+  height: calc(100% - 56px);
+  margin-inline: auto;
+  padding: 15px 15px 32px 27px;
+  border: 1px solid #9b8b795c;
+  border-radius: 12px;
+  background: linear-gradient(125deg, #615963 0%, #343039 22%, #29252d 60%, #4d4349);
+  box-shadow: 0 1px 0 #dccab04a inset, 1px 3px 0 #1e1b22, 2px 5px 0 #76675c88,
+    3px 7px 0 #28212b, 0 22px 48px -20px #000c;
 }
-
 .precision-static-frame::before,
 .precision-static-frame::after {
   content: '';
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
-  border: 1px solid #9ca49f;
-  top: 8px;
+  background: #c7b29a88;
+  top: 6px;
 }
 .precision-static-frame::before { left: 12px; }
-.precision-static-frame::after { right: 9px; }
-
+.precision-static-frame::after { right: 10px; }
 .precision-static-surface {
   position: relative;
-  overflow: hidden;
-  border: 1px solid #bcc1ba;
-  border-radius: 4px;
-  background: #f8f7f1;
-  box-shadow: 0 1px 2px #3b44322b;
-  container-type: inline-size;
+  box-sizing: border-box;
+  height: 100%;
   min-width: 0;
+  overflow: auto;
+  border: 1px solid #17141a;
+  border-radius: 4px;
+  background: #f5f1ea;
+  color-scheme: light;
+  scrollbar-width: thin;
+  scrollbar-color: #8f7e88 #eee7e0;
+  container-type: inline-size;
+  box-shadow: 0 0 0 1px #bca68d40;
 }
-
 .precision-static-surface > * { min-width: 0; max-width: 100%; }
-
 .precision-static-trim {
   position: absolute;
-  left: 36px;
-  right: 32px;
+  left: 31px;
+  right: 25px;
   bottom: 13px;
   height: 5px;
-  background: repeating-linear-gradient(90deg, #909891 0 1px, transparent 1px 7px);
-  background-size: 126px 5px;
-  background-repeat: no-repeat;
+  background: repeating-linear-gradient(90deg, #c7b29a80 0 1px, transparent 1px 7px) left/126px 5px no-repeat;
 }
 .precision-static-trim::after {
   content: '';
@@ -116,69 +124,65 @@
   width: 33px;
   border-radius: 1px;
   background: var(--scene-goal-accent);
-  transition: background-color .3s ease;
 }
-
 .precision-static-dial {
   position: absolute;
   z-index: 3;
-  width: 37px;
-  height: 37px;
-  right: -18px;
+  width: 30px;
+  height: 30px;
+  right: -14px;
   bottom: 16%;
-  border: 2px solid #2e55df;
+  border: 2px solid #756172;
   border-radius: 50%;
-  background: repeating-conic-gradient(#244cd6 0deg 3deg, #4068ec 3deg 7deg);
-  box-shadow: 2px 3px 0 #143cb7, 3px 5px 5px #0a247333;
+  background: #513448;
+  box-shadow: 2px 3px 0 #241d26, 3px 6px 7px #0006;
   transform: rotate(var(--scene-dial-angle));
-  transition: transform .65s cubic-bezier(.2, .7, .2, 1);
+  pointer-events: none;
 }
 .precision-static-dial::before {
   content: '';
   position: absolute;
   inset: 3px;
   border-radius: inherit;
-  background: linear-gradient(135deg, #3767fb, #1949dc);
-  box-shadow: 0 1px 0 #7596ff inset;
+  background: var(--scene-goal-accent);
+  box-shadow: 0 1px 1px #fff5 inset;
 }
 .precision-static-dial::after {
   content: '';
   position: absolute;
   width: 2px;
-  height: 7px;
-  top: 6px;
-  left: 15px;
+  height: 6px;
+  top: 5px;
+  left: 12px;
   border-radius: 2px;
-  background: #eef2ff;
+  background: #332b32;
 }
 
-.precision-static-legend {
-  display: none;
-  margin: 16px 0 0;
-  color: #3c413c;
-  font-size: 12px;
-  line-height: 1.5;
-  text-align: center;
+/* Mobile, reduced motion and WebGL failure share the same full HTML flow. */
+.precision-scene.precision-scene--static {
+  box-sizing: border-box;
+  height: auto !important;
+  min-height: 0;
+  padding: 24px 18px 32px;
 }
-.precision-scene[data-mode="layers"] .precision-static-legend {
-  display: block;
+.precision-scene--static .precision-static-frame {
+  top: 0;
+  width: 100%;
+  height: auto;
 }
+.precision-scene--static .precision-static-surface { height: auto; overflow: visible; }
+.precision-scene--static .precision-layers { position: relative; inset: auto; margin-top: 24px; }
 
 @media (max-width: 999px) {
-  .precision-scene--mobile {
-    min-height: 0 !important;
-    height: auto !important;
-    padding: 16px 25px 30px 5px;
-  }
-  .precision-static-frame { max-width: 670px; padding: 12px 10px 28px 20px; border-radius: 8px; }
-  .precision-static-trim { left: 23px; right: 20px; bottom: 11px; }
-  .precision-static-dial { width: 32px; height: 32px; right: -15px; }
-  .precision-static-dial::after { left: 12px; top: 5px; height: 6px; }
-  .precision-static-frame::before { top: 5px; left: 8px; width: 3px; height: 3px; }
-  .precision-static-frame::after { top: 5px; right: 6px; width: 3px; height: 3px; }
+  .precision-scene.precision-scene--mobile { padding: 16px 14px 28px 0; }
+  .precision-scene--mobile .precision-static-frame { max-width: 780px; padding: 10px 8px 27px 14px; border-radius: 8px; }
+  .precision-scene--mobile .precision-static-trim { left: 18px; right: 18px; bottom: 11px; }
+  .precision-scene--mobile .precision-static-dial { width: 24px; height: 24px; right: -12px; }
+  .precision-scene--mobile .precision-static-dial::after { left: 9px; top: 4px; height: 5px; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .precision-static-frame { transform: none !important; }
-  .precision-static-dial, .precision-static-trim::after { transition: none; }
+@media (max-width: 600px) {
+  .precision-scene.precision-scene--mobile { padding-right: 0; }
+  .precision-scene--mobile .precision-static-frame { padding: 8px 5px 25px 7px; }
+  .precision-scene--mobile .precision-static-dial { display: none; }
+  .precision-scene--mobile .precision-layers { gap: 8px 16px; }
 }
