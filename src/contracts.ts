@@ -1,4 +1,4 @@
-import type { DemoGoal } from './data';
+import type { DemoId, Goal } from './data';
 
 /** Stable DOM surfaces shared by the shell and independently owned features. */
 export interface PageMounts {
@@ -12,7 +12,7 @@ export interface PageMounts {
 export type SceneMode = 'presentation' | 'layers' | 'interactive';
 
 export interface CatalogueState {
-  goal: DemoGoal;
+  goal: DemoId;
   mode: SceneMode;
 }
 
@@ -22,7 +22,7 @@ export interface SceneOptions {
 }
 
 export interface SceneController {
-  setGoal(goal: DemoGoal): void;
+  setGoal(goal: DemoId): void;
   setMode(mode: SceneMode): void;
   dispose(): void;
 }
@@ -31,12 +31,12 @@ export interface CatalogueOptions {
   container: HTMLElement;
   demoSlot: HTMLElement;
   onStateChange(state: CatalogueState): void;
-  onProjectRequest(goal: DemoGoal): void;
+  onProjectRequest(goal: Goal): void;
 }
 
 export interface CatalogueController {
   getState(): CatalogueState;
-  selectGoal(goal: DemoGoal): void;
-  open(goal?: DemoGoal): void;
+  selectGoal(goal: DemoId): void;
+  open(goal?: DemoId): void;
   dispose(): void;
 }

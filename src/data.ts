@@ -1,5 +1,5 @@
 export type Goal = 'presence' | 'inquiries' | 'bookings' | 'sales';
-export type DemoGoal = Exclude<Goal, 'presence'>;
+export type DemoId = 'meisterwerk' | 'nordlicht' | 'sales' | 'solara';
 export type PackageId = 'start' | 'business' | 'complete';
 export type PackageChoice = PackageId | 'custom';
 
@@ -20,9 +20,9 @@ export const packages: { id: PackageId; number: string; name: string; price: str
 ];
 
 export const services = [
-  { name: 'Websites', description: 'Eine klare Struktur, eigenständige Gestaltung und Technik, die zu Ihrem Unternehmen passt. Vom kompakten Einstieg bis zum umfangreicheren Auftritt.' },
+  { name: 'Klarheit & Websites', description: 'Komplexe Leistungen verständlich machen. Wir strukturieren Inhalte und Nutzerwege und geben Ihrem Unternehmen einen eigenständigen Auftritt.' },
   { name: 'Foto & Video', description: 'Menschen, Räume und Produkte aus Ihrem Unternehmen. Wir planen Motive, Produktion und Nutzungsrechte passend zum vereinbarten Paket.' },
-  { name: 'Marke & digitale Inhalte', description: 'Farben, Typografie und Inhalte für Ihre Kanäle. Branding, Social-Media-Content und weiterführende SEO vereinbaren wir passend zum Bedarf.' },
+  { name: 'Digitale Werkzeuge', description: 'Bedarfschecks, Produktvergleiche, CMS, Shops oder Portale: Wir wählen Funktionen nach Ihrer Aufgabe. Schnittstellen und Automatisierungen verbinden bei Bedarf Website und Geschäftsabläufe – mit gesondertem Umfang.' },
 ];
 
 export const packageQuestions = [
@@ -44,8 +44,9 @@ export const extensions = [
   { id: '3d', name: 'Etwas Besonderes erleben', short: 'Interaktives 3D', description: 'Produkte und Geschichten mit räumlicher Gestaltung und gezielter Bewegung erlebbar machen.' },
 ];
 
-export const concepts: { goal: DemoGoal; number: string; name: string; type: string; title: string; description: string; tags: string[] }[] = [
-  { goal: 'inquiries', number: '01', name: 'Klarraum', type: 'Beratung & Strategie', title: 'Klarheit, die Vertrauen schafft.', description: 'Ruhige Typografie und eine klare Haltung geben einer Beratung Profil. Ein direkter Anfrageweg macht den nächsten Schritt leicht.', tags: ['Markenauftritt', 'Anfragen', 'CMS'] },
-  { goal: 'bookings', number: '02', name: 'Studio Still', type: 'Bewegung & Balance', title: 'Ankommen. Schon vor dem Termin.', description: 'Eine warme Bildsprache und viel Raum übersetzen die Atmosphäre eines Studios ins Digitale. Die Terminwahl bleibt direkt erreichbar.', tags: ['Webdesign', 'Buchung', 'Lokale Präsenz'] },
-  { goal: 'sales', number: '03', name: 'Safran Atelier', type: 'Genuss & Botanik', title: 'Von der Blüte zum Genuss.', description: 'Eine anonymisierte Designstudie mit botanischen Nahaufnahmen, einer interaktiven Produktgeschichte und einem vollständig lokalen Einkaufsweg.', tags: ['Anonymisierte Demo', 'Produkte', 'Interaktion'] },
+export const concepts: { goal: DemoId; projectGoal: Goal; number: string; name: string; type: string; title: string; description: string; problem: string; solution: string; tags: string[] }[] = [
+  { goal: 'meisterwerk', projectGoal: 'inquiries', number: '01', name: 'Meisterwerk', type: 'Innenausbau & Raumplanung', title: 'Aus einem Raumwunsch wird ein Vorhaben.', description: 'Fallgeschichten, ein Vorher-nachher-Vergleich und Materialentscheidungen führen zu einem konkreten Projektbriefing.', problem: 'Ein Veränderungswunsch ist noch schwer zu beschreiben.', solution: 'Raumideen erkunden und ein Projektbriefing zusammenstellen.', tags: ['Raumfallbuch', 'Bildvergleich', 'Projektbriefing'] },
+  { goal: 'nordlicht', projectGoal: 'inquiries', number: '02', name: 'Nordlicht', type: 'Gebäudetechnik & Service', title: 'Die richtige Frage vor der Technik.', description: 'Ein verzweigter Bedarfscheck unterscheidet Beratung, Wartung und Störung und erklärt den nächsten Gesprächsschritt.', problem: 'Technische Angebote überfordern und Anfragen bleiben unklar.', solution: 'Passende Folgefragen führen zu einer begründeten Einordnung.', tags: ['Bedarfscheck', 'Entscheidungshilfe', 'Kontaktentwurf'] },
+  { goal: 'sales', projectGoal: 'sales', number: '03', name: 'Safran Atelier', type: 'Genuss & Botanik', title: 'Von der Blüte zum Genuss.', description: 'Eine anonymisierte Designstudie mit botanischen Nahaufnahmen, einer interaktiven Produktgeschichte und einem vollständig lokalen Einkaufsweg.', problem: 'Ein besonderes Produkt braucht eine verständliche Geschichte.', solution: 'Die Kamerafahrt verbindet Entdeckung, Produktauswahl und Einkauf.', tags: ['Anonymisierte Demo', 'Produkte', 'Interaktion'] },
+  { goal: 'solara', projectGoal: 'inquiries', number: '04', name: 'Solara', type: 'B2B-Beschaffung & Produktentwicklung', title: 'Vom Aromaprofil zur qualifizierten Anfrage.', description: 'Zwei Arbeitswege, ein Produktvergleich, die Musterliste und ein Blend-Briefing verbinden Entdeckung und Beschaffung.', problem: 'Produktwissen und Anforderungen liegen an verschiedenen Stellen.', solution: 'Rohstoffe vergleichen, Muster sammeln und eine Anfrage vorbereiten.', tags: ['Rohstoffregister', 'Produktvergleich', 'Musteranfrage'] },
 ];

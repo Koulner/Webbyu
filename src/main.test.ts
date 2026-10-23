@@ -59,6 +59,7 @@ describe('concept demo integration', () => {
     mount();
     await app.sceneReady;
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
+    app.catalogue.selectGoal('sales');
     const heroDemo = document.querySelector<HTMLElement>('#hero-demo-slot .demo')!;
     const inlinePanel = heroDemo.querySelector<HTMLElement>('.demo-panel')!;
     expect(inlinePanel.hidden).toBe(true);
@@ -71,14 +72,14 @@ describe('concept demo integration', () => {
     heroDemo.querySelector<HTMLButtonElement>('[data-panel-close]')!.click();
     expect(inlinePanel.hidden).toBe(true);
 
-    const launchButton = button('button[data-demo="bookings"]');
+    const launchButton = button('button[data-demo="nordlicht"]');
     launchButton.focus();
     launchButton.click();
     expect(dialog.open).toBe(true);
     expect(showModal).toHaveBeenCalledTimes(1);
-    expect(dialog.querySelector('[data-dialog-title]')!.textContent).toBe('Studio Still');
+    expect(dialog.querySelector('[data-dialog-title]')!.textContent).toBe('Nordlicht');
     const booking = dialog.querySelector('.demo')!;
-    expect(booking.getAttribute('data-demo')).toBe('bookings');
+    expect(booking.getAttribute('data-demo')).toBe('nordlicht');
     expect(document.querySelector('#hero-demo-slot .demo')).toBeNull();
     button('.concept-dialog-close').click();
     expect(dialog.open).toBe(false);
@@ -94,7 +95,7 @@ describe('concept demo integration', () => {
       description: 'Mein Projekt', name: 'Ada', email: 'ada@example.test',
     };
     store.update(answers);
-    expect(app.catalogue.getState()).toEqual({ goal: 'inquiries', mode: 'presentation' });
+    expect(app.catalogue.getState()).toEqual({ goal: 'meisterwerk', mode: 'presentation' });
     button('[data-scene-mode="interactive"]').click();
     button('[data-catalogue-goal="sales"]').click();
     button('[data-open-current]').click();
@@ -111,7 +112,7 @@ describe('concept demo integration', () => {
     const initialized = deferred<SceneController>();
     const initScene = vi.fn(() => initialized.promise);
     mount(() => imported.promise);
-    app.catalogue.selectGoal('bookings');
+    app.catalogue.selectGoal('nordlicht');
     button('[data-scene-mode="layers"]').click();
     imported.resolve({ initScene });
     await vi.waitFor(() => expect(initScene).toHaveBeenCalledTimes(1));
@@ -165,12 +166,12 @@ describe('concept demo integration', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     mount(async () => { throw new Error('Chunk unavailable'); });
     const inquiry = document.querySelector<HTMLElement>('#hero-demo-slot .demo')!;
-    const name = inquiry.querySelector<HTMLInputElement>('[name="name"]')!;
+    const name = inquiry.shadowRoot!.querySelector<HTMLInputElement>('[name="name"]')!;
     name.value = 'Bleibt erhalten';
     await app.sceneReady;
     app.catalogue.selectGoal('sales');
     button('#hero-demo-slot [data-add-cart]').click();
-    app.catalogue.selectGoal('inquiries');
+    app.catalogue.selectGoal('meisterwerk');
     expect(document.querySelector('#hero-demo-slot .demo')).toBe(inquiry);
     expect(name.value).toBe('Bleibt erhalten');
     expect(inquiry.classList.contains('demo--responsive')).toBe(true);

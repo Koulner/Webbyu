@@ -3,7 +3,7 @@ import './tokens.css';
 import './styles.css';
 import './scene.css';
 import './content.css';
-import { extensions, packages, type DemoGoal, type PackageId } from './data';
+import { extensions, packages, type DemoId, type PackageId } from './data';
 import type { SceneController, SceneOptions } from './contracts';
 import { briefStore, type BriefStore } from './state';
 import { createDemo } from './demos';
@@ -56,13 +56,13 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   const previewObservers: ResizeObserver[] = [];
   root.querySelectorAll<HTMLElement>('[data-preview]').forEach(preview => {
     const inner = preview.querySelector<HTMLElement>('.preview-canvas')!;
-    inner.append(createDemo(preview.dataset.preview as DemoGoal, { interactive: false }));
+    inner.append(createDemo(preview.dataset.preview as DemoId, { interactive: false }));
     const observer = new ResizeObserver(() => { inner.style.transform = `scale(${preview.clientWidth / 720})`; });
     observer.observe(preview);
     previewObservers.push(observer);
   });
   root.querySelectorAll<HTMLButtonElement>('button[data-demo]').forEach(button => {
-    button.addEventListener('click', () => catalogue.open(button.dataset.demo as DemoGoal), listenerOptions);
+    button.addEventListener('click', () => catalogue.open(button.dataset.demo as DemoId), listenerOptions);
   });
   root.querySelectorAll<HTMLAnchorElement>('a[href="#projektfinder"]').forEach(link => {
     link.addEventListener('click', event => {

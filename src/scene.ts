@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import { CSS3DObject, CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import type { DemoGoal } from './data';
+import type { DemoId } from './data';
 import type { SceneController, SceneMode, SceneOptions } from './contracts';
 import './scene.css';
 
-const GOAL_ANGLE: Record<DemoGoal, number> = { inquiries: -.72, bookings: 0, sales: .72 };
-const GOAL_ACCENT: Record<DemoGoal, string> = {
-  inquiries: '#c7b29a', bookings: '#b598b0', sales: '#cfa477',
+const GOAL_ANGLE: Record<DemoId, number> = { meisterwerk: -.72, nordlicht: 0, sales: .72, solara: 1.15 };
+const GOAL_ACCENT: Record<DemoId, string> = {
+  meisterwerk: '#c7b29a', nordlicht: '#9bb8d8', sales: '#cfa477', solara: '#d6ba70',
 };
 const SCREEN = { width: 720, height: 576, scale: .01, x: .12, y: .1, z: .382 };
 
@@ -27,7 +27,7 @@ export async function initScene({ container, demoElement }: SceneOptions): Promi
   const responsiveClasses = new Map<HTMLElement, boolean>();
   const mobileMedia = window.matchMedia('(max-width: 999px)');
   const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let currentGoal: DemoGoal = 'inquiries';
+  let currentGoal: DemoId = 'meisterwerk';
   let currentMode: SceneMode = 'presentation';
   let responsiveMode = false;
   let unavailable = false;
@@ -37,7 +37,7 @@ export async function initScene({ container, demoElement }: SceneOptions): Promi
   let projection: {
     surface: HTMLElement;
     setPose: (mode: SceneMode) => void;
-    setGoal: (goal: DemoGoal) => void;
+    setGoal: (goal: DemoId) => void;
     setEnabled: (enabled: boolean) => void;
   } | undefined;
 
@@ -261,7 +261,7 @@ export async function initScene({ container, demoElement }: SceneOptions): Promi
       cssObject.position.z = SCREEN.z + front.position.z;
       requestRender();
     };
-    const setGoal = (goal: DemoGoal) => {
+    const setGoal = (goal: DemoId) => {
       accent.color.set(GOAL_ACCENT[goal]);
       knob.rotation.z = GOAL_ANGLE[goal];
       requestRender();

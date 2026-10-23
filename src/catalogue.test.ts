@@ -46,14 +46,14 @@ function setup() {
 describe('catalogue sessions and explicit controls', () => {
   it('starts in presentation and preserves explicit mode while selecting labelled concepts', () => {
     const { controller, container, click, onStateChange, onProjectRequest } = setup();
-    expect(controller.getState()).toEqual({ goal: 'inquiries', mode: 'presentation' });
-    expect(container.querySelector('[data-catalogue-goal="inquiries"]')!.textContent).toContain('01 / 03KlarraumAnfragen');
-    expect(container.querySelector('[data-catalogue-goal="bookings"]')!.textContent).toContain('02 / 03Studio StillBuchungen');
-    expect(container.querySelector('[data-catalogue-goal="sales"]')!.textContent).toContain('03 / 03Safran AtelierVerkäufe');
+    expect(controller.getState()).toEqual({ goal: 'meisterwerk', mode: 'presentation' });
+    expect(container.querySelector('[data-catalogue-goal="meisterwerk"]')!.textContent).toContain('01 / 04MeisterwerkRaumfallbuch');
+    expect(container.querySelector('[data-catalogue-goal="nordlicht"]')!.textContent).toContain('02 / 04NordlichtBedarfscheck');
+    expect(container.querySelector('[data-catalogue-goal="sales"]')!.textContent).toContain('03 / 04Safran AtelierAnonymisierte Demo');
     click('[data-scene-mode="interactive"]');
-    click('[data-catalogue-goal="bookings"]');
-    expect(controller.getState()).toEqual({ goal: 'bookings', mode: 'interactive' });
-    expect(onStateChange).toHaveBeenLastCalledWith({ goal: 'bookings', mode: 'interactive' });
+    click('[data-catalogue-goal="nordlicht"]');
+    expect(controller.getState()).toEqual({ goal: 'nordlicht', mode: 'interactive' });
+    expect(onStateChange).toHaveBeenLastCalledWith({ goal: 'nordlicht', mode: 'interactive' });
     click('[data-scene-mode="layers"]');
     controller.selectGoal('sales');
     expect(controller.getState()).toEqual({ goal: 'sales', mode: 'layers' });
@@ -63,32 +63,31 @@ describe('catalogue sessions and explicit controls', () => {
     click('[data-project-request]');
     expect(onProjectRequest).toHaveBeenCalledExactlyOnceWith('sales');
     const snapshot = controller.getState();
-    snapshot.goal = 'inquiries';
+    snapshot.goal = 'meisterwerk';
     expect(controller.getState().goal).toBe('sales');
   });
 
-  it('retains form, booking and cart state in one live node per goal across selection and dialog', () => {
+  it('retains briefing, assistant and cart state in one live node per goal across selection and dialog', () => {
     const { controller, demoSlot, dialog } = setup();
     const inquiry = demoSlot.firstElementChild as HTMLElement;
-    const name = inquiry.querySelector<HTMLInputElement>('[name="name"]')!;
+    const name = inquiry.shadowRoot!.querySelector<HTMLInputElement>('[name="name"]')!;
     name.value = 'Ada';
-    controller.selectGoal('bookings');
+    controller.selectGoal('nordlicht');
     const booking = demoSlot.firstElementChild as HTMLElement;
-    const service = booking.querySelector<HTMLSelectElement>('[name="service"]')!;
-    service.value = 'Yoga Flow';
-    booking.querySelector<HTMLButtonElement>('[data-time="18:00"]')!.click();
+    const north = booking.shadowRoot!;
+    north.querySelector<HTMLInputElement>('[value="existing"]')!.click();
+    north.querySelector<HTMLButtonElement>('#next')!.click();
     controller.selectGoal('sales');
     const sales = demoSlot.firstElementChild as HTMLElement;
     sales.querySelector<HTMLButtonElement>('[data-variant="2"]')!.click();
     sales.querySelector<HTMLButtonElement>('[data-add-cart]')!.click();
-    controller.selectGoal('inquiries');
+    controller.selectGoal('meisterwerk');
     expect(demoSlot.firstElementChild).toBe(inquiry);
     expect(name.value).toBe('Ada');
-    controller.open('bookings');
+    controller.open('nordlicht');
     expect(dialog.querySelector('.demo')).toBe(booking);
     expect(demoSlot.querySelector('.demo')).toBeNull();
-    expect(service.value).toBe('Yoga Flow');
-    expect(booking.querySelector('[data-time="18:00"]')!.getAttribute('aria-pressed')).toBe('true');
+    expect(north.querySelector('#progress')!.textContent).toBe('02 / 03');
     dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.click();
     expect(demoSlot.firstElementChild).toBe(booking);
     expect(booking.classList.contains('demo--responsive')).toBe(false);
@@ -96,7 +95,7 @@ describe('catalogue sessions and explicit controls', () => {
     expect(dialog.querySelector('.demo')).toBe(sales);
     expect(sales.querySelector('[data-variant-name]')!.textContent).toBe('3 × 1 g');
     expect(sales.querySelector('[data-cart-count]')!.textContent).toBe('(1)');
-    controller.selectGoal('inquiries');
+    controller.selectGoal('meisterwerk');
     expect(dialog.open).toBe(false);
     expect(demoSlot.firstElementChild).toBe(inquiry);
     controller.selectGoal('sales');
@@ -112,13 +111,13 @@ describe('catalogue sessions and explicit controls', () => {
     demoSlot.classList.add('demo--responsive');
     dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.click();
     expect(inquiry.classList.contains('demo--responsive')).toBe(true);
-    controller.selectGoal('bookings');
+    controller.selectGoal('nordlicht');
     expect(demoSlot.firstElementChild!.classList.contains('demo--responsive')).toBe(true);
     controller.open();
     demoSlot.classList.remove('demo--responsive');
     dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.click();
     expect(demoSlot.firstElementChild!.classList.contains('demo--responsive')).toBe(false);
-    controller.selectGoal('inquiries');
+    controller.selectGoal('meisterwerk');
     expect(demoSlot.firstElementChild).toBe(inquiry);
     expect(inquiry.classList.contains('demo--responsive')).toBe(false);
   });
@@ -147,7 +146,7 @@ describe('catalogue sessions and explicit controls', () => {
     const staleAdd = disposedDemo.querySelector<HTMLButtonElement>('[data-add-cart]')!;
     controller.dispose();
     controller.dispose();
-    controller.selectGoal('bookings');
+    controller.selectGoal('nordlicht');
     controller.open();
     expect(document.querySelector('.concept-dialog')).toBeNull();
     expect(container.childElementCount).toBe(0);
@@ -158,19 +157,20 @@ describe('catalogue sessions and explicit controls', () => {
     const stateCalls = onStateChange.mock.calls.length;
     const next = mountCatalogue({ container, demoSlot, onStateChange, onProjectRequest });
     controllers.push(next);
-    container.querySelector<HTMLButtonElement>('[data-catalogue-goal="bookings"]')!.click();
+    container.querySelector<HTMLButtonElement>('[data-catalogue-goal="nordlicht"]')!.click();
     expect(onStateChange).toHaveBeenCalledTimes(stateCalls + 2);
     expect(document.querySelectorAll('.concept-dialog')).toHaveLength(1);
     expect(demoSlot.querySelectorAll('.demo')).toHaveLength(1);
   });
 
-  it('retains a reviewed order and confirmed inquiry across dialog reparenting, selection and resize', () => {
+  it('retains a reviewed order and partly completed briefing across dialog reparenting, selection and resize', () => {
     const { controller, demoSlot, dialog } = setup();
     const inquiry = demoSlot.firstElementChild as HTMLElement;
-    inquiry.querySelector<HTMLInputElement>('[name="name"]')!.value = 'Ada';
-    inquiry.querySelector<HTMLInputElement>('[name="email"]')!.value = 'ada@example.test';
-    inquiry.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
-    inquiry.querySelector<HTMLButtonElement>('[data-confirm]')!.click();
+    inquiry.shadowRoot!.querySelector<HTMLInputElement>('[name="name"]')!.value = 'Ada';
+    inquiry.shadowRoot!.querySelector<HTMLInputElement>('[name="email"]')!.value = 'ada@example.test';
+    const wish = inquiry.shadowRoot!.querySelector<HTMLTextAreaElement>('[name="wish"]')!;
+    wish.value = 'Mehr Stauraum';
+    inquiry.shadowRoot!.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     controller.selectGoal('sales');
     const sales = demoSlot.firstElementChild as HTMLElement;
     sales.querySelector<HTMLButtonElement>('[data-add-cart]')!.click();
@@ -182,10 +182,10 @@ describe('catalogue sessions and explicit controls', () => {
     demoSlot.classList.add('demo--responsive');
     dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.click();
     expect(sales.classList.contains('demo--responsive')).toBe(true);
-    controller.selectGoal('inquiries');
+    controller.selectGoal('meisterwerk');
     expect(demoSlot.firstElementChild).toBe(inquiry);
-    expect(inquiry.querySelector<HTMLElement>('[data-step="complete"]')!.hidden).toBe(false);
-    expect(inquiry.querySelector('.demo-result')!.textContent).toContain('Ada');
+    expect(inquiry.shadowRoot!.querySelector('#form-step')!.textContent).toBe('02 / 03');
+    expect(wish.value).toBe('Mehr Stauraum');
     controller.selectGoal('sales');
     expect(demoSlot.firstElementChild).toBe(sales);
     expect(sales.querySelector<HTMLElement>('[data-step="review"]')!.hidden).toBe(false);

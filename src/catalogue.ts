@@ -1,24 +1,16 @@
-import { concepts, type DemoGoal } from './data';
+import { concepts, type DemoId } from './data';
 import type { CatalogueController, CatalogueOptions, CatalogueState, SceneMode } from './contracts';
 import { createDemo, disposeDemo, mountDemoDialog } from './demos';
 import './catalogue.css';
 
-const goalLabels: Record<DemoGoal, string> = {
-  inquiries: 'Anfragen', bookings: 'Buchungen', sales: 'Verkäufe',
-};
 const modes: SceneMode[] = ['presentation', 'layers', 'interactive'];
-const goalDescriptions: Record<DemoGoal, string> = {
-  inquiries: 'Beratung mit einem klaren Anfrageweg.',
-  bookings: 'Bewegung mit einem passenden Termin.',
-  sales: 'Botanische Produktwelt mit lokalem Shop.',
-};
 
 /** Owns the live demo sessions. The scene only receives the persistent slot. */
 export function mountCatalogue(options: CatalogueOptions): CatalogueController {
   const { container, demoSlot, onStateChange, onProjectRequest } = options;
-  let state: CatalogueState = { goal: 'inquiries', mode: 'presentation' };
+  let state: CatalogueState = { goal: 'meisterwerk', mode: 'presentation' };
   let disposed = false;
-  const cache = new Map<DemoGoal, HTMLElement>();
+  const cache = new Map<DemoId, HTMLElement>();
   const syncLayout = () => {
     for (const demo of demoSlot.querySelectorAll<HTMLElement>(':scope > .demo')) {
       demo.classList.toggle('demo--responsive', demoSlot.classList.contains('demo--responsive'));
@@ -29,7 +21,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
   container.classList.add('catalogue');
   container.innerHTML = `
     <div class="catalogue-concepts" role="group" aria-label="Konzept auswählen">
-      ${concepts.map(concept => `<button type="button" class="catalogue-concept" data-catalogue-goal="${concept.goal}" aria-pressed="${concept.goal === state.goal}"><span class="catalogue-position">${concept.number} / 03</span><strong>${concept.name}</strong><span class="catalogue-goal">${goalLabels[concept.goal]}</span><span class="catalogue-description">${goalDescriptions[concept.goal]}</span><span class="catalogue-selection-mark" aria-hidden="true">↗</span></button>`).join('')}
+      ${concepts.map(concept => `<button type="button" class="catalogue-concept" data-catalogue-goal="${concept.goal}" aria-pressed="${concept.goal === state.goal}"><span class="catalogue-position">${concept.number} / ${String(concepts.length).padStart(2, '0')}</span><strong>${concept.name}</strong><span class="catalogue-goal">${concept.tags[0]}</span><span class="catalogue-description">${concept.solution}</span><span class="catalogue-selection-mark" aria-hidden="true">↗</span></button>`).join('')}
     </div>
     <div class="catalogue-toolbar">
     <div class="catalogue-modes" role="group" aria-label="Ansicht der Konzeptdemo">
@@ -42,6 +34,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
       <button type="button" data-project-request>So etwas für mein Projekt <span aria-hidden="true">↗</span></button>
     </div>
     </div>
+    <div class="catalogue-context" aria-live="polite"></div>
     <p class="catalogue-status" role="status" aria-live="polite"></p>
   `;
 
@@ -61,7 +54,9 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
     container.querySelectorAll<HTMLButtonElement>('[data-scene-mode]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.sceneMode === state.mode));
     });
-    const name = concepts.find(concept => concept.goal === state.goal)!.name;
+    const concept = concepts.find(concept => concept.goal === state.goal)!;
+    const name = concept.name;
+    container.querySelector('.catalogue-context')!.innerHTML = `<p><span>Die Aufgabe</span>${concept.problem}</p><p><span>Die Lösung</span>${concept.solution}</p>`;
     const label = state.mode === 'interactive' ? 'Direkt ausprobieren. Ihre Eingaben bleiben beim Konzeptwechsel erhalten.' : state.mode === 'layers' ? 'Aufbau ansehen. Zum Bedienen „Demo ausprobieren“ wählen.' : 'Präsentation. Mit „Demo ausprobieren“ starten Sie die lokale Simulation.';
     container.querySelector('.catalogue-status')!.textContent = `${name} · ${label}`;
   }
@@ -71,7 +66,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
     onStateChange({ ...state });
   }
 
-  function selectGoal(goal: DemoGoal): void {
+  function selectGoal(goal: DemoId): void {
     if (disposed || state.goal === goal) return;
     dialog.close();
     state = { ...state, goal };
@@ -91,7 +86,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
     if (!target || !container.contains(target) || disposed) return;
     const goal = target.dataset.catalogueGoal;
     if (concepts.some(concept => concept.goal === goal)) {
-      selectGoal(goal as DemoGoal);
+      selectGoal(goal as DemoId);
     } else if (modes.includes(target.dataset.sceneMode as SceneMode)) {
       const mode = target.dataset.sceneMode as SceneMode;
       if (mode !== state.mode) {
@@ -101,7 +96,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
     } else if (target.hasAttribute('data-open-current')) {
       open();
     } else if (target.hasAttribute('data-project-request')) {
-      onProjectRequest(state.goal);
+      onProjectRequest(concepts.find(concept => concept.goal === state.goal)!.projectGoal);
     }
   }
 

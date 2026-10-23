@@ -1,0 +1,7 @@
+.demo.reference-demo { overflow-y: auto; scrollbar-width: thin; container: reference / inline-size; }
+.demo.reference-demo.demo--responsive { width: 100%; height: auto; min-height: 576px; overflow: visible; }
+.concept-dialog .demo.reference-demo { width: 100%; height: auto; }
+.catalogue-context { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.catalogue-context p { margin: 0; font-size: 16px; }
+.catalogue-context span { display: block; margin-bottom: 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+@media (max-width: 600px) { .catalogue-context { grid-template-columns: 1fr; gap: 14px; } }

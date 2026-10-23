@@ -28,7 +28,7 @@ describe('page shell contract', () => {
     root.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(link => {
       if (link.hash) expect(root.querySelector(link.hash)).not.toBeNull();
     });
-    expect(root.querySelector('h1 em')?.textContent).toBe('Ein eigener Auftritt.');
+    expect(root.querySelector('h1 em')?.textContent).toBe('Digital weitergedacht.');
     // The gallery is now the single collection, not duplicated as decorative demos.
     expect(root.querySelector('[data-preview]')).toBeNull();
     expect(root.querySelector('#main')?.getAttribute('tabindex')).toBe('-1');

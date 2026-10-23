@@ -153,9 +153,9 @@ describe('scene modes and lifecycle', () => {
     const replacement = document.createElement('div');
     replacement.className = 'demo';
     slot.replaceChildren(replacement);
-    controller.setGoal('bookings');
+    controller.setGoal('nordlicht');
     expect(replacement.classList.contains('demo--responsive')).toBe(true);
-    expect(container.dataset.goal).toBe('bookings');
+    expect(container.dataset.goal).toBe('nordlicht');
     expect(container.dataset.mode).toBe('interactive');
     expect(container.style.getPropertyValue('--scene-dial-angle')).toBe('0rad');
   });
@@ -240,7 +240,7 @@ describe('scene modes and lifecycle', () => {
     const renderer = mocks.renderers[0];
     expect(container.contains(slot)).toBe(true);
     for (let i = 0; i < 4; i++) {
-      controller.setGoal(i % 2 ? 'sales' : 'bookings');
+      controller.setGoal(i % 2 ? 'sales' : 'nordlicht');
       resizeObservers[0].callback();
     }
     expect(frames.size).toBe(0);
@@ -283,7 +283,7 @@ describe('scene modes and lifecycle', () => {
     const native = container.querySelector<HTMLElement>('.precision-static-surface')!;
     native.scrollTop = 320;
     input.focus();
-    controller.setGoal('inquiries');
+    controller.setGoal('meisterwerk');
     controller.setMode('interactive');
     expect(native.scrollTop).toBe(320);
     expect(document.activeElement).toBe(input);
@@ -293,7 +293,7 @@ describe('scene modes and lifecycle', () => {
     mobile.change(true);
     expect(native.scrollTop).toBe(320);
     expect(slot.parentElement).toBe(native);
-    controller.setGoal('bookings');
+    controller.setGoal('nordlicht');
     expect(native.scrollTop).toBe(0);
   });
 
@@ -392,7 +392,7 @@ describe('scene modes and lifecycle', () => {
 
   it('switches permanently to accessible HTML on context loss without losing state', async () => {
     const { container, slot, input, controller } = await mount();
-    controller.setGoal('bookings');
+    controller.setGoal('nordlicht');
     controller.setMode('presentation');
     input.value = 'Wieder verfügbar';
     const renderer = mocks.renderers[0];
@@ -405,7 +405,7 @@ describe('scene modes and lifecycle', () => {
     expect(slot.inert).toBe(false);
     expect(slot.querySelector('input')).toBe(input);
     expect(input.value).toBe('Wieder verfügbar');
-    expect(container.dataset.goal).toBe('bookings');
+    expect(container.dataset.goal).toBe('nordlicht');
     expect(container.dataset.mode).toBe('presentation');
     mobile.change(true);
     mobile.change(false);

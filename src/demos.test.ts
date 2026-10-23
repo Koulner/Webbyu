@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDemo, disposeDemo, mountDemoDialog } from './demos';
-import type { DemoGoal } from './data';
+import type { DemoId } from './data';
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal');
 const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close');
@@ -42,7 +42,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function demo(goal: DemoGoal): HTMLElement {
+function demo(goal: DemoId): HTMLElement {
   const root = createDemo(goal);
   document.body.append(root);
   return root;
@@ -76,109 +76,6 @@ function mountDialog(): ReturnType<typeof mountDemoDialog> {
 }
 
 describe('interactive concept demos', () => {
-  it('validates inquiry fields, reviews escaped text and confirms locally with an editable draft', () => {
-    const fetchSpy = vi.fn();
-    const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
-    const storageSpy = vi.spyOn(Storage.prototype, 'setItem');
-    vi.stubGlobal('fetch', fetchSpy);
-    const root = demo('inquiries');
-    const result = root.querySelector<HTMLElement>('.demo-result')!;
-    openPanel(root);
-    submit(root);
-    expect(result.textContent).toBe('');
-    expect(root.querySelector('.demo-validation')!.textContent).toContain('markierten Felder');
-    expect(document.activeElement).toBe(root.querySelector('[name="name"]'));
-    expect(root.querySelector('[name="email"]')!.getAttribute('aria-invalid')).toBe('true');
-    change(root, 'name', '  ');
-    change(root, 'email', 'ada@example.com');
-    submit(root);
-    expect(result.textContent).toBe('');
-    expect(root.querySelector<HTMLInputElement>('[name="name"]')!.validity.customError).toBe(true);
-    change(root, 'name', '<img src=x onerror="alert(1)">');
-    change(root, 'email', 'keine-adresse');
-    submit(root);
-    expect(result.textContent).toBe('');
-    change(root, 'email', 'ada@example.com');
-    submit(root);
-    const review = root.querySelector<HTMLElement>('[data-step="review"]')!;
-    expect(review.hidden).toBe(false);
-    expect(review.textContent).toContain('<img src=x onerror="alert(1)">');
-    expect(review.querySelector('img')).toBeNull();
-    expect(result.textContent).toBe('');
-    expect(document.activeElement).toBe(root.querySelector('[data-review-title]'));
-    button(root, '[data-confirm]').click();
-    expect(result.textContent).toContain('<img src=x onerror="alert(1)">');
-    expect(result.querySelector('img')).toBeNull();
-    expect(result.textContent).toContain('Ihre Anfrage wurde nicht versendet');
-    button(root, '[data-step="complete"] [data-edit]').click();
-    expect(root.querySelector<HTMLInputElement>('[name="email"]')!.value).toBe('ada@example.com');
-    change(root, 'project', 'Ein neuer Auftritt.');
-    expect(result.textContent).toBe('');
-    submit(root);
-    expect(review.textContent).toContain('Ein neuer Auftritt.');
-    button(root, '[data-step="review"] [data-edit]').click();
-    expect(document.activeElement).toBe(root.querySelector('[name="name"]'));
-    expect(fetchSpy).not.toHaveBeenCalled();
-    expect(xhrSpy).not.toHaveBeenCalled();
-    expect(storageSpy).not.toHaveBeenCalled();
-  });
-
-  it('uses the selected course, day, and time and preserves them after closing the panel', () => {
-    const root = demo('bookings');
-    const trigger = openPanel(root);
-    const result = root.querySelector<HTMLElement>('.demo-result')!;
-    submit(root);
-    expect(root.querySelector('[data-step="review"]')!.textContent).toContain('Pilates · 60 Minuten');
-    button(root, '[data-confirm]').click();
-    expect(result.textContent).toContain('Pilates am Montag, 19. Oktober um 09:00 Uhr');
-    button(root, '[data-step="complete"] [data-edit]').click();
-    change(root, 'service', 'Slow Stretch');
-    expect(result.textContent).toBe('');
-    button(root, '[data-day="Donnerstag, 22. Oktober"]').click();
-    button(root, '[data-time="18:00"]').click();
-    expect(root.querySelectorAll('[data-day][aria-pressed="true"]')).toHaveLength(1);
-    expect(root.querySelectorAll('[data-time][aria-pressed="true"]')).toHaveLength(1);
-    submit(root);
-    button(root, '[data-confirm]').click();
-    expect(result.textContent).toContain('Slow Stretch am Donnerstag, 22. Oktober um 18:00 Uhr');
-    expect(result.textContent).toContain('Kein echter Termin wurde gebucht');
-    button(root, '[data-panel-close]').click();
-    expect(document.activeElement).toBe(trigger);
-    trigger.click();
-    expect(root.querySelector<HTMLSelectElement>('[name="service"]')!.value).toBe('Slow Stretch');
-    expect(button(root, '[data-day="Donnerstag, 22. Oktober"]').getAttribute('aria-pressed')).toBe('true');
-    expect(button(root, '[data-time="18:00"]').getAttribute('aria-pressed')).toBe('true');
-    expect(root.querySelector<HTMLElement>('[data-step="complete"]')!.hidden).toBe(false);
-    button(root, '[data-step="complete"] [data-edit]').click();
-    button(root, '[data-time="12:30"]').click();
-    expect(result.textContent).toBe('');
-  });
-
-  it('reconciles time availability with course and day, including days without appointments', () => {
-    const root = demo('bookings');
-    openPanel(root);
-    change(root, 'service', 'Slow Stretch');
-    expect(root.querySelectorAll('[data-time][aria-pressed="true"]')).toHaveLength(0);
-    expect(button(root, '[data-time="09:00"]').disabled).toBe(true);
-    submit(root);
-    expect(root.querySelector<HTMLElement>('[data-step="review"]')!.hidden).toBe(true);
-    expect(document.activeElement).toBe(button(root, '[data-time="12:30"]'));
-    button(root, '[data-day="Mittwoch, 21. Oktober"]').click();
-    expect(root.querySelectorAll('[data-time]:disabled')).toHaveLength(3);
-    expect(root.querySelector('.demo-availability')!.textContent).toContain('keinen Beispieltermin');
-    submit(root);
-    expect(root.querySelector('.demo-validation')!.textContent).toContain('verfügbarem Termin');
-    button(root, '[data-day="Donnerstag, 22. Oktober"]').click();
-    button(root, '[data-time="18:00"]').click();
-    change(root, 'service', 'Yoga Flow');
-    expect(button(root, '[data-time="18:00"]').getAttribute('aria-pressed')).toBe('true');
-    submit(root);
-    const review = root.querySelector('[data-step="review"]')!;
-    expect(review.textContent).toContain('Yoga Flow · 60 Minuten');
-    expect(review.textContent).toContain('20');
-    expect(review.textContent).toContain('Donnerstag, 22. Oktober 2026');
-  });
-
   it('keeps separate cart variants, updates amounts, and restores focus after quantity changes or removal', () => {
     const root = demo('sales');
     button(root, '[data-add-cart]').click();
@@ -256,7 +153,7 @@ describe('interactive concept demos', () => {
     expect(storageSpy).not.toHaveBeenCalled();
   });
 
-  it.each(['inquiries', 'bookings', 'sales'] as const)('keeps %s previews inert and disposes live handlers', goal => {
+  it.each(['sales'] as const)('keeps %s previews inert and disposes live handlers', goal => {
     const preview = createDemo(goal, { interactive: false });
     document.body.append(preview);
     expect(preview.inert).toBe(true);
@@ -308,8 +205,8 @@ describe('interactive concept demos', () => {
     document.body.style.overflow = 'clip';
     launch.focus();
     const controller = mountDialog();
-    const liveDemo = demo('bookings');
-    controller.open('bookings', liveDemo);
+    const liveDemo = demo('sales');
+    controller.open('sales', liveDemo);
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
     const root = dialog.querySelector<HTMLElement>('.demo')!;
     const trigger = openPanel(root);
@@ -338,27 +235,27 @@ describe('interactive concept demos', () => {
 
   it('resets modal and panel scrolling when opening from a lower CTA and when reopening a cached concept', () => {
     const controller = mountDialog();
-    const liveDemo = demo('bookings');
-    controller.open('bookings', liveDemo);
+    const liveDemo = demo('sales');
+    controller.open('sales', liveDemo);
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
     const root = dialog.querySelector<HTMLElement>('.demo')!;
     const panel = root.querySelector<HTMLElement>('.demo-panel')!;
     dialog.scrollTop = 420;
     panel.scrollTop = 180;
-    button(root, '.demo-studio-copy [data-panel-open]').click();
+    button(root, '[data-panel-open]').click();
     expect(panel.hidden).toBe(false);
     expect(panel.scrollTop).toBe(0);
     expect(dialog.scrollTop).toBe(0);
     expect(scrollIntoView).not.toHaveBeenCalled();
-    change(root, 'service', 'Yoga Flow');
+    change(root, 'quantity', '3');
     button(root, '[data-panel-close]').click();
     expect(dialog.scrollTop).toBe(420);
     dialog.scrollTop = 350;
     controller.close();
-    controller.open('bookings', liveDemo);
+    controller.open('sales', liveDemo);
     expect(dialog.scrollTop).toBe(0);
     expect(dialog.querySelector('.demo')).toBe(root);
-    expect(root.querySelector<HTMLSelectElement>('[name="service"]')!.value).toBe('Yoga Flow');
+    expect(root.querySelector<HTMLInputElement>('[name="quantity"]')!.value).toBe('3');
     dialog.scrollTop = 260;
     controller.open('sales', demo('sales'));
     expect(dialog.scrollTop).toBe(0);
@@ -366,10 +263,10 @@ describe('interactive concept demos', () => {
   });
 
   it('closes an already open inner panel first even when Escape originates from the modal bar', () => {
-    const liveDemo = demo('inquiries');
+    const liveDemo = demo('sales');
     openPanel(liveDemo);
     const controller = mountDialog();
-    controller.open('inquiries', liveDemo);
+    controller.open('sales', liveDemo);
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
     dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
     expect(liveDemo.querySelector<HTMLElement>('.demo-panel')!.hidden).toBe(true);
@@ -379,12 +276,12 @@ describe('interactive concept demos', () => {
   });
 
   it('restores the same node, original sibling position and responsive class on disposal', () => {
-    const liveDemo = demo('inquiries');
+    const liveDemo = demo('sales');
     liveDemo.classList.add('demo--responsive');
     const sibling = document.createElement('span');
     liveDemo.after(sibling);
     const controller = mountDialog();
-    controller.open('inquiries', liveDemo);
+    controller.open('sales', liveDemo);
     controller.dispose();
     controller.dispose();
     expect(liveDemo.nextSibling).toBe(sibling);
@@ -394,7 +291,7 @@ describe('interactive concept demos', () => {
   });
 
   it.each([false, true])('scrolls only a responsive inline demo into view (responsive: %s)', (responsive) => {
-    const root = demo('inquiries');
+    const root = demo('sales');
     root.classList.toggle('demo--responsive', responsive);
     const panel = root.querySelector<HTMLElement>('.demo-panel')!;
     panel.scrollTop = 190;

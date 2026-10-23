@@ -4,7 +4,7 @@
 
 German agency prototype for two founders in Hamburg / Bad Oldesloe: a light editorial page with a dark interactive 3D demo gallery. Instrument Sans for UI/body and Instrument Serif for large headings and genuine italic accents, locally served with licenses. Palette: ivory #F5F1EA, ink #241D26, aubergine #513448, gallery #151419, champagne #C7B29A. Body text >=16px, functional labels >=12px. Use a compact typographic introduction, generous dark gallery, clear services/process/finder, restrained contours and considered lighting.
 
-Three fictional concepts remain: Klarraum (inquiries), Studio Still (bookings), Safran Atelier (sales, replacing Forma at the user's request in AP3). They are interactive local simulations, not real transactions. The shop adapts the user's supplied project anonymously, without real brand/contact/integration data. No backend, accounts or style configurator in this release. The user subsequently authorized GitHub Pages for the prototype and explicitly requested the AP2/AP6 push, completed through `e2ac99e` on origin/dev.
+Current concepts after the 2026-10-23 reference transfer: Meisterwerk, Nordlicht, Safran Atelier and Solara. Meisterwerk and Nordlicht replace Klarraum and Studio Still; Solara is added. Safran Atelier, including the camera journey from `2936c2d`, is retained. All are local simulations. The user-supplied prior project's business concept informs the new copy; Webbyu branding, team, existing package drafts and the gallery remain. Earlier package records below describe their historical state. No backend, accounts or style configurator in this release. The user previously authorized GitHub Pages for the prototype and explicitly requested the AP2/AP6 push, completed through `e2ac99e` on origin/dev.
 
 ## Delivery state
 
@@ -44,7 +44,7 @@ AP1 extracts markup into `renderPage(root): PageMounts`, installs/serves Instrum
 
 `SceneMode = 'presentation' | 'layers' | 'interactive'`.
 
-`CatalogueState = { goal: DemoGoal; mode: SceneMode }`.
+`CatalogueState = { goal: DemoId; mode: SceneMode }`. Since the reference transfer, this field identifies a demo independently of the Finder business goal. `concept.projectGoal` controls the explicit handoff.
 
 `initScene({ container, demoElement }): Promise<SceneController>`; controller has `setGoal(goal)`, `setMode(mode)`, `dispose()`.
 
@@ -52,7 +52,7 @@ AP1 extracts markup into `renderPage(root): PageMounts`, installs/serves Instrum
 
 Preserve `createDemo(goal, { interactive? }): HTMLElement`. Cache a single live demo per goal and reparent it between stage and dialog. Scene projects/manages the persistent slot, not the individual demo lifetime. Dialog must restore the live demo and layout class after close. Noninteractive decorative previews must not become alternative live sessions.
 
-Initial state is inquiries/presentation. Selection preserves mode. Main replays latest getState() after asynchronous scene loading. Only onProjectRequest updates the project brief goal and clears selectedPackage; other answers remain. Catalogue exploration never mutates the brief.
+Initial state is meisterwerk/presentation. Selection preserves mode. Main replays latest getState() after asynchronous scene loading. Only onProjectRequest updates the project brief goal and clears selectedPackage; other answers remain. Catalogue exploration never mutates the brief. Meisterwerk, Nordlicht and Solara hand off inquiries; Safran hands off sales.
 
 ## User reference update — 2026-10-22
 
@@ -86,6 +86,8 @@ Run typecheck, targeted tests and production build for packages; coordinator run
 Verify immediate try; cached form/booking/cart state across selection, dialog and resize; no brief mutations from browsing; explicit goal handoff preserves other answers; Escape inner-panel-first then dialog; focus restore; reduced motion; unavailable WebGL and context loss; import failure; no duplicate listeners/renderers on disposal; no console errors. Record bundle size/warnings honestly. Browser screenshots belong in ignored artifacts, not Git.
 
 ## Handoffs and verification history
+
+- 2026-10-23: Previous-project business concept and demos transferred at the user's request. Meisterwerk replaces Klarraum, Nordlicht replaces Studio Still, Solara is added, and Safran including `2936c2d` is retained. Demo identities are separated from Finder goals; three imported designs use scoped Shadow DOM and container queries. All data stays in memory. TypeScript, 77 tests, `/Webbyu/` production build and whitespace checks passed; browser verification covered 360–1440px, Nordlicht, Solara, nested dialogs, the Safran journey and production image paths. Existing font/chunk warnings remain. Source analysis and details: `REFERENCE_MIGRATION.md`. No remote publication in this transfer; independent AP5 remains separate.
 
 - 2026-10-20: AP0 baseline created. Previous approval attempt had not executed due to a usage-limit review failure; retry succeeded. No source changes before baseline.
 - 2026-10-21: Coordination resumed in a new chat at the user's request. Existing AP1 chat `01a15b21-aa11-7e32-a4d6-6dabc570ff0d` continues in `C:/Users/lukas/.codex/worktrees/4d78/Webbyu` on `codex/ap1-foundation`; no duplicate implementation chat created. Integration remains at `083e104` pending AP1 acceptance.
