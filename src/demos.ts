@@ -1,5 +1,6 @@
 import type { DemoGoal } from './data';
 import './demos.css';
+import { saffronChapters, saffronJourneyMarkup, mountSaffronJourney } from './saffron-journey';
 
 let instance = 0;
 const arrow = '<span aria-hidden="true">↗</span>';
@@ -260,17 +261,13 @@ function salesDemo(root: HTMLElement, id: string, signal: AbortSignal): void {
     { name: '1 g', label: 'Küchenglas', price: 16, grams: 1, color: '#776a4a' },
     { name: '3 × 1 g', label: 'Geschenkset', price: 42, grams: 3, color: '#79648c' },
   ];
-  const botanicalScenes = [
-    { title: 'Die Blüte', image: new URL('./assets/demos/saffron/flower.webp', import.meta.url).href, alt: 'Violette Safranblüte mit roten Narbenästen in Nahaufnahme', text: 'Alles beginnt mit einer Blüte. Zwischen violetten Blütenblättern liegen die feinen roten Narbenäste.' },
-    { title: 'Der rote Faden', image: new URL('./assets/demos/saffron/detail.webp', import.meta.url).href, alt: 'Ein roter Narbenast mit trichterförmiger Spitze vor violetten Blütenblättern', text: 'Ein kleines Detail im großen Bild: die rote Narbe. Die Nahaufnahme macht ihre Struktur sichtbar.' },
-    { title: 'Das Gewürz', image: new URL('./assets/demos/saffron/threads.webp', import.meta.url).href, alt: 'Getrocknete rote Safranfäden auf hellem Grund', text: 'Getrocknete Fäden, intensive Farbe. In dieser fiktiven Kollektion entdecken Sie Safran in drei Größen.' },
-  ];
+  const botanicalScenes = saffronChapters;
   let variant = 0;
   const cart = new Map<number, number>();
   root.innerHTML = `<div class="demo-main">
     <nav class="demo-nav" aria-label="Safran Atelier Konzeptnavigation"><span class="demo-logo">safran<span>ATELIER</span></span><button class="demo-nav-link" data-product-open type="button">Kollektion ${arrow}</button><button class="demo-nav-link" data-panel-open type="button">Tasche <span data-cart-count>(0)</span> ${arrow}</button></nav>
-    <div class="demo-spice-hero"><div class="demo-spice-hero-copy"><p class="demo-eyebrow">Botanik trifft Genuss.</p><h2>Ein kleiner Faden.<br><em>Ein großer Moment.</em></h2><p>Entdecken Sie die leise Schönheit einer besonderen Zutat. Von der Blüte bis in Ihre Küche.</p><button class="demo-cta" data-product-open type="button">Safran entdecken ${arrow}</button><span class="demo-caption">Fiktive Marke · Lokale Shopdemo</span></div></div>
-    <section class="demo-botanical-story" aria-label="Von der Blüte zum Gewürz"><div class="demo-spice-section-heading"><p class="demo-eyebrow">Ein Blick ins Detail</p><h3>Von der Blüte<br><em>zum Gewürz.</em></h3><p>Drei Perspektiven auf eine kleine Zutat. Wählen Sie ein Kapitel.</p></div><div class="demo-botanical-controls" role="group" aria-label="Botanisches Kapitel">${botanicalScenes.map((scene, index) => `<button type="button" data-ingredient="${index}" aria-pressed="${index === 0}" aria-controls="${id}-botanical"><span>0${index + 1}</span>${scene.title}</button>`).join('')}</div><figure id="${id}-botanical" class="demo-botanical-figure"><img data-ingredient-image src="${botanicalScenes[0].image}" alt="${botanicalScenes[0].alt}" width="960" height="728" loading="lazy"><figcaption data-ingredient-caption aria-live="polite">${botanicalScenes[0].text}</figcaption></figure></section>
+    <div class="demo-spice-hero"><div class="demo-spice-hero-copy"><p class="demo-eyebrow">Botanik trifft Genuss.</p><h2>Ein kleiner Faden.<br><em>Ein großer Moment.</em></h2><p>Entdecken Sie die leise Schönheit einer besonderen Zutat. Von der Blüte bis in Ihre Küche.</p><div class="demo-spice-hero-actions"><button class="demo-cta" data-journey-open type="button">Kamerafahrt entdecken <span aria-hidden="true">↓</span></button><button class="demo-nav-link" data-product-open type="button">Zur Kollektion ${arrow}</button></div><span class="demo-caption">Fiktive Marke · Lokale Shopdemo</span></div></div>
+    ${saffronJourneyMarkup(id)}
     <section class="demo-spice-product" aria-label="Safran-Kollektion" tabindex="-1"><div class="demo-spice-product-art"><img src="${botanicalScenes[2].image}" alt="Rote Safranfäden als unmarkierte Produktillustration" width="960" height="628" loading="lazy"><span>Die Kollektion<br>Safran Atelier</span></div><div class="demo-spice-product-copy"><p class="demo-eyebrow">Für kleine Genussmomente</p><h3>Safranfäden.<br><em>Ganz nach Ihrem Maß.</em></h3><p>Ein Probierglas, ein Vorrat für die Küche oder ein Set zum Verschenken. Finden Sie Ihre Größe.</p><div class="demo-product-spec"><strong><span data-product-price>9 €</span> <small>Demopreis / Packung</small></strong><span data-unit-price>18 € / g · fiktiver Grundpreis</span></div><fieldset class="demo-variants"><legend>Größe: <span data-variant-name>0,5 g</span></legend><div>${variants.map((item, index) => `<button type="button" data-variant="${index}" aria-pressed="${index === 0}" aria-label="${item.label}, ${item.name}"><strong>${item.name}</strong><span>${item.label}</span></button>`).join('')}</div></fieldset><div class="demo-product-purchase"><label>Menge<input name="quantity" type="number" min="1" max="99" step="1" value="1" inputmode="numeric" aria-describedby="${id}-quantity-error"></label><button class="demo-cta" type="button" data-add-cart>In die Demo-Tasche ${arrow}</button></div><p id="${id}-quantity-error" class="demo-shop-status" role="status" aria-live="polite"></p><button type="button" class="demo-secondary demo-shop-cart-link" data-panel-open data-cart-open-inline hidden>Demo-Tasche ansehen ${arrow}</button><details class="demo-product-details"><summary>Was zeigt dieses Beispiel?</summary><p>Eine anonymisierte Produktpräsentation mit frei erfundenen Größen und Preisen. Die Bilder zeigen botanische Details. Die Demo enthält keine reale Herkunftszusage, Zertifizierung oder Kaufmöglichkeit.</p></details></div></section>
     <section class="demo-spice-ritual" aria-label="Inspiration für die Küche"><p class="demo-eyebrow">Ein kleines Ritual</p><h3>Ein Hauch von <em>besonders.</em></h3><div><p><span>01 / ENTDECKEN</span>Eine Prise Farbe für Reis, Saucen oder Desserts.</p><p><span>02 / AUSWÄHLEN</span>Die passende Größe für Ihre nächste Küchenidee.</p><p><span>03 / AUSPROBIEREN</span>Den Einkaufsweg hier ganz ohne Bestellung erleben.</p></div></section>
     <footer class="demo-footer"><span>Safran Atelier · Fiktives Konzept</span><span>Anonymisierte Demo · kein echter Kauf</span></footer>
@@ -278,14 +275,7 @@ function salesDemo(root: HTMLElement, id: string, signal: AbortSignal): void {
     <section data-step="review" hidden><h4 tabindex="-1" data-review-title>Ihre Bestellübersicht</h4><dl class="demo-summary" data-order-items></dl><label class="demo-shipping-label">Lieferoption<select name="shipping"><option value="delivery">Standardversand · 4 €</option><option value="pickup">Abholung im Beispielatelier · 0 €</option></select></label><p class="demo-shipping-note"></p><dl class="demo-summary demo-order-totals" data-order-totals></dl><p class="demo-privacy-note">Nur eine Simulation: keine Adress- oder Zahlungsdaten, keine Bestellung.</p><div class="demo-step-actions"><button type="button" class="demo-cta" data-order-confirm>Kauf lokal simulieren ${arrow}</button><button type="button" class="demo-secondary" data-cart-edit>Tasche bearbeiten</button></div></section>
     <section data-step="complete" hidden><span class="demo-complete-mark" aria-hidden="true">✓</span><h4>Ihr Demokauf ist durchgespielt.</h4><p class="demo-result" role="status" aria-live="polite" tabindex="-1"></p><dl class="demo-summary" data-order-receipt></dl><p class="demo-privacy-note">Es wurde nichts bestellt, bezahlt oder versendet. Ihre Tasche bleibt zum Weiterprobieren erhalten.</p><button type="button" class="demo-secondary" data-cart-edit>Tasche weiter bearbeiten</button></section>`)} `;
   bindPanel(root, signal);
-  root.querySelectorAll<HTMLButtonElement>('[data-ingredient]').forEach(button => button.addEventListener('click', () => {
-    const scene = botanicalScenes[Number(button.dataset.ingredient)];
-    const image = root.querySelector<HTMLImageElement>('[data-ingredient-image]')!;
-    image.src = scene.image;
-    image.alt = scene.alt;
-    root.querySelector('[data-ingredient-caption]')!.textContent = scene.text;
-    root.querySelectorAll('[data-ingredient]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-  }, { signal }));
+  mountSaffronJourney(root, signal);
   root.querySelectorAll('[data-product-open]').forEach(button => button.addEventListener('click', () => {
     const product = root.querySelector<HTMLElement>('.demo-spice-product')!;
     product.focus({ preventScroll: true });

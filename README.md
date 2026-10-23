@@ -45,9 +45,11 @@ node node_modules/vite/bin/vite.js build
 node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-## Aktueller Stand · 22. Oktober 2026
+## Aktueller Stand · 23. Oktober 2026
 
 AP2 ist integriert. AP6 übernimmt Inhalte und Struktur der bereitgestellten HTML-Referenz in die bestehende helle Editorial-Seite. Die dunkle 3D-Galerie und die drei interaktiven Demos bleiben erhalten; die weitere 3D-Story folgt später.
+
+Die Safran-Atelier-Demo enthält jetzt die gerenderte 3D-Kamerafahrt aus dem Referenzprojekt: Blüte → rote Narbe → Safranfäden. Unter „Kamerafahrt entdecken“ lässt sie sich durch Scrollen, Abspielen/Pause, Kapitelwahl oder den Positionsregler steuern. Die echte Markenverpackung ist ausgespart. Bei reduzierter Bewegung, Datensparmodus oder fehlender Browserunterstützung bleiben die Kapitel als Bilder zugänglich. Die 201 lokalen Frames (zusammen 2,94 MB) werden bei Bedarf geladen; die Animation pausiert außerhalb der sichtbaren Demo und in inaktiven Tabs.
 
 - Leistungen, Start / Business / Complete, Team, Zusammenarbeit und Kontakt sind über direkte Abschnittslinks erreichbar. Eingaben und Demo-Sitzungen bleiben beim Navigieren erhalten.
 - 599 €, 1.099 € und 2.499 € sind **interne Preisentwürfe mit offener Steuerbasis**. Seitenzählung, Zusatzseitenpreise und mehrere Produktionsdetails bleiben abzustimmen. Ablauf und Grenzen sind in aufklappbaren Details beschrieben.
@@ -64,6 +66,7 @@ Prüfbilder und der responsive Prüfstand liegen lokal in `artifacts/ap6-preview
 - `src/state.ts`: gemeinsamer, flüchtiger Projektzustand und Paketempfehlungen.
 - `src/scene.ts`: 3D-Galerie, explizite Ansichtsmodi und Ersatzdarstellungen.
 - `src/demos.ts`: drei fiktive, lokal bedienbare Konzeptarbeiten.
+- `src/saffron-journey.ts` / `.css`: Kamera, Scrollführung und Ersatzdarstellung innerhalb der Safran-Demo; Herkunft der Frames in `src/assets/demos/saffron/journey/README.md`.
 - `src/finder.ts`: Projektfinder und sichtbare Anfragezusammenfassung.
 
 Alle Konzeptmarken sind fiktive Designstudien. Es werden keine Anfragen verschickt, Termine gebucht oder Bestellungen ausgeführt. Angaben im Projektfinder bleiben ausschließlich im Arbeitsspeicher des geöffneten Browsers und werden beim Neuladen verworfen. Schriften werden lokal ausgeliefert.
