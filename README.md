@@ -1,5 +1,7 @@
 # Webbyu
 
+Ideen, Entscheidungen und nächste Schritte: [Ideen- und Arbeitsdokument](IDEEN_UND_ROADMAP.md). Aktueller Schwerpunkt ist der immersive Produkt-Onepager für eine Brille; das Dokument enthält den Tracker und wiederverwendbare Prompts für die Weiterarbeit.
+
 Lokaler, deutschsprachiger Website-Prototyp für die von einem einzelnen Gründer aufgebaute Digitalagentur Webbyu in Hamburg / Bad Oldesloe. Der Auftritt spricht aus der Ich-Perspektive mit einem direkten Ansprechpartner. Vite, TypeScript, Three.js und GSAP; ohne Backend oder externe Laufzeit-APIs.
 
 ## Starten
@@ -45,7 +47,15 @@ node node_modules/vite/bin/vite.js build
 node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-## Aktueller Stand · 23. Oktober 2026
+## Die Reise · 24. Oktober 2026
+
+Unter `/reise/` führen sieben Stationen von der Idee und dem Fundament über die vier bestehenden Konzeptstudien zum nächsten Vorhaben. Die bisherige Geländescholle weicht verbundenen Erlebnisräumen mit Lichtfeldern, räumlichem Nebel und einem wachsenden Netzwerk. Einstieg über Desktop-/Mobilnavigation und die aktualisierte Reise-Vorschau unter „Über mich“. Die Seite ist eine echte zweite HTML-Ausgabe; Stationslinks wie `/reise/#raumgut` und die bisherige Übersichtsadresse `#landschaft` bleiben erhalten.
+
+Die Bildwelt entsteht aus lokalen Three.js-Geometrien. Natürliches Scrollen, Kapitelwahl, Stationsmarkierungen, Zurück unten links und Weiter unten rechts steuern denselben Weg. An den vier Konzeptstationen erscheinen die tatsächlichen Demoseiten bereits als skalierte Website-Flächen in der räumlichen Bühne. Ein Klick öffnet dieselbe Live-Sitzung in der bedienbaren Großansicht; danach kehrt sie samt Eingaben in die Vorschau zurück. Bei reduzierter Bewegung bleibt die Kamera in der Übersicht; ohne WebGL steht die gemeinsame Vektorübersicht mit allen Kapiteln bereit. GPU-Arbeit pausiert außerhalb des Sichtbereichs, in Hintergrundtabs und während geöffneter Demos.
+
+Inhalte, drei persönliche Notizen im Text, Positionen, Lichtfarben und Netzwerkverbindungen werden in `src/journey/data.ts` gepflegt. Die Konzepttexte erklären Aufgabe, Ansatz und Nutzen. Die Reihenfolge ist redaktionell, ohne erfundene Jahreszahlen oder Kundenreferenzen. Die ursprüngliche Webbyu-Wortmarke bleibt auf ausdrücklichen Nutzerwunsch erhalten. Texte, Vorschauen und Navigation müssen ohne gegenseitige Überdeckung zugänglich bleiben. Die Umsetzung bleibt lokal, ohne neue Abhängigkeiten oder Veröffentlichung. Aktuelle Abnahme und historische Prüfbelege sind in `JOURNEY.md` getrennt; die Prüfung der Weiterentwicklung ist noch ausstehend. Prüfbilder liegen unter `artifacts/journey/` (lokal, ignoriert).
+
+## Bisheriger Stand · 23. Oktober 2026
 
 Die bestehende helle Editorial-Seite und dunkle 3D-Galerie verbinden jetzt das Webbyu-Angebot mit dem Business-Konzept des früheren Projekts: Angebote verständlich machen, Anfragen vorbereiten und Geschäftsabläufe vereinfachen. Die weitere 3D-Story folgt später.
 

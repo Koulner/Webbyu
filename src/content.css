@@ -1,4 +1,13 @@
 /* Reference content extends the accepted editorial shell; the gallery owns itself. */
+.journey-teaser{display:grid;grid-template-columns:1.3fr 1fr;align-items:center;gap:40px;margin-top:56px;background:#1b3038;color:var(--color-ivory);padding:32px 40px 32px 20px;overflow:hidden;border-radius:3px}
+.journey-teaser-landscape{min-width:0;background:radial-gradient(ellipse,#71857322,transparent 68%)}
+.journey-teaser-landscape svg{display:block;width:100%;height:auto;transition:transform .4s}
+.journey-teaser:hover svg{transform:translateY(-5px)}
+.journey-teaser>div>span:first-child{font-size:11px;letter-spacing:.1em;color:#c4cfb8}
+.journey-teaser h3{font-size:clamp(30px,3.5vw,48px);font-weight:500;letter-spacing:-.05em;line-height:1.1;margin:18px 0}
+.journey-teaser p{font-size:16px;line-height:1.7;color:#c1cec7;max-width:35ch}
+.journey-teaser-link{display:inline-flex;gap:32px;align-items:center;border-bottom:1px solid #b7c1ab;margin-top:20px;padding-block:12px;font-size:14px;color:var(--color-highlight)}
+@media(max-width:700px){.journey-teaser{grid-template-columns:1fr;padding:16px 24px 28px;gap:8px}.journey-teaser-landscape{max-height:260px}.journey-teaser-landscape svg{max-height:260px}.journey-teaser h3 br{display:none}}
 .services-section { padding-block: 88px 48px; }
 .services-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
 .services-grid article { border-top: 1px solid var(--color-border); padding-top: 24px; }

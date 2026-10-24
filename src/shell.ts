@@ -1,5 +1,6 @@
 import { concepts, extensions, packages, packageQuestions, priceDraftNotice, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
+import { landscapeSvg } from './journey/map';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -12,6 +13,7 @@ export function renderPage(root: HTMLElement): PageMounts {
       <nav aria-label="Hauptnavigation">
         <a href="#ansatz">Ansatz</a>
         <a href="#arbeiten">Beispiele <span>${String(concepts.length).padStart(2, '0')}</span></a>
+        <a href="${import.meta.env.BASE_URL}reise/">Die Reise</a>
         <a href="#leistungen">Leistungen</a>
         <a href="#pakete">Pakete</a>
         <a href="#ueber-uns">Über mich</a>
@@ -22,9 +24,10 @@ export function renderPage(root: HTMLElement): PageMounts {
     <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile Navigation" hidden>
       <a href="#ansatz">Ansatz <span>01</span></a>
       <a href="#arbeiten">Beispiele <span>02</span></a>
-      <a href="#leistungen">Leistungen <span>03</span></a>
-      <a href="#pakete">Pakete <span>04</span></a>
-      <a href="#ueber-uns">Über mich <span>05</span></a>
+      <a href="${import.meta.env.BASE_URL}reise/">Die Reise <span>03</span></a>
+      <a href="#leistungen">Leistungen <span>04</span></a>
+      <a href="#pakete">Pakete <span>05</span></a>
+      <a href="#ueber-uns">Über mich <span>06</span></a>
       <a href="#projektfinder">Kontakt & Projekt ${arrow}</a>
     </nav>
     <main id="main" tabindex="-1">
@@ -144,6 +147,10 @@ export function renderPage(root: HTMLElement): PageMounts {
               <li><span>04</span><div><h3>Prüfen & übergeben.</h3><p>Wir gehen die fertige Lösung gemeinsam durch. Sie erhalten die vereinbarten Dateien, Zugänge und eine Einführung. Betrieb und spätere Änderungen sind geklärt.</p></div></li>
             </ol>
           </div>
+          <a class="journey-teaser" href="${import.meta.env.BASE_URL}reise/">
+            <div class="journey-teaser-landscape">${landscapeSvg()}</div>
+            <div><span>DIE REISE / WEBBYU</span><h3>Eine Idee nimmt<br>Form an.</h3><p>Vom ersten Gedanken zu vier erlebbaren Konzeptstudien. Entdecken Sie verbundene Erlebnisräume, in denen Inhalt, Gestaltung und Funktion zusammenfinden.</p><span class="journey-teaser-link">Die Reise entdecken ${arrow}</span></div>
+          </a>
         </div>
       </section>
 

@@ -67,4 +67,15 @@ describe('page shell contract', () => {
     expect(description.textContent).toContain('fiktive Marken');
     expect(description.textContent).toContain('Simulationen');
   });
+
+  it('links the separate journey from both navigation surfaces and the about preview', () => {
+    const root = document.createElement('div');
+    renderPage(root);
+    const destination = `${import.meta.env.BASE_URL}reise/`;
+    expect(root.querySelector('.site-header nav')?.querySelector(`a[href="${destination}"]`)).not.toBeNull();
+    expect(root.querySelector('.mobile-nav')?.querySelector(`a[href="${destination}"]`)).not.toBeNull();
+    const teaser = root.querySelector('.about-section .journey-teaser');
+    expect(teaser?.getAttribute('href')).toBe(destination);
+    expect(teaser?.querySelector('svg')).not.toBeNull();
+  });
 });

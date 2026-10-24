@@ -10,4 +10,12 @@ const base = process.env.GITHUB_ACTIONS === 'true' && repository && !repository.
   ? `/${repository}/`
   : '/';
 
-export default defineConfig({ base });
+export default defineConfig({
+  base,
+  // QA screenshots and alternate builds are not application source. Watching
+  // files while they are copied can terminate the Windows development server.
+  server: { watch: { ignored: ['**/artifacts/**'] } },
+  build: {
+    rollupOptions: { input: { main: 'index.html', journey: 'reise/index.html' } },
+  },
+});
