@@ -38,10 +38,6 @@ Eine optionale spätere Inhaltspflege ist eine projektbezogene Entscheidung. Die
 
 Die ursprünglichen werkzeug.-Dateien unter `site/` bleiben als Referenz erhalten. Das untersuchte WordPress-Paket unter `projektpruefung/` bleibt ein getrenntes historisches Prüfobjekt und wird nicht zur technischen Basis.
 
-## Wortmarke: Web · By · Yu
-
-Nutzerergänzung vom 24. Oktober 2026: Die sichtbare Wortmarke soll als „WebByYu“ gelesen werden. Header und Footer gliedern sie deshalb in drei Wortteile: „Web“ in dunklem Blau, „By“ in einem zurückhaltenden Blaugrau und „Yu“ auf dem gelbgrünen Akzent der Website. Die Großschreibung macht die Trennung auch unabhängig von der Farbe sichtbar. Die zugängliche Linkbezeichnung liest „Web By Yu“. Diese Gestaltung betrifft die Wortmarke; Repository, Domain und bestehende Projektbezeichnungen werden dadurch nicht umbenannt.
-
 ## Prüfung und Vorschau
 
 - Lokale Vorschau: http://127.0.0.1:5173/; HTTP 200 geprüft.
