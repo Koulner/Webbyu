@@ -66,8 +66,11 @@
 /* The werkzeug reference: plain language, precise sans typography and useful detail. */
 .site-header { padding-inline: max(var(--page-gutter), calc((100% - 84rem) / 2 + var(--page-gutter))); }
 .site-header nav { gap: 24px; }
-.site-header .wordmark, .site-footer .wordmark { font-weight: 750; letter-spacing: -.06em; }
-.wordmark-dot { background: var(--color-ink); }
+.site-header .wordmark, .site-footer .wordmark { align-items: baseline; font-weight: 700; letter-spacing: -.055em; white-space: nowrap; }
+.wordmark-web { color: var(--color-ink); }
+.wordmark-by { color: var(--color-wordmark-by); margin-left: .035em; font-weight: 500; }
+.wordmark-yu { color: var(--color-ink); margin-left: .035em; padding-inline: .08em; background: linear-gradient(transparent 13%, var(--color-highlight) 13%, var(--color-highlight) 94%, transparent 94%); }
+.wordmark-period { margin-left: .015em; color: var(--color-ink); }
 .header-cta { border-color: var(--color-ink); border-radius: 0; }
 .button--primary { background: var(--color-ink); color: var(--color-ivory); }
 .button--primary:hover { background: var(--color-aubergine); }

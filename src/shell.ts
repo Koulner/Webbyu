@@ -2,13 +2,14 @@ import { concepts, extensions, packages, packageQuestions, priceDraftNotice, sco
 import type { PageMounts } from './contracts';
 
 const arrow = '<span aria-hidden="true">↗</span>';
+const wordmark = '<span class="wordmark-web">Web</span><span class="wordmark-by">By</span><span class="wordmark-yu">Yu</span><span class="wordmark-period" aria-hidden="true">.</span>';
 
 /** Page composition only. Each feature owns its mount contents and listeners. */
 export function renderPage(root: HTMLElement): PageMounts {
   root.innerHTML = `
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <header class="site-header">
-      <a class="wordmark" href="#" aria-label="Webbyu – Startseite">webbyu<span class="wordmark-dot" aria-hidden="true"></span></a>
+      <a class="wordmark" href="#" aria-label="Web By Yu – Startseite">${wordmark}</a>
       <nav aria-label="Hauptnavigation">
         <a href="#ansatz">Ansatz</a>
         <a href="#arbeiten">Beispiele <span>${String(concepts.length).padStart(2, '0')}</span></a>
@@ -165,7 +166,7 @@ export function renderPage(root: HTMLElement): PageMounts {
       </section>
     </main>
     <footer class="site-footer section-shell">
-      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">webbyu<span class="wordmark-dot" aria-hidden="true"></span></a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
+      <div class="footer-top"><a class="wordmark" href="#" aria-label="Web By Yu – zurück nach oben">${wordmark}</a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
       <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a></nav>
       <div class="legal-notes">
         <details id="impressum"><summary>Impressum · noch zu ergänzen</summary><p>Interner Platzhalter. Betreiber, Rechtsform, ladungsfähige Anschrift und geschäftliche Kontaktdaten sind noch zu bestätigen. Eine freigegebene Anbieterkennzeichnung liegt noch nicht vor.</p></details>
