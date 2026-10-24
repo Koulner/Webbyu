@@ -46,7 +46,7 @@ export function renderPage(root: HTMLElement): PageMounts {
           <div class="section-kicker"><span>01 / AUS DEM ATELIER</span><span>Vier Aufgaben. Vier Lösungen.</span></div>
           <div class="section-heading gallery-heading">
             <h2 id="work-title">Ein Rahmen.<br><em>Ihre Möglichkeiten.</em></h2>
-            <p>Ein Raumwunsch, eine technische Frage, ein Einkauf oder eine Musteranfrage: Vier Konzepte zeigen, wie aus einer Geschäftsaufgabe ein nutzbarer digitaler Weg wird.</p>
+            <p>Ein Raumwunsch, eine technische Frage, ein besonderes Genussprodukt oder ein Möbelshop: Vier Konzepte zeigen, wie aus einer Geschäftsaufgabe ein nutzbarer digitaler Weg wird.</p>
           </div>
           <div class="gallery-workspace">
             <div class="gallery-controls"><div id="catalogue-mount"></div></div>

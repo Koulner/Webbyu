@@ -6,9 +6,9 @@ import type { DemoId } from './data';
 import type { SceneController, SceneMode, SceneOptions } from './contracts';
 import './scene.css';
 
-const GOAL_ANGLE: Record<DemoId, number> = { meisterwerk: -.72, nordlicht: 0, sales: .72, solara: 1.15 };
+const GOAL_ANGLE: Record<DemoId, number> = { meisterwerk: -.72, nordlicht: 0, sales: .72, raumgut: 1.15 };
 const GOAL_ACCENT: Record<DemoId, string> = {
-  meisterwerk: '#c7b29a', nordlicht: '#9bb8d8', sales: '#cfa477', solara: '#d6ba70',
+  meisterwerk: '#c7b29a', nordlicht: '#9bb8d8', sales: '#cfa477', raumgut: '#a3b090',
 };
 const SCREEN = { width: 720, height: 576, scale: .01, x: .12, y: .1, z: .382 };
 

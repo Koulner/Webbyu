@@ -1,5 +1,7 @@
 # Übernahme des früheren Webprojekts · 23. Oktober 2026
 
+**Aktualisierung 24. Oktober:** Auf Wunsch ersetzt die Händler-Demo Raumgut die unten historisch dokumentierte Solara-Demo. Aktueller Stand und Prüfung: [RETAILER_DEMO.md](RETAILER_DEMO.md). Die anderen drei Demos bleiben erhalten.
+
 ## Analyse und Business-Konzept
 
 Die frühere Website `site/dist/index.html` positioniert digitale Arbeit über ihren Nutzen: komplexe Angebote verständlich machen, passende Entscheidungen ermöglichen und äußeren Auftritt mit internen Abläufen verbinden. Website, CMS, Shop, Portal oder Schnittstelle folgen der konkreten Aufgabe. Die Zusammenarbeit beginnt mit Verstehen und Strukturieren, danach folgen Gestaltung und Umsetzung.

@@ -49,7 +49,7 @@ node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 5173 --strict
 
 Die bestehende helle Editorial-Seite und dunkle 3D-Galerie verbinden jetzt das Webbyu-Angebot mit dem Business-Konzept des früheren Projekts: Angebote verständlich machen, Anfragen vorbereiten und Geschäftsabläufe vereinfachen. Die weitere 3D-Story folgt später.
 
-Die Galerie enthält vier interaktive Konzepte: **Meisterwerk** (Raumfallbuch und Projektbriefing) ersetzt Klarraum; **Nordlicht** (verzweigter Bedarfscheck) ersetzt Studio Still; **Safran Atelier** bleibt samt Kamerafahrt erhalten; **Solara** (Rohstoffregister, Produktvergleich, Musterliste und Blend-Briefing) kommt hinzu. Details zur Übernahme stehen in `REFERENCE_MIGRATION.md`.
+Die Galerie enthält vier interaktive Konzepte: **Meisterwerk** (Raumfallbuch und Projektbriefing) ersetzt Klarraum; **Nordlicht** (verzweigter Bedarfscheck) ersetzt Studio Still; **Safran Atelier** bleibt samt Kamerafahrt erhalten. Seit 24. Oktober ersetzt **Raumgut** die zwischenzeitlich ergänzte Solara-Demo: ein Möbelshop mit eigenen Bildern, Suche, kombinierten Filtern, Produktvarianten, Verfügbarkeit, Merkliste, Warenkorb und vollständiger lokaler Bestellvorschau. Details stehen in `REFERENCE_MIGRATION.md` und `RETAILER_DEMO.md`.
 
 Die Safran-Atelier-Demo enthält jetzt die gerenderte 3D-Kamerafahrt aus dem Referenzprojekt: Blüte → rote Narbe → Safranfäden. Unter „Kamerafahrt entdecken“ lässt sie sich durch Scrollen, Abspielen/Pause, Kapitelwahl oder den Positionsregler steuern. Die echte Markenverpackung ist ausgespart. Bei reduzierter Bewegung, Datensparmodus oder fehlender Browserunterstützung bleiben die Kapitel als Bilder zugänglich. Die 201 lokalen Frames (zusammen 2,94 MB) werden bei Bedarf geladen; die Animation pausiert außerhalb der sichtbaren Demo und in inaktiven Tabs.
 
@@ -68,7 +68,7 @@ Prüfbilder und der responsive Prüfstand liegen lokal in `artifacts/ap6-preview
 - `src/state.ts`: gemeinsamer, flüchtiger Projektzustand und Paketempfehlungen.
 - `src/scene.ts`: 3D-Galerie, explizite Ansichtsmodi und Ersatzdarstellungen.
 - `src/demos.ts`: Safran-Demo, gemeinsame Sitzungsverwaltung und Großansicht.
-- `src/reference-demos/`: übernommene Meisterwerk-, Nordlicht- und Solara-Demos mit isolierter Gestaltung und lokalen Abläufen; Bilder in `public/reference-assets/`.
+- `src/reference-demos/`: Meisterwerk, Nordlicht und Raumgut mit isolierter Gestaltung und lokalen Abläufen; Bilder in `public/reference-assets/`.
 - `src/saffron-journey.ts` / `.css`: Kamera, Scrollführung und Ersatzdarstellung innerhalb der Safran-Demo; Herkunft der Frames in `src/assets/demos/saffron/journey/README.md`.
 - `src/finder.ts`: Projektfinder und sichtbare Anfragezusammenfassung.
 

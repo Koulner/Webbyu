@@ -3,11 +3,11 @@ import handwerkBody from './handwerk/body.html?raw';
 import handwerkStyle from './handwerk/style.css?raw';
 import nordlichtBody from './gebaeudetechnik/body.html?raw';
 import nordlichtStyle from './gebaeudetechnik/style.css?raw';
-import solaraBody from './gewuerze/body.html?raw';
-import solaraStyle from './gewuerze/style.css?raw';
+import raumgutBody from './raumgut/body.html?raw';
+import raumgutStyle from './raumgut/style.css?raw';
 import { mount as mountHandwerk } from './handwerk/app.js';
 import { mount as mountNordlicht } from './gebaeudetechnik/app.js';
-import { mount as mountSolara } from './gewuerze/app.js';
+import { mount as mountRaumgut } from './raumgut/app';
 import './runtime.css';
 
 export interface ReferenceScope {
@@ -26,7 +26,7 @@ export interface ReferenceHelpers {
 const references = {
   meisterwerk: { body: handwerkBody, css: handwerkStyle, mount: mountHandwerk },
   nordlicht: { body: nordlichtBody, css: nordlichtStyle, mount: mountNordlicht },
-  solara: { body: solaraBody, css: solaraStyle, mount: mountSolara },
+  raumgut: { body: raumgutBody, css: raumgutStyle, mount: mountRaumgut },
 };
 
 /** Shadow DOM preserves the original designs and live state while the gallery reparents them. */
@@ -49,8 +49,6 @@ export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales
     .reference-page dialog { max-width: calc(100vw - 32px); max-height: 85dvh; }
     @container reference (max-width: 480px) {
       .reference-page .compare-dock { flex-wrap: wrap; gap: 8px; justify-content: center; }
-      .reference-page .blend-banner > div { min-width: 0; }
-      .reference-page .blend-banner h2 { font-size: clamp(32px, 10cqw, 42px); overflow-wrap: anywhere; }
     }
   </style><div class="reference-page">${resolveAssets(source.body)}</div>`;
   const page = shadow.querySelector<HTMLElement>('.reference-page')!;
@@ -102,7 +100,8 @@ export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales
     dialog.addEventListener('close', () => {
       const explicitReturn = (dialog as HTMLDialogElement & { returnTarget?: HTMLElement }).returnTarget;
       const target = explicitReturn ?? returns.get(dialog);
-      if (!shadow.querySelector('dialog[open]') && target?.isConnected) target.focus({ preventScroll: true });
+      const parentDialog = target?.closest<HTMLDialogElement>('dialog');
+      if (target?.isConnected && (!shadow.querySelector('dialog[open]') || parentDialog?.open)) target.focus({ preventScroll: true });
     }, { signal });
     dialog.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;

@@ -92,48 +92,46 @@ describe('imported business demos', () => {
     expect(root.querySelector<HTMLButtonElement>('#prepare')!.hidden).toBe(true);
   });
 
-  it('compares ingredients, keeps a sample list and produces a safe local request with no storage', () => {
-    const storage = vi.spyOn(Storage.prototype, 'setItem');
-    const { root, click, fill, submit } = setup('solara');
-    click('[data-compare="saffron"]'); click('[data-compare="pepper"]');
-    click('#show-compare');
-    expect(root.querySelector('#comparison')!.textContent).toContain('Schwarzer Pfeffer');
-    click('#compare-dialog [data-close]');
-    click('#products [data-sample="saffron"]');
-    click('[data-blend]');
-    fill('application', 'Saucen'); fill('profile', 'Rauchig und frisch');
-    submit('#blend-form');
-    expect(root.querySelector('#blend-summary')!.textContent).toContain('Rauchig und frisch');
-    fill('context', '<img src=x> Eine neue Sauce');
-    fill('company', 'Testküche'); fill('email', 'ada@example.test');
-    submit('#request-form');
-    expect(root.querySelector<HTMLElement>('#request-result')!.hidden).toBe(false);
-    expect(root.querySelector('#request-preview')!.textContent).toContain('Safran');
-    expect(root.querySelector('#request-preview')!.textContent).toContain('Rauchig und frisch');
-    expect(root.querySelector('#request-preview img')).toBeNull();
-    expect(storage).not.toHaveBeenCalled();
+  it.each(['maintenance', 'fault'] as const)('finishes the %s route with a validated, editable local contact draft', route => {
+    const fetch = vi.fn(), xhr = vi.spyOn(XMLHttpRequest.prototype, 'send'), storage = vi.spyOn(Storage.prototype, 'setItem');
+    vi.stubGlobal('fetch', fetch);
+    const { root, click, fill, submit } = setup('nordlicht');
+    click(`[data-route="${route}"]`);
+    const answers = route === 'maintenance' ? ['heat', 'multi', 'unknown'] : ['no', 'air', 'partial'];
+    for (const answer of answers) { click(`[value="${answer}"]`); click('#next'); }
+    expect(root.querySelector('#result-title')!.textContent).toContain(route === 'maintenance' ? 'Wartungsstand' : 'Beobachtungen');
+    click('#prepare'); submit('#contact-form');
+    expect(root.querySelector<HTMLElement>('#contact-result')!.hidden).toBe(true);
+    fill('name', 'Alex Beispiel'); fill('email', 'alex@example.test'); fill('place', 'Musterstadt');
+    fill('notes', '<img src=x> Bitte die Unterlagen einordnen.'); submit('#contact-form');
+    expect(root.querySelector<HTMLElement>('#contact-result')!.hidden).toBe(false);
+    expect(root.querySelector('#contact-preview')!.textContent).toContain('Bitte die Unterlagen einordnen.');
+    expect(root.querySelector('#contact-preview img')).toBeNull();
+    click('#edit-contact');
+    expect(root.querySelector<HTMLInputElement>('[name="name"]')!.value).toBe('Alex Beispiel');
+    expect(fetch).not.toHaveBeenCalled(); expect(xhr).not.toHaveBeenCalled(); expect(storage).not.toHaveBeenCalled();
   });
 
-  it('preserves Solara state across reparenting and closes the inner dialog before the gallery', () => {
+  it('preserves Raumgut favorites across reparenting and closes the inner dialog before the gallery', () => {
     const container = document.createElement('div'), slot = document.createElement('div');
     document.body.append(container, slot);
     const request = vi.fn();
     const catalogue = mountCatalogue({ container, demoSlot: slot, onStateChange: () => {}, onProjectRequest: request });
     cleanups.push(() => catalogue.dispose());
-    catalogue.selectGoal('solara');
+    catalogue.selectGoal('raumgut');
     const demo = slot.firstElementChild as HTMLElement;
-    demo.shadowRoot!.querySelector<HTMLButtonElement>('#products [data-sample="saffron"]')!.click();
-    catalogue.selectGoal('sales'); catalogue.open('solara');
+    demo.shadowRoot!.querySelector<HTMLButtonElement>('#rg-grid [data-save="nori"]')!.click();
+    catalogue.selectGoal('sales'); catalogue.open('raumgut');
     expect(document.querySelector('.concept-dialog .demo')).toBe(demo);
-    expect(demo.shadowRoot!.querySelector('#sample-count')!.textContent).toBe('1');
-    demo.shadowRoot!.querySelector<HTMLButtonElement>('#open-list')!.click();
+    expect(demo.shadowRoot!.querySelector('#rg-saved-count')!.textContent).toBe('1');
+    demo.shadowRoot!.querySelector<HTMLButtonElement>('[data-action="favorites"]')!.click();
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
     dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
     expect(dialog.open).toBe(true);
-    expect(demo.shadowRoot!.querySelector<HTMLDialogElement>('#list-dialog')!.open).toBe(false);
+    expect(demo.shadowRoot!.querySelector<HTMLDialogElement>('#rg-saved-dialog')!.open).toBe(false);
     dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
     expect(slot.firstElementChild).toBe(demo);
     container.querySelector<HTMLButtonElement>('[data-project-request]')!.click();
-    expect(request).toHaveBeenCalledExactlyOnceWith('inquiries');
+    expect(request).toHaveBeenCalledExactlyOnceWith('sales');
   });
 });
