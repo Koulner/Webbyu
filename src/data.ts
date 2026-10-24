@@ -7,8 +7,8 @@ export const priceDraftNotice = 'Interner Preisentwurf · Steuerbasis noch offen
 export const scopeNotice = 'Shops, komplexe Buchungen und individuelle Integrationen benötigen einen gesonderten Umfang und ein eigenes Angebot.';
 
 export const goals: { id: Goal; label: string; description: string }[] = [
-  { id: 'presence', label: 'Sichtbar werden', description: 'Ein Auftritt, der zeigt, wer Sie sind.' },
-  { id: 'inquiries', label: 'Anfragen gewinnen', description: 'Aus Interesse ein Gespräch machen.' },
+  { id: 'presence', label: 'Mein Angebot verständlich zeigen', description: 'Kunden erkennen, was Sie anbieten und für wen es passt.' },
+  { id: 'inquiries', label: 'Passendere Anfragen erhalten', description: 'Die richtigen Fragen schon vor dem ersten Gespräch klären.' },
   { id: 'bookings', label: 'Buchungen ermöglichen', description: 'Den Weg zum Termin einfacher machen.' },
   { id: 'sales', label: 'Produkte verkaufen', description: 'Ihre Produkte verdienen eine eigene Bühne.' },
 ];
@@ -20,9 +20,15 @@ export const packages: { id: PackageId; number: string; name: string; price: str
 ];
 
 export const services = [
-  { name: 'Klarheit & Websites', description: 'Komplexe Leistungen verständlich machen. Ich strukturiere Inhalte und Nutzerwege und gebe Ihrem Unternehmen einen eigenständigen Auftritt.' },
-  { name: 'Foto & Video', description: 'Menschen, Räume und Produkte aus Ihrem Unternehmen. Ich plane Motive, Produktion und Nutzungsrechte passend zum vereinbarten Paket.' },
-  { name: 'Digitale Werkzeuge', description: 'Bedarfschecks, Produktvergleiche, CMS, Shops oder Portale: Ich wähle Funktionen nach Ihrer Aufgabe. Schnittstellen und Automatisierungen verbinden bei Bedarf Website und Geschäftsabläufe – mit gesondertem Umfang.' },
+  { name: 'Ihr Angebot verständlich machen', description: 'Ich ordne Ihre Leistungen und Inhalte so, dass Besucher sich zurechtfinden: Was bieten Sie an? Für wen ist es passend? Wie geht es weiter?', examples: ['Inhalte und Seiten gemeinsam planen', 'Texte, Bilder und Gestaltung aufeinander abstimmen', 'Eine eigene Website für Ihr Unternehmen entwickeln'], outcome: 'Kunden können Ihr Angebot einordnen und den nächsten Schritt finden.' },
+  { name: 'Kunden bei der Auswahl helfen', description: 'Wenn eine Entscheidung Erklärung braucht, kann die Website dabei helfen. Ein paar passende Fragen, ein Vergleich oder eine anschauliche Produktdarstellung machen Möglichkeiten greifbar.', examples: ['Wünsche vor einer Anfrage zusammenstellen', 'Produkte und Varianten verständlich vergleichen', 'Anfragen, Termine oder einen Einkauf vorbereiten'], outcome: 'Sie erhalten eine bessere Grundlage für das Gespräch oder den Kauf.' },
+  { name: 'Die Arbeit dahinter vereinfachen', description: 'Ich schaue auch darauf, was nach dem Klick passiert. Wo werden Angaben erneut eingetippt? Welche Informationen fehlen? Welche vorhandenen Dienste sollen zusammenarbeiten?', examples: ['Wiederkehrende Angaben geordnet weitergeben', 'Inhalte bei Bedarf selbst bearbeiten', 'Shop, Buchung oder andere Dienste passend anbinden'], outcome: 'Eine Lösung, die zu Ihren tatsächlichen Abläufen passt. Umfang und Betreuung klären wir gemeinsam.' },
+];
+
+export const situations = [
+  { title: '„Ich muss mein Angebot immer wieder erklären.“', context: 'Sie bieten mehrere Leistungen oder ein erklärungsbedürftiges Produkt an. Besucher wissen nicht sofort, was für sie passt.', approach: 'Wir ordnen Ihre Angebote nach den Fragen Ihrer Kunden. Beispiele, verständliche Texte und passende Auswahlmöglichkeiten führen durch die Entscheidung.', example: 'Ein Dienstleistungsbetrieb zeigt, für welche Situationen seine Angebote gedacht sind. Besucher finden den passenden Einstieg und können ihr Anliegen genauer beschreiben.', result: 'Ein klareres Angebot und ein sinnvoll vorbereiteter Kontakt.' },
+  { title: '„Bei Anfragen fehlen oft die wichtigen Angaben.“', context: 'Ein freies Nachrichtenfeld lässt viele Fragen offen. Sie fragen Raumgröße, gewünschten Umfang oder den Anlass anschließend einzeln nach.', approach: 'Eine kurze, passende Abfrage sammelt die Informationen, die Sie wirklich brauchen. Die nächsten Fragen richten sich nach den bisherigen Antworten.', example: 'Bei einem Raumprojekt werden erst Wünsche und Nutzung geklärt. Bei einem technischen Anliegen unterscheidet die Website zwischen Beratung, Wartung und Störung.', result: 'Ein gemeinsamer Ausgangspunkt für das erste Gespräch.' },
+  { title: '„Zu viel läuft noch über Listen und Rückfragen.“', context: 'Produktinformationen, Bestellungen oder Anfragen liegen an verschiedenen Stellen. Angaben werden wiederholt übertragen und Zusammenhänge gehen verloren.', approach: 'Wir zeichnen den Ablauf auf und entscheiden, wo eine gezielte Funktion oder die Anbindung eines vorhandenen Dienstes helfen kann.', example: 'Ein Shop kann Kunden bei Varianten und Verfügbarkeit unterstützen. Eine Buchung kann die Angaben mitnehmen, die Sie für die Vorbereitung benötigen. Die nötigen Verbindungen werden gesondert geplant.', result: 'Weniger unnötige Zwischenschritte — soweit der gemeinsam vereinbarte Ablauf sie ermöglicht.' },
 ];
 
 export const packageQuestions = [
@@ -35,17 +41,17 @@ export const packageQuestions = [
 
 export const extensions = [
   { id: 'photos', name: 'Eigene Fotos produzieren', short: 'Fotografie', description: 'Im Paketentwurf: 15 bearbeitete Fotos bei Business, 30 bei Complete. Motive, Aufnahmeumfang und Nutzungsrechte stimme ich vorher mit Ihnen ab.' },
-  { id: 'videos', name: 'Foto, Video & Text verbinden', short: 'Content', description: 'Complete sieht zwei Kurzvideos bis je 30 Sekunden und Texterstellung vor. Produktion, Formate und Nutzungsrechte werden individuell vereinbart.' },
-  { id: 'cms', name: 'Inhalte selbst pflegen', short: 'CMS', description: 'Texte, Bilder und neue Inhalte bearbeiten, ohne jedes Mal die Entwicklung zu brauchen.' },
+  { id: 'videos', name: 'Foto, Video & Text verbinden', short: 'Texte & Videos', description: 'Complete sieht zwei Kurzvideos bis je 30 Sekunden und Texterstellung vor. Produktion, Formate und Nutzungsrechte werden individuell vereinbart.' },
+  { id: 'cms', name: 'Inhalte selbst pflegen', short: 'Inhalte bearbeiten', description: 'Texte, Bilder und neue Inhalte bei Bedarf selbst bearbeiten. Die passende Möglichkeit zur Pflege wird für Ihr Projekt ausgewählt.' },
   { id: 'booking', name: 'Termine einfacher buchen', short: 'Buchung', description: 'Leistungen und verfügbare Zeiten in einen passenden Buchungsablauf einbinden.' },
-  { id: 'seo', name: 'Besser gefunden werden', short: 'SEO', description: 'Suchintention, Seitenstruktur und Inhalte gezielt auf Ihr Angebot abstimmen.' },
-  { id: 'maps', name: 'Den Weg zu Ihnen zeigen', short: 'Maps', description: 'Standort, Anfahrt und Ihre lokale Präsenz verständlich zusammenbringen.' },
+  { id: 'seo', name: 'Besser gefunden werden', short: 'Suchmaschinen', description: 'Seiten und Inhalte auf die Fragen ausrichten, mit denen Kunden nach Ihrem Angebot suchen. Zusätzliche Maßnahmen stimmen wir gesondert ab.' },
+  { id: 'maps', name: 'Den Weg zu Ihnen zeigen', short: 'Standort & Anfahrt', description: 'Standort, Anfahrt und Ihre lokale Präsenz verständlich zusammenbringen.' },
   { id: 'wizard', name: 'Zur richtigen Wahl führen', short: 'Projektfinder', description: 'Mit wenigen Fragen zum passenden Produkt, Paket oder Angebot führen.' },
   { id: '3d', name: 'Etwas Besonderes erleben', short: 'Interaktives 3D', description: 'Produkte und Geschichten mit räumlicher Gestaltung und gezielter Bewegung erlebbar machen.' },
 ];
 
 export const concepts: { goal: DemoId; projectGoal: Goal; number: string; name: string; type: string; title: string; description: string; problem: string; solution: string; tags: string[] }[] = [
-  { goal: 'meisterwerk', projectGoal: 'inquiries', number: '01', name: 'Meisterwerk', type: 'Innenausbau & Raumplanung', title: 'Aus einem Raumwunsch wird ein Vorhaben.', description: 'Fallgeschichten, ein Vorher-nachher-Vergleich und Materialentscheidungen führen zu einem konkreten Projektbriefing.', problem: 'Ein Veränderungswunsch ist noch schwer zu beschreiben.', solution: 'Raumideen erkunden und ein Projektbriefing zusammenstellen.', tags: ['Raumfallbuch', 'Bildvergleich', 'Projektbriefing'] },
+  { goal: 'meisterwerk', projectGoal: 'inquiries', number: '01', name: 'Meisterwerk', type: 'Innenausbau & Raumplanung', title: 'Aus einem Raumwunsch wird ein Vorhaben.', description: 'Raumbeispiele, ein Vorher-nachher-Vergleich und Materialentscheidungen helfen, die eigenen Wünsche zu beschreiben und eine Anfrage vorzubereiten.', problem: 'Ein Veränderungswunsch ist noch schwer zu beschreiben.', solution: 'Raumideen erkunden und die eigenen Wünsche für eine Anfrage sammeln.', tags: ['Raumideen', 'Bildvergleich', 'Anfrage vorbereiten'] },
   { goal: 'nordlicht', projectGoal: 'inquiries', number: '02', name: 'Nordlicht', type: 'Gebäudetechnik & Service', title: 'Die richtige Frage vor der Technik.', description: 'Ein verzweigter Bedarfscheck unterscheidet Beratung, Wartung und Störung und erklärt den nächsten Gesprächsschritt.', problem: 'Technische Angebote überfordern und Anfragen bleiben unklar.', solution: 'Passende Folgefragen führen zu einer begründeten Einordnung.', tags: ['Bedarfscheck', 'Entscheidungshilfe', 'Kontaktentwurf'] },
   { goal: 'sales', projectGoal: 'sales', number: '03', name: 'Safran Atelier', type: 'Genuss & Botanik', title: 'Von der Blüte zum Genuss.', description: 'Eine anonymisierte Designstudie mit botanischen Nahaufnahmen, einer interaktiven Produktgeschichte und einem vollständig lokalen Einkaufsweg.', problem: 'Ein besonderes Produkt braucht eine verständliche Geschichte.', solution: 'Die Kamerafahrt verbindet Entdeckung, Produktauswahl und Einkauf.', tags: ['Anonymisierte Demo', 'Produkte', 'Interaktion'] },
   { goal: 'raumgut', projectGoal: 'sales', number: '04', name: 'Raumgut', type: 'Möbelhandel & Wohnkultur', title: 'Lieblingsstücke finden. Zuhause weiterdenken.', description: 'Ein vollständiger Möbelshop mit eigener Bildwelt, Suche, Filtern, Produktvarianten, Merkliste und einem lokalen Einkaufsweg bis zur Bestellvorschau.', problem: 'Ein großes Sortiment braucht Orientierung und einen einfachen Einkaufsweg.', solution: 'Möbel entdecken, Größen auswählen und den Einkauf vollständig ausprobieren.', tags: ['Möbelshop', 'Merkliste & Varianten', 'Bestellvorschau'] },

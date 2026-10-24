@@ -1,12 +1,13 @@
 /* Shared foundation: keep these names stable across the page, catalogue and scene. */
 :root {
-  --color-ivory: #f5f1ea;
-  --color-ink: #241d26;
-  --color-aubergine: #513448;
-  --color-gallery: #151419;
-  --color-champagne: #c7b29a;
-  --color-muted: #685e65;
-  --color-border: #d5cbc9;
+  --color-ivory: #f3f1eb;
+  --color-ink: #17222b;
+  --color-aubergine: #253e47;
+  --color-gallery: #121b25;
+  --color-champagne: #e7ff5a;
+  --color-muted: #536168;
+  --color-border: #d1d5d1;
+  --color-highlight: #e7ff5a;
   --color-on-dark: var(--color-ivory);
 
   --font-sans: 'Instrument Sans', Arial, sans-serif;
@@ -28,7 +29,7 @@
   --space-7: 3rem;
   --space-8: 4rem;
   --page-gutter: clamp(1.25rem, 5vw, 5rem);
-  --page-max-width: 90rem;
+  --page-max-width: 84rem;
   --control-min-size: 2.75rem;
   --radius-small: 0.25rem;
   --radius-medium: 0.75rem;

@@ -47,7 +47,7 @@ describe('catalogue sessions and explicit controls', () => {
   it('starts in presentation and preserves explicit mode while selecting labelled concepts', () => {
     const { controller, container, click, onStateChange, onProjectRequest } = setup();
     expect(controller.getState()).toEqual({ goal: 'meisterwerk', mode: 'presentation' });
-    expect(container.querySelector('[data-catalogue-goal="meisterwerk"]')!.textContent).toContain('01 / 04MeisterwerkRaumfallbuch');
+    expect(container.querySelector('[data-catalogue-goal="meisterwerk"]')!.textContent).toContain('01 / 04MeisterwerkRaumideen');
     expect(container.querySelector('[data-catalogue-goal="nordlicht"]')!.textContent).toContain('02 / 04NordlichtBedarfscheck');
     expect(container.querySelector('[data-catalogue-goal="sales"]')!.textContent).toContain('03 / 04Safran AtelierAnonymisierte Demo');
     click('[data-scene-mode="interactive"]');

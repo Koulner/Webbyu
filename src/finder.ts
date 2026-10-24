@@ -8,7 +8,7 @@ const timingNames: Record<string, string> = { flexible: 'Zeitlich flexibel', soo
 const reasons: Record<Goal, string> = {
   presence: 'Sie möchten sichtbar werden. Ein präziser Unternehmensauftritt stellt Ihr Angebot vor und macht den Kontakt einfach.',
   inquiries: 'Sie möchten aus Interesse konkrete Anfragen machen. Klare Besucherführung und passende Anfragewege unterstützen dieses Ziel.',
-  bookings: 'Sie möchten den Weg zum Termin erleichtern. Ich kläre mit Ihnen zuerst den Buchungsablauf und die nötige Integration. Dafür ist ein gesondertes Angebot erforderlich.',
+  bookings: 'Sie möchten den Weg zum Termin erleichtern. Ich kläre mit Ihnen den Buchungsablauf und welche vorhandenen Dienste angebunden werden sollen. Dafür ist ein gesondertes Angebot erforderlich.',
   sales: 'Sie möchten Produkte verkaufen. Sortiment, Kaufablauf und technische Anbindung bestimmen den Umfang. Ein Shop ist in keinem der drei Website-Pakete pauschal enthalten.',
 };
 
@@ -73,16 +73,16 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
         <div class="finder-complete-mark" aria-hidden="true">↗</div>
         <p class="finder-eyebrow">Ihr Projekt auf einen Blick</p>
         <h3 class="finder-heading" tabindex="-1">Ein guter Anfang.<br>Ihre Idee nimmt Form an.</h3>
-        <p class="finder-step-intro">Hier ist Ihr Briefing. Sie können es kopieren oder Ihre Angaben noch einmal bearbeiten.</p>
+        <p class="finder-step-intro">Hier ist die Zusammenfassung Ihres Vorhabens. Sie können sie kopieren oder Ihre Angaben noch einmal bearbeiten.</p>
         <div class="finder-notice" role="status"><strong>Zusammenfassung erstellt. Nichts versendet.</strong> Dies ist ein lokaler Prototyp. Ihre Angaben bleiben nur im Speicher dieser Seite und werden beim Neuladen gelöscht.</div>
-        <div class="finder-summary" data-summary><dl>${summaryEntries(state).map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><p>Preis nach Briefing. Der endgültige Umfang wird gemeinsam abgestimmt.</p></div>
+        <div class="finder-summary" data-summary><dl>${summaryEntries(state).map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><p>Ein Angebot entsteht nach dem Gespräch. Den endgültigen Umfang stimmen wir gemeinsam ab.</p></div>
         <div class="finder-actions finder-actions-summary"><button class="finder-back" type="button" data-action="edit">← Angaben bearbeiten</button><button class="finder-next" type="button" data-action="copy">Zusammenfassung kopieren <span aria-hidden="true">↗</span></button></div>
         <p class="finder-copy-status" role="status" aria-live="polite"></p>`;
     } else {
       if (step === 0) {
         body = `<p class="finder-eyebrow">01 / Erst das Ziel. Dann die Website.</p>
           <h3 class="finder-heading" tabindex="-1">Was möchten Sie<br>möglich machen?</h3>
-          <p class="finder-step-intro">Wählen Sie das wichtigste Ziel für Ihr Business. Alles Weitere stimme ich darauf ab.</p>
+          <p class="finder-step-intro">Wählen Sie das wichtigste Ziel für Ihr Unternehmen. Alles Weitere stimme ich darauf ab.</p>
           <fieldset class="finder-options finder-goals"><legend class="finder-sr-only">Das wichtigste Ziel Ihrer Website</legend>${goals.map((goal, index) => `
             <label class="finder-option ${state.goal === goal.id ? 'is-selected' : ''}"><input type="radio" name="finder-goal" value="${goal.id}" data-focus="goal-${goal.id}" ${state.goal === goal.id ? 'checked' : ''}><span class="finder-option-number">0${index + 1}</span><span class="finder-option-copy"><strong>${goal.label}</strong><span>${goal.description}</span></span><span class="finder-selection-mark" aria-hidden="true"></span></label>`).join('')}</fieldset>`;
       } else if (step === 1) {
@@ -100,7 +100,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           <div class="finder-fields">
             <label class="finder-field">Ihr Ausgangspunkt<select name="projectType" data-focus="projectType">${Object.entries(projectNames).map(([value, label]) => `<option value="${value}" ${state.projectType === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
             <label class="finder-field">Wann möchten Sie starten?<select name="timing" data-focus="timing">${Object.entries(timingNames).map(([value, label]) => `<option value="${value}" ${state.timing === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
-            <label class="finder-field finder-field-wide">Was haben Sie vor? <span class="finder-optional">Optional</span><textarea name="description" data-focus="description" rows="5" maxlength="5000" placeholder="Ihr Business, Ihre Idee oder was Ihnen besonders wichtig ist …">${escape(state.description)}</textarea></label>
+            <label class="finder-field finder-field-wide">Was haben Sie vor? <span class="finder-optional">Optional</span><textarea name="description" data-focus="description" rows="5" maxlength="5000" placeholder="Ihr Unternehmen, Ihre Idee oder was im Alltag einfacher werden soll …">${escape(state.description)}</textarea></label>
           </div>`;
       } else {
         const chosen = selectedPackage(state);
@@ -115,7 +115,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           <label class="finder-field finder-package-field">Paketwunsch selbst wählen<select name="selectedPackage" data-focus="selectedPackage"><option value="custom" ${choice === 'custom' ? 'selected' : ''}>Individuellen Umfang klären</option>${packages.map(item => `<option value="${item.id}" ${choice === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select></label>
           <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>
-          <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">*</span><input type="text" name="name" data-focus="name" autocomplete="name" required maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">*</span><input type="email" name="email" data-focus="email" autocomplete="email" required maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-business.de"></label></div>
+          <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">*</span><input type="text" name="name" data-focus="name" autocomplete="name" required maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">*</span><input type="email" name="email" data-focus="email" autocomplete="email" required maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-unternehmen.de"></label></div>
           <p class="finder-privacy">* Erforderlich für Ihre Zusammenfassung. Dieser lokale Prototyp versendet keine Daten. Ihre Angaben bleiben nur bis zum Neuladen in dieser Seite.</p>`;
       }
 
@@ -192,7 +192,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
       step = 0;
       render(true);
     } else if (action === 'copy') {
-      const text = `Webbyu – mein Projektbriefing\n\n${summaryEntries(store.get()).map(([label, value]) => `${label}: ${value}`).join('\n\n')}\n\nPreis nach Briefing. Lokaler Prototyp – nichts versendet.`;
+      const text = `Webbyu – mein Vorhaben\n\n${summaryEntries(store.get()).map(([label, value]) => `${label}: ${value}`).join('\n\n')}\n\nEin Angebot entsteht nach dem Gespräch. Lokaler Prototyp – nichts versendet.`;
       try {
         if (!navigator.clipboard) throw new Error('Clipboard unavailable');
         await navigator.clipboard.writeText(text);
