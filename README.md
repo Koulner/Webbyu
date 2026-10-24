@@ -1,6 +1,6 @@
 # Webbyu
 
-Lokaler, deutschsprachiger Website-Prototyp für die von zwei Gründern aufgebaute Digitalagentur Webbyu in Hamburg / Bad Oldesloe. Vite, TypeScript, Three.js und GSAP; ohne Backend oder externe Laufzeit-APIs.
+Lokaler, deutschsprachiger Website-Prototyp für die von einem einzelnen Gründer aufgebaute Digitalagentur Webbyu in Hamburg / Bad Oldesloe. Der Auftritt spricht aus der Ich-Perspektive mit einem direkten Ansprechpartner. Vite, TypeScript, Three.js und GSAP; ohne Backend oder externe Laufzeit-APIs.
 
 ## Starten
 
@@ -53,7 +53,7 @@ Die Galerie enthält vier interaktive Konzepte: **Meisterwerk** (Raumfallbuch un
 
 Die Safran-Atelier-Demo enthält jetzt die gerenderte 3D-Kamerafahrt aus dem Referenzprojekt: Blüte → rote Narbe → Safranfäden. Unter „Kamerafahrt entdecken“ lässt sie sich durch Scrollen, Abspielen/Pause, Kapitelwahl oder den Positionsregler steuern. Die echte Markenverpackung ist ausgespart. Bei reduzierter Bewegung, Datensparmodus oder fehlender Browserunterstützung bleiben die Kapitel als Bilder zugänglich. Die 201 lokalen Frames (zusammen 2,94 MB) werden bei Bedarf geladen; die Animation pausiert außerhalb der sichtbaren Demo und in inaktiven Tabs.
 
-- Leistungen, Start / Business / Complete, Team, Zusammenarbeit und Kontakt sind über direkte Abschnittslinks erreichbar. Eingaben und Demo-Sitzungen bleiben beim Navigieren erhalten.
+- Leistungen, Start / Business / Complete, Über mich, Zusammenarbeit und Kontakt sind über direkte Abschnittslinks erreichbar. Eingaben und Demo-Sitzungen bleiben beim Navigieren erhalten.
 - 599 €, 1.099 € und 2.499 € sind **interne Preisentwürfe mit offener Steuerbasis**. Seitenzählung, Zusatzseitenpreise und mehrere Produktionsdetails bleiben abzustimmen. Ablauf und Grenzen sind in aufklappbaren Details beschrieben.
 - Foto- und Content-Wünsche fließen in die Paketorientierung ein. Verkauf und Buchung führen zur individuellen Umfangsklärung. Eine manuelle Paketwahl überschreibt das Geschäftsziel nicht; die kopierbare Zusammenfassung enthält Preisstatus und Leistungsabgrenzung.
 - Kontaktadressen, Impressum und Datenschutz sind ausdrücklich Platzhalter. Der Finder erstellt ausschließlich ein lokales Briefing.

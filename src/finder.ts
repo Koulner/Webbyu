@@ -8,7 +8,7 @@ const timingNames: Record<string, string> = { flexible: 'Zeitlich flexibel', soo
 const reasons: Record<Goal, string> = {
   presence: 'Sie möchten sichtbar werden. Ein präziser Unternehmensauftritt stellt Ihr Angebot vor und macht den Kontakt einfach.',
   inquiries: 'Sie möchten aus Interesse konkrete Anfragen machen. Klare Besucherführung und passende Anfragewege unterstützen dieses Ziel.',
-  bookings: 'Sie möchten den Weg zum Termin erleichtern. Wir klären zuerst den Buchungsablauf und die nötige Integration. Dafür ist ein gesondertes Angebot erforderlich.',
+  bookings: 'Sie möchten den Weg zum Termin erleichtern. Ich kläre mit Ihnen zuerst den Buchungsablauf und die nötige Integration. Dafür ist ein gesondertes Angebot erforderlich.',
   sales: 'Sie möchten Produkte verkaufen. Sortiment, Kaufablauf und technische Anbindung bestimmen den Umfang. Ein Shop ist in keinem der drei Website-Pakete pauschal enthalten.',
 };
 
@@ -82,7 +82,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
       if (step === 0) {
         body = `<p class="finder-eyebrow">01 / Erst das Ziel. Dann die Website.</p>
           <h3 class="finder-heading" tabindex="-1">Was möchten Sie<br>möglich machen?</h3>
-          <p class="finder-step-intro">Wählen Sie das wichtigste Ziel für Ihr Business. Alles Weitere stimmen wir darauf ab.</p>
+          <p class="finder-step-intro">Wählen Sie das wichtigste Ziel für Ihr Business. Alles Weitere stimme ich darauf ab.</p>
           <fieldset class="finder-options finder-goals"><legend class="finder-sr-only">Das wichtigste Ziel Ihrer Website</legend>${goals.map((goal, index) => `
             <label class="finder-option ${state.goal === goal.id ? 'is-selected' : ''}"><input type="radio" name="finder-goal" value="${goal.id}" data-focus="goal-${goal.id}" ${state.goal === goal.id ? 'checked' : ''}><span class="finder-option-number">0${index + 1}</span><span class="finder-option-copy"><strong>${goal.label}</strong><span>${goal.description}</span></span><span class="finder-selection-mark" aria-hidden="true"></span></label>`).join('')}</fieldset>`;
       } else if (step === 1) {
@@ -107,11 +107,11 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
         const choice = state.selectedPackage ?? recommendPackage(state.goal, state.extensions);
         const isRecommended = state.selectedPackage === null;
         const reason = choice === 'custom'
-          ? (state.goal === 'sales' || state.goal === 'bookings' ? reasons[state.goal] : 'Wir klären Funktionen, Inhalte und technische Anbindungen gemeinsam und stellen daraus einen individuellen Umfang zusammen.')
+          ? (state.goal === 'sales' || state.goal === 'bookings' ? reasons[state.goal] : 'Ich kläre mit Ihnen Funktionen, Inhalte und technische Anbindungen und stelle daraus einen individuellen Umfang zusammen.')
           : chosen!.description;
         body = `<p class="finder-eyebrow">04 / Ein Vorschlag für Ihren Auftritt.</p>
           <h3 class="finder-heading" tabindex="-1">Ein erster Rahmen<br>für Ihr Vorhaben.</h3>
-          <div class="finder-recommendation"><span class="finder-recommendation-label">${isRecommended ? 'Unsere erste Orientierung' : 'Ihre Paketauswahl'}</span><h4>${chosen?.name ?? 'Individuellen Umfang klären'}</h4><p>${reason}</p><span class="finder-price">${chosen ? `${chosen.price} · ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'}</span></div>
+          <div class="finder-recommendation"><span class="finder-recommendation-label">${isRecommended ? 'Meine erste Orientierung' : 'Ihre Paketauswahl'}</span><h4>${chosen?.name ?? 'Individuellen Umfang klären'}</h4><p>${reason}</p><span class="finder-price">${chosen ? `${chosen.price} · ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'}</span></div>
           <label class="finder-field finder-package-field">Paketwunsch selbst wählen<select name="selectedPackage" data-focus="selectedPackage"><option value="custom" ${choice === 'custom' ? 'selected' : ''}>Individuellen Umfang klären</option>${packages.map(item => `<option value="${item.id}" ${choice === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select></label>
           <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>

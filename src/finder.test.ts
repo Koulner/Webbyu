@@ -84,7 +84,7 @@ describe('project finder', () => {
     choose(goal === 'sales' ? 'presence' : 'sales');
     next(); next(); next();
     expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(goal === 'sales' ? 'start' : 'custom');
-    expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Unsere erste Orientierung');
+    expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Meine erste Orientierung');
   });
 
   it('requires valid contact data and safely displays the complete local summary without a request', () => {

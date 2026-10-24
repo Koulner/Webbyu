@@ -13,7 +13,7 @@ export function renderPage(root: HTMLElement): PageMounts {
         <a href="#arbeiten">Arbeiten <span>${String(concepts.length).padStart(2, '0')}</span></a>
         <a href="#leistungen">Leistungen</a>
         <a href="#pakete">Pakete</a>
-        <a href="#ueber-uns">Über uns</a>
+        <a href="#ueber-uns">Über mich</a>
       </nav>
       <a class="header-cta" href="#projektfinder">Kontakt & Projekt ${arrow}</a>
       <button type="button" class="mobile-menu-button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menü öffnen"><span></span><span></span></button>
@@ -22,7 +22,7 @@ export function renderPage(root: HTMLElement): PageMounts {
       <a href="#arbeiten">Arbeiten <span>01</span></a>
       <a href="#leistungen">Leistungen <span>02</span></a>
       <a href="#pakete">Pakete <span>03</span></a>
-      <a href="#ueber-uns">Über uns <span>04</span></a>
+      <a href="#ueber-uns">Über mich <span>04</span></a>
       <a href="#projektfinder">Kontakt & Projekt ${arrow}</a>
     </nav>
     <main id="main" tabindex="-1">
@@ -31,14 +31,14 @@ export function renderPage(root: HTMLElement): PageMounts {
         <div class="hero-layout">
           <h1 id="hero-title">Ihr Business.<br><em>Digital weitergedacht.</em></h1>
           <div class="hero-copy">
-            <p class="hero-description">Wir entwickeln Websites und digitale Werkzeuge, die Ihr Angebot verständlich machen, Anfragen vorbereiten und Abläufe vereinfachen. Für Unternehmen in Hamburg, Bad Oldesloe und Umgebung.</p>
+            <p class="hero-description">Ich entwickle Websites und digitale Werkzeuge, die Ihr Angebot verständlich machen, Anfragen vorbereiten und Abläufe vereinfachen. Für Unternehmen in Hamburg, Bad Oldesloe und Umgebung.</p>
             <div class="hero-actions">
               <a class="button button--primary" href="#projektfinder">Projekt skizzieren ${arrow}</a>
               <a class="text-link" href="#arbeiten">Arbeiten entdecken <span aria-hidden="true">↓</span></a>
             </div>
           </div>
         </div>
-        <div class="hero-bottom"><p>Zwei Gründer. Von der ersten Idee bis zur Übergabe.</p><span>Individuell gestaltet. Klar vereinbart. In Ihrer Hand.</span></div>
+        <div class="hero-bottom"><p>Ein Gründer. Ihr Ansprechpartner von der ersten Idee bis zur Übergabe.</p><span>Individuell gestaltet. Klar vereinbart. In Ihrer Hand.</span></div>
       </section>
 
       <section id="arbeiten" class="work-section" aria-labelledby="work-title" aria-describedby="gallery-disclaimer">
@@ -69,10 +69,10 @@ export function renderPage(root: HTMLElement): PageMounts {
         <div class="section-kicker"><span>02 / LEISTUNGEN</span><span>Ihr Ziel gibt die Richtung vor.</span></div>
         <div class="section-heading">
           <h2 id="services-title">Erst die Aufgabe.<br><em>Dann die Lösung.</em></h2>
-          <p>Was sollen Ihre Kunden verstehen, entscheiden oder tun können? Daraus entwickeln wir Struktur, Gestaltung und die passende Technik.</p>
+          <p>Was sollen Ihre Kunden verstehen, entscheiden oder tun können? Daraus entwickle ich Struktur, Gestaltung und die passende Technik.</p>
         </div>
         <div class="services-grid">${services.map((service, index) => `<article><span class="service-number">0${index + 1}</span><h3>${service.name}</h3><p>${service.description}</p></article>`).join('')}</div>
-        <div class="service-footnote"><p><strong>Auch besondere Vorhaben beginnen mit einem Gespräch.</strong> Drohne und 360°, Automatisierungen und individuelle Schnittstellen prüfen wir auf Machbarkeit. Umfang, Betrieb und spätere Pflege werden vorher geklärt.</p><a class="text-link" href="#projektfinder">Vorhaben skizzieren ${arrow}</a></div>
+        <div class="service-footnote"><p><strong>Auch besondere Vorhaben beginnen mit einem Gespräch.</strong> Drohne und 360°, Automatisierungen und individuelle Schnittstellen prüfe ich auf Machbarkeit. Umfang, Betrieb und spätere Pflege werden vorher geklärt.</p><a class="text-link" href="#projektfinder">Vorhaben skizzieren ${arrow}</a></div>
       </section>
 
       <section id="pakete" class="packages-section section-shell" aria-labelledby="packages-title" aria-describedby="price-draft-note">
@@ -103,20 +103,20 @@ export function renderPage(root: HTMLElement): PageMounts {
 
       <section id="zusammenarbeit" class="about-section" aria-labelledby="about-title">
         <div class="section-shell">
-          <div class="section-kicker"><span>04 / ÜBER UNS</span><span>Ein gemeinsamer Weg.</span></div>
+          <div class="section-kicker"><span>04 / ÜBER MICH</span><span>Persönlich. Von Anfang an.</span></div>
           <div class="about-layout">
             <div class="about-copy" id="ueber-uns" tabindex="-1">
-              <h2 id="about-title">Zwei Gründer.<br><em>Eine gemeinsame<br>Arbeitsweise.</em></h2>
-              <p>Wir bauen Webbyu als Digitalagentur auf. Unser Schwerpunkt sind verständliche Websites, digitale Werkzeuge und passende Inhalte für Unternehmen in Hamburg, Bad Oldesloe und Umgebung.</p>
-              <p>Wir beginnen mit Ihrem Geschäft, Ihren Kunden und den Abläufen dahinter. Gestaltung und Technik folgen der Aufgabe – vom klaren Auftritt bis zum passenden digitalen Werkzeug.</p>
+              <h2 id="about-title">Ein Gründer.<br><em>Ihr direkter<br>Ansprechpartner.</em></h2>
+              <p>Ich bin der Gründer hinter Webbyu und Ihr direkter Ansprechpartner. Mein Schwerpunkt sind verständliche Websites, digitale Werkzeuge und passende Inhalte für Unternehmen in Hamburg, Bad Oldesloe und Umgebung.</p>
+              <p>Ich beginne mit Ihrem Geschäft, Ihren Kunden und den Abläufen dahinter. Gestaltung und Technik folgen der Aufgabe – vom klaren Auftritt bis zum passenden digitalen Werkzeug.</p>
               <p>Domain und Hosting bleiben in Ihrer Hand. Sie erhalten die vereinbarten Dateien und Zugänge – ohne verpflichtenden laufenden Betreuungsvertrag.</p>
               <a class="text-link" href="#projektfinder">Erzählen Sie von Ihrer Idee ${arrow}</a>
             </div>
             <ol class="process-list">
-              <li><span>01</span><div><h3>Verstehen.</h3><p>Wir klären Geschäft, Nutzer, Inhalte und Engpässe. Was muss verständlicher oder einfacher werden?</p></div></li>
-              <li><span>02</span><div><h3>Strukturieren.</h3><p>Wir ordnen Informationen, priorisieren Funktionen und planen den Weg von der ersten Frage zur nächsten Handlung.</p></div></li>
+              <li><span>01</span><div><h3>Verstehen.</h3><p>Ich kläre mit Ihnen Geschäft, Nutzer, Inhalte und Engpässe. Was muss verständlicher oder einfacher werden?</p></div></li>
+              <li><span>02</span><div><h3>Strukturieren.</h3><p>Ich ordne Informationen, priorisiere Funktionen und plane den Weg von der ersten Frage zur nächsten Handlung.</p></div></li>
               <li><span>03</span><div><h3>Gestalten & entwickeln.</h3><p>Aus der Struktur wird eine eigenständige, funktionierende Oberfläche – auf dem großen Bildschirm und in der Hand.</p></div></li>
-              <li><span>04</span><div><h3>Übergeben.</h3><p>Wir prüfen Ihren Auftritt gemeinsam. Sie bekommen eine verständliche Einführung und einen klaren nächsten Schritt.</p></div></li>
+              <li><span>04</span><div><h3>Übergeben.</h3><p>Gemeinsam mit Ihnen prüfe ich Ihren Auftritt. Sie bekommen eine verständliche Einführung und einen klaren nächsten Schritt.</p></div></li>
             </ol>
           </div>
         </div>
@@ -141,7 +141,7 @@ export function renderPage(root: HTMLElement): PageMounts {
     </main>
     <footer class="site-footer section-shell">
       <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">webbyu<span class="wordmark-dot" aria-hidden="true"></span></a><p>Websites mit Charakter.<br>Für Menschen mit Ideen.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
-      <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über uns</a><a href="#projektfinder">Kontakt</a><a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a></nav>
+      <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a></nav>
       <div class="legal-notes">
         <details id="impressum"><summary>Impressum · noch zu ergänzen</summary><p>Interner Platzhalter. Betreiber, Rechtsform, ladungsfähige Anschrift und geschäftliche Kontaktdaten sind noch zu bestätigen. Eine freigegebene Anbieterkennzeichnung liegt noch nicht vor.</p></details>
         <details id="datenschutz"><summary>Datenschutz · noch zu ergänzen</summary><p>Interner Platzhalter. Die endgültige Erklärung muss Hosting und die tatsächlich eingesetzten Dienste berücksichtigen. Der Projektfinder speichert Angaben nur im Arbeitsspeicher dieses Tabs und versendet sie nicht. Erst der Kopierknopf überträgt die Zusammenfassung in Ihre Zwischenablage. Dieser Hinweis ersetzt keine vollständige Datenschutzerklärung.</p></details>
