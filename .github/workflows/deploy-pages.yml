@@ -1,9 +1,8 @@
-name: Deploy GitHub Pages
+name: Deploy dev preview to GitHub Pages
 
 on:
   push:
     branches:
-      - main
       - dev
   workflow_dispatch:
 
@@ -13,12 +12,12 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-${{ github.ref_name }}
+  group: pages-preview
   cancel-in-progress: true
 
 jobs:
   build:
-    if: github.ref_name == 'main' || github.ref_name == 'dev'
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,10 +33,12 @@ jobs:
         run: npm ci
 
       - name: Verify
-        run: npm run typecheck && npm test
+        run: npm run typecheck && npm test && npm run test:deploy
 
       - name: Build
         run: npm run build
+        env:
+          SITE_NOINDEX: 'true'
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -48,13 +49,11 @@ jobs:
           path: dist
 
   deploy:
-    if: github.ref_name == 'main' || github.ref_name == 'dev'
+    if: github.ref == 'refs/heads/dev'
     needs: build
     runs-on: ubuntu-latest
     environment:
-      # Keep each explicitly deployable branch independent from any existing
-      # protection policy on the default github-pages environment.
-      name: github-pages-${{ github.ref_name }}
+      name: github-pages-dev
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages

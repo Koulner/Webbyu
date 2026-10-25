@@ -1,0 +1,72 @@
+name: Deploy prod to IONOS
+
+on:
+  push:
+    branches: [prod]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never interrupt an upload while files are being published.
+concurrency:
+  group: ionos-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/prod'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify
+        run: npm run typecheck && npm test && npm run test:deploy
+      - name: Build for webbyu.de
+        run: npm run build
+        env:
+          SITE_BASE_PATH: /
+      - name: Prepare production files
+        run: node scripts/prepare-ionos.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ionos-production
+          path: dist/
+          include-hidden-files: true
+          retention-days: 14
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ionos-production
+      url: https://webbyu.de
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: ionos-production
+          path: dist/
+      - name: Install SFTP password helper
+        run: sudo apt-get update -qq && sudo apt-get install -y sshpass
+      - name: Publish via verified SFTP connection
+        run: node scripts/deploy-ionos.mjs
+        env:
+          IONOS_SFTP_HOST: ${{ secrets.IONOS_SFTP_HOST }}
+          IONOS_SFTP_USER: ${{ secrets.IONOS_SFTP_USER }}
+          IONOS_SFTP_PASSWORD: ${{ secrets.IONOS_SFTP_PASSWORD }}
+          IONOS_REMOTE_DIR: ${{ secrets.IONOS_REMOTE_DIR }}
+          IONOS_SSH_FINGERPRINT: ${{ secrets.IONOS_SSH_FINGERPRINT }}
+      - name: Check published website
+        run: node scripts/verify-ionos.mjs
+        env:
+          IONOS_SITE_URL: ${{ vars.IONOS_SITE_URL }}

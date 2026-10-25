@@ -21,11 +21,11 @@ node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173 --strictPort
 
 Danach `http://127.0.0.1:5173/` öffnen. Den Server mit `Strg+C` beenden.
 
-## GitHub Pages
+## Veröffentlichung: Vorschau und Produktion
 
-Der Workflow in `.github/workflows/deploy-pages.yml` baut und veröffentlicht bei jedem Push auf `main` oder `dev`. Beide Branches deployen auf dieselbe GitHub-Pages-Adresse; der zuletzt erfolgreiche Lauf ist dort sichtbar. Für ein Repository unter `https://<konto>.github.io/<repository>/` setzt Vite den Projektpfad automatisch. Bei einem User- oder Organisations-Repository namens `<konto>.github.io` bleibt die Adresse auf Root-Ebene.
+`dev` veröffentlicht die öffentliche GitHub-Pages-Vorschau mit `noindex`. `prod` ist für die automatische Veröffentlichung auf IONOS Webhosting Plus unter webbyu.de vorgesehen. Der neue Workflow auf `main` veröffentlicht nichts; ein noch nicht aktualisierter Branch verwendet weiterhin seine frühere Workflow-Version. Tests und Build laufen vor jeder Veröffentlichung. Die Vorschau verwendet `/Webbyu/`, der IONOS-Build die Domainwurzel `/`.
 
-Im Repository unter **Settings → Pages → Build and deployment** einmal **Source: GitHub Actions** wählen. Danach reicht ein Push auf `main` oder `dev`; der Workflow führt Typecheck, Tests und Produktionsbuild vor dem Deployment aus. Die Deployments verwenden dafür getrennte Environments (`github-pages-main` und `github-pages-dev`), damit eine bestehende Branch-Regel des Standard-Environments `github-pages` den jeweils erlaubten Branch nicht blockiert.
+Die IONOS-Verbindung benötigt vier Secrets, die der Betreiber selbst im GitHub-Environment `ionos-production` hinterlegt. Keine Zugangsdaten in Chat oder Repository eintragen. Vollständige Einrichtung, Domainzuordnung und Fehlerbehebung: [DEPLOYMENT.md](DEPLOYMENT.md). Bis diese Einrichtung abgeschlossen ist, erfolgt keine erfolgreiche IONOS-Veröffentlichung. Pages bleibt auf **Settings → Pages → Source: GitHub Actions** mit dem Environment `github-pages-dev` eingerichtet.
 
 ## Prüfen und bauen
 
