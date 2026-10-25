@@ -222,3 +222,30 @@ button:disabled { cursor: wait; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* The homepage supplies its own frame and navigation. */
+html:has(.journey-embedded) { color-scheme: dark; scrollbar-color: #55716f #10272f; scrollbar-width: thin; }
+.journey-embedded .journey-header, .journey-embedded .journey-footer,
+.journey-embedded .journey-disclaimer, .journey-embedded .journey-scroll-cue, .journey-embedded .journey-facts { display: none; }
+.journey-embedded .journey-chapter { padding-top: 7svh; }
+.journey-embedded .journey-copy { top: 7svh; }
+.journey-embedded .journey-scene-label { top: 32px; }
+.journey-embedded .journey-preview { top: 110px; width: min(50vw, calc((100svh - 245px) * 1.6)); transform: none; }
+.journey-embedded .journey-preview-frame { box-shadow: 0 18px 50px #00151d40; }
+.journey-embedded .journey-network-key { bottom: 130px; }
+.journey-embedded .journey-welcome h1 { font-size: clamp(48px, 5.5vw, 80px); }
+@media (max-width: 760px) {
+  .journey-embedded { --journey-scene-height: 230px; }
+  .journey-embedded .journey-chapter { padding-top: var(--journey-scene-height); }
+  .journey-embedded .journey-copy { top: auto; }
+  .journey-embedded .journey-scene-label { top: 22px; }
+  .journey-embedded .journey-scene-label > span:last-child { font-size: 15px; }
+  .journey-embedded .journey-vector { padding-top: 20px; }
+  .journey-embedded .journey-preview { top: 76px; width: min(calc(100% - 44px), 225px); }
+  .journey-embedded .journey-welcome h1 { font-size: clamp(38px, 9vw, 58px); margin-block: 12px 16px; }
+  .journey-embedded .journey-facts { display: none; }
+  .journey-embedded .journey-copy > p { font-size: 13px; line-height: 1.65; }
+  .journey-embedded .journey-action { margin-top: 18px; }
+  .journey-embedded .journey-dock { left: 12px; right: 12px; }
+  .journey-embedded .journey-chapters a { min-width: 26px; }
+}

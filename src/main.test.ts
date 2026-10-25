@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountApp } from './main';
-import type { SceneController } from './contracts';
 import { createBriefStore } from './state';
 
 const dialogPrototype = HTMLDialogElement.prototype;
@@ -10,24 +9,17 @@ const originalClose = Object.getOwnPropertyDescriptor(dialogPrototype, 'close');
 let showModal: ReturnType<typeof vi.fn>;
 let app: ReturnType<typeof mountApp>;
 let store: ReturnType<typeof createBriefStore>;
-let scene: SceneController;
 let root: HTMLElement;
 const button = (selector: string) => document.querySelector<HTMLButtonElement>(selector)!;
-function mount(loadScene = async () => ({ initScene: async () => scene })) {
-  app = mountApp(root, { store, loadScene });
+function mount() {
+  app = mountApp(root, { store });
   return app;
-}
-function deferred<T>() {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(done => { resolve = done; });
-  return { promise, resolve };
 }
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="app"></div>';
   root = document.querySelector('#app')!;
   store = createBriefStore();
-  scene = { setGoal: vi.fn(), setMode: vi.fn(), dispose: vi.fn() };
   vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} });
   vi.stubGlobal('matchMedia', () => ({ matches: false }));
   Element.prototype.scrollIntoView = vi.fn();
@@ -54,77 +46,48 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('concept demo integration', () => {
-  it('opens inline panels separately and moves the selected live demo into the modal', async () => {
+describe('homepage integration', () => {
+  it('opens concepts on demand, preserves inputs, and restores focus', () => {
     mount();
-    await app.sceneReady;
+    expect(document.querySelector('.demo')).toBeNull();
+    const launch = button('[data-demo="meisterwerk"]');
+    launch.focus();
+    launch.click();
     const dialog = document.querySelector<HTMLDialogElement>('.concept-dialog')!;
-    app.catalogue.selectGoal('sales');
-    const heroDemo = document.querySelector<HTMLElement>('#hero-demo-slot .demo')!;
-    const inlinePanel = heroDemo.querySelector<HTMLElement>('.demo-panel')!;
-    expect(inlinePanel.hidden).toBe(true);
-    expect(dialog.open).toBe(false);
-    button('[data-scene-mode="interactive"]').click();
-    heroDemo.querySelector<HTMLButtonElement>('[data-panel-open]')!.click();
-    expect(inlinePanel.hidden).toBe(false);
-    expect(dialog.open).toBe(false);
-    expect(showModal).not.toHaveBeenCalled();
-    heroDemo.querySelector<HTMLButtonElement>('[data-panel-close]')!.click();
-    expect(inlinePanel.hidden).toBe(true);
-
-    const launchButton = button('button[data-demo="nordlicht"]');
-    launchButton.focus();
-    launchButton.click();
+    const demo = dialog.querySelector<HTMLElement>('.demo')!;
+    const name = demo.shadowRoot!.querySelector<HTMLInputElement>('[name="name"]')!;
+    name.value = 'Bleibt erhalten';
     expect(dialog.open).toBe(true);
-    expect(showModal).toHaveBeenCalledTimes(1);
-    expect(dialog.querySelector('[data-dialog-title]')!.textContent).toBe('Nordlicht');
-    const booking = dialog.querySelector('.demo')!;
-    expect(booking.getAttribute('data-demo')).toBe('nordlicht');
-    expect(document.querySelector('#hero-demo-slot .demo')).toBeNull();
     button('.concept-dialog-close').click();
-    expect(dialog.open).toBe(false);
-    expect(document.activeElement).toBe(launchButton);
-    expect(document.querySelector('#hero-demo-slot .demo')).toBe(booking);
+    expect(document.activeElement).toBe(launch);
+    button('[data-demo="sales"]').click();
+    button('.concept-dialog-close').click();
+    launch.click();
+    expect(dialog.querySelector('.demo')).toBe(demo);
+    expect(name.value).toBe('Bleibt erhalten');
+    expect(document.querySelector('#scene')).toBeNull();
   });
 
-  it('keeps browsing isolated and transfers only the explicitly requested goal to the Finder', () => {
+  it('keeps exploring concepts separate from the project brief', () => {
     mount();
-    const answers = {
-      goal: 'presence' as const, selectedPackage: 'start' as const,
-      extensions: ['cms'], projectType: 'relaunch', timing: 'soon',
-      description: 'Mein Projekt', name: 'Ada', email: 'ada@example.test',
-    };
-    store.update(answers);
-    expect(app.catalogue.getState()).toEqual({ goal: 'meisterwerk', mode: 'presentation' });
-    button('[data-scene-mode="interactive"]').click();
-    button('[data-catalogue-goal="sales"]').click();
-    button('[data-open-current]').click();
+    store.update({ goal: 'presence', selectedPackage: 'start', name: 'Ada' });
+    const before = store.get();
+    button('[data-demo="sales"]').click();
     button('.concept-dialog-close').click();
-    expect(app.catalogue.getState()).toEqual({ goal: 'sales', mode: 'interactive' });
-    expect(store.get()).toEqual(answers);
-    button('[data-project-request]').click();
-    expect(store.get()).toEqual({ ...answers, goal: 'sales', selectedPackage: null });
-    expect(document.querySelector<HTMLInputElement>('input[name="finder-goal"][value="sales"]')?.checked).toBe(true);
+    expect(store.get()).toEqual(before);
   });
 
-  it('replays the newest goal and mode after both import and asynchronous initialization', async () => {
-    const imported = deferred<{ initScene: () => Promise<SceneController> }>();
-    const initialized = deferred<SceneController>();
-    const initScene = vi.fn(() => initialized.promise);
-    mount(() => imported.promise);
-    app.catalogue.selectGoal('nordlicht');
-    button('[data-scene-mode="layers"]').click();
-    imported.resolve({ initScene });
-    await vi.waitFor(() => expect(initScene).toHaveBeenCalledTimes(1));
-    app.catalogue.selectGoal('sales');
-    button('[data-scene-mode="interactive"]').click();
-    initialized.resolve(scene);
-    await app.sceneReady;
-    expect(scene.setGoal).toHaveBeenLastCalledWith('sales');
-    expect(scene.setMode).toHaveBeenLastCalledWith('interactive');
-    expect(initScene).toHaveBeenCalledWith({
-      container: document.querySelector('#scene'), demoElement: document.querySelector('#hero-demo-slot'),
-    });
+  it('disposes sessions and global listeners once', () => {
+    mount();
+    button('[data-demo="sales"]').click();
+    app.dispose();
+    app.dispose();
+    expect(document.querySelector('.concept-dialog')).toBeNull();
+    expect(document.querySelector('.demo')).toBeNull();
+    button('.mobile-menu-button').click();
+    expect(button('.mobile-menu-button').getAttribute('aria-expanded')).toBe('false');
+    root.replaceChildren();
+    expect(() => window.dispatchEvent(new Event('scroll'))).not.toThrow();
   });
 
   it('keeps the brief goal on package selection and preserves the Finder step through navigation', () => {
@@ -160,55 +123,6 @@ describe('concept demo integration', () => {
     document.querySelector<HTMLAnchorElement>('.footer-nav a[href="#datenschutz"]')!.click();
     expect(document.querySelector<HTMLDetailsElement>('#datenschutz')!.open).toBe(true);
     expect(document.activeElement).toBe(document.querySelector('#datenschutz summary'));
-  });
-
-  it('keeps cached HTML sessions usable when the lazy scene import fails', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    mount(async () => { throw new Error('Chunk unavailable'); });
-    const inquiry = document.querySelector<HTMLElement>('#hero-demo-slot .demo')!;
-    const name = inquiry.shadowRoot!.querySelector<HTMLInputElement>('[name="name"]')!;
-    name.value = 'Bleibt erhalten';
-    await app.sceneReady;
-    app.catalogue.selectGoal('sales');
-    button('#hero-demo-slot [data-add-cart]').click();
-    app.catalogue.selectGoal('meisterwerk');
-    expect(document.querySelector('#hero-demo-slot .demo')).toBe(inquiry);
-    expect(name.value).toBe('Bleibt erhalten');
-    expect(inquiry.classList.contains('demo--responsive')).toBe(true);
-    expect(document.querySelector<HTMLElement>('#hero-demo-slot')!.inert).toBe(false);
-    app.catalogue.open();
-    expect(document.querySelector('.concept-dialog .demo')).toBe(inquiry);
-    button('.concept-dialog-close').click();
-    app.catalogue.selectGoal('sales');
-    expect(document.querySelector('#hero-demo-slot [data-cart-count]')!.textContent).toBe('(1)');
-  });
-
-  it('does not initialize an imported scene after disposal', async () => {
-    const imported = deferred<{ initScene: () => Promise<SceneController> }>();
-    const initScene = vi.fn(async () => scene);
-    mount(() => imported.promise);
-    await Promise.resolve();
-    app.dispose();
-    imported.resolve({ initScene });
-    await app.sceneReady;
-    expect(initScene).not.toHaveBeenCalled();
-  });
-
-  it('disposes a late initialized scene exactly once and removes global UI listeners', async () => {
-    const initialized = deferred<SceneController>();
-    const initScene = vi.fn(() => initialized.promise);
-    mount(async () => ({ initScene }));
-    await vi.waitFor(() => expect(initScene).toHaveBeenCalledTimes(1));
-    app.dispose();
-    app.dispose();
-    initialized.resolve(scene);
-    await app.sceneReady;
-    expect(scene.dispose).toHaveBeenCalledTimes(1);
-    expect(scene.setGoal).not.toHaveBeenCalled();
-    button('.mobile-menu-button').click();
-    expect(button('.mobile-menu-button').getAttribute('aria-expanded')).toBe('false');
-    root.replaceChildren();
-    expect(() => window.dispatchEvent(new Event('scroll'))).not.toThrow();
   });
 
   it('keeps extension buttons synchronized with Finder selection, removal, and unsure', () => {

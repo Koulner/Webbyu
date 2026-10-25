@@ -1,6 +1,5 @@
 import { concepts, extensions, packages, packageQuestions, priceDraftNotice, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
-import { landscapeSvg } from './journey/map';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -75,12 +74,16 @@ export function renderPage(root: HTMLElement): PageMounts {
             <h2 id="work-title">So kann sich eine<br><em>gute Lösung anfühlen.</em></h2>
             <p>Wünsche für einen Raum sammeln, ein technisches Anliegen einordnen oder das passende Produkt finden: Probieren Sie aus, wie die Website bei einer konkreten Aufgabe helfen kann.</p>
           </div>
-          <div class="gallery-workspace">
-            <div class="gallery-controls"><div id="catalogue-mount"></div></div>
-            <div class="gallery-stage">
-              <div class="gallery-stage-label" aria-hidden="true"><span>WEBBYU / FUNKTIONIERENDE BEISPIELE</span><span>AUSWÄHLEN · AUSPROBIEREN · VERSTEHEN</span></div>
-              <div id="scene" class="scene-host" aria-label="Interaktive Bühne für die ausgewählte Konzeptdemo"><div id="hero-demo-slot" class="demo--responsive"></div></div>
+          <div id="journey-preview" class="journey-embed" role="region" aria-label="Die Reise – interaktive Vorschau">
+            <div class="journey-embed-bar">
+              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Von der Idee zum Erlebnis.</span></div>
+              <div class="journey-embed-actions">
+                <a href="${import.meta.env.BASE_URL}reise/" data-journey-page>Reise öffnen ${arrow}</a>
+                <button type="button" data-journey-fullscreen aria-label="Die Reise im Vollbild ansehen" aria-pressed="false" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span data-fullscreen-label>Vollbild</span></button>
+              </div>
             </div>
+            <iframe class="journey-embed-frame" src="${import.meta.env.BASE_URL}reise/?embed=1" title="Die Reise von Webbyu – sieben Stationen und vier interaktive Konzepte" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+            <p class="journey-embed-status" role="status" hidden></p>
           </div>
           <div class="gallery-footer">
             <p id="gallery-disclaimer">Beispiele für fiktive Marken, keine Kundenreferenzen. Sie können die Abläufe ausprobieren; Anfragen und Käufe sind lokale Simulationen. Bildmaterial ist KI-generiert.</p>
@@ -147,10 +150,6 @@ export function renderPage(root: HTMLElement): PageMounts {
               <li><span>04</span><div><h3>Prüfen & übergeben.</h3><p>Wir gehen die fertige Lösung gemeinsam durch. Sie erhalten die vereinbarten Dateien, Zugänge und eine Einführung. Betrieb und spätere Änderungen sind geklärt.</p></div></li>
             </ol>
           </div>
-          <a class="journey-teaser" href="${import.meta.env.BASE_URL}reise/">
-            <div class="journey-teaser-landscape">${landscapeSvg()}</div>
-            <div><span>DIE REISE / WEBBYU</span><h3>Eine Idee nimmt<br>Form an.</h3><p>Vom ersten Gedanken zu vier erlebbaren Konzeptstudien. Entdecken Sie verbundene Erlebnisräume, in denen Inhalt, Gestaltung und Funktion zusammenfinden.</p><span class="journey-teaser-link">Die Reise entdecken ${arrow}</span></div>
-          </a>
         </div>
       </section>
 
@@ -185,9 +184,7 @@ export function renderPage(root: HTMLElement): PageMounts {
 
   return {
     story: root.querySelector<HTMLElement>('#hero-story')!,
-    scene: root.querySelector<HTMLElement>('#scene')!,
-    demoSlot: root.querySelector<HTMLElement>('#hero-demo-slot')!,
-    catalogue: root.querySelector<HTMLElement>('#catalogue-mount')!,
+    journeyPreview: root.querySelector<HTMLElement>('#journey-preview')!,
     finder: root.querySelector<HTMLElement>('#finder-mount')!,
   };
 }

@@ -10,12 +10,14 @@ export interface LandscapeController {
 }
 type DemoModule = Pick<typeof import('../demos'), 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
 interface JourneyOptions {
+  embedded?: boolean;
   loadScene?: () => Promise<{ initLandscape(container: HTMLElement): LandscapeController }>;
   loadDemos?: () => Promise<DemoModule>;
 }
 
 export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   renderJourney(root);
+  root.classList.toggle('journey-embedded', Boolean(options.embedded));
   const events = new AbortController();
   const listen = { signal: events.signal };
   const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -144,6 +146,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     // Scrolling updates the current entry; explicit chapter choices create history.
     const hash = index<0?'#landschaft':`#${stations[index].id}`;
     if (!travelling && location.hash !== hash) history.replaceState(null,'',hash);
+    if (options.embedded) window.parent.postMessage({ type: 'webbyu:journey-position', hash }, location.origin);
   }
 
   function update() {
@@ -215,6 +218,12 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
 
   root.addEventListener('click',event=>{
     const target=event.target instanceof Element?event.target:null;
+    const homeLink = target?.closest<HTMLAnchorElement>('a');
+    if (options.embedded && homeLink && homeLink.origin === location.origin && homeLink.pathname === import.meta.env.BASE_URL) {
+      event.preventDefault();
+      window.parent.postMessage({ type: 'webbyu:journey-home', hash: homeLink.hash }, location.origin);
+      return;
+    }
     if(target?.closest('[data-guide-dismiss]')) {
       guide.hidden=true;guideOpen.hidden=false;
       guideOpen.focus({preventScroll:true});return;
@@ -245,7 +254,11 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     positionFallbackPins();
   },listen);
   window.addEventListener('scroll',schedule,{...listen,passive:true});
-  window.addEventListener('resize',schedule,listen);
+  window.addEventListener('resize',()=>{
+    // Fullscreen changes the chapter heights. Keep the chosen station in view.
+    if (options.embedded && active >= -1) go(active, false, false);
+    else schedule();
+  },listen);
   const fromHistory=()=>go(stationIndex(location.hash),false,false);
   window.addEventListener('popstate',fromHistory,listen);
   window.addEventListener('hashchange',fromHistory,listen);

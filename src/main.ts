@@ -1,21 +1,17 @@
 import './fonts.css';
 import './tokens.css';
 import './styles.css';
-import './scene.css';
 import './content.css';
 import { extensions, packages, type DemoId, type PackageId } from './data';
-import type { SceneController, SceneOptions } from './contracts';
 import { briefStore, type BriefStore } from './state';
-import { createDemo } from './demos';
-import { mountCatalogue } from './catalogue';
+import { createDemo, disposeDemo, mountDemoDialog } from './demos';
+import { mountJourneyPreview } from './journey-preview';
 import { mountFinder } from './finder';
 import { renderPage } from './shell';
 
 const arrow = '<span aria-hidden="true">↗</span>';
-type SceneModule = { initScene(options: SceneOptions): Promise<SceneController> };
 interface AppOptions {
   store?: BriefStore;
-  loadScene?: () => Promise<SceneModule>;
 }
 
 /** Main owns cross-feature wiring; feature modules only consume their contracts. */
@@ -26,7 +22,6 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   const listenerOptions = { signal: events.signal };
   const finder = mountFinder(mounts.finder, store);
   let disposed = false;
-  let scene: SceneController | undefined;
   let toastTimer = 0;
 
   function goToFinder(restart = true) {
@@ -38,31 +33,23 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
     });
   }
 
-  const catalogue = mountCatalogue({
-    container: mounts.catalogue,
-    demoSlot: mounts.demoSlot,
-    onStateChange(state) {
-      scene?.setGoal(state.goal);
-      scene?.setMode(state.mode);
-    },
-    onProjectRequest(goal) {
-      // Exploring a concept is private to the catalogue. Only this explicit
-      // handoff changes the brief; every other Finder answer is retained.
-      store.update({ goal, selectedPackage: null });
-      goToFinder();
-    },
-  });
-
-  const previewObservers: ResizeObserver[] = [];
-  root.querySelectorAll<HTMLElement>('[data-preview]').forEach(preview => {
-    const inner = preview.querySelector<HTMLElement>('.preview-canvas')!;
-    inner.append(createDemo(preview.dataset.preview as DemoId, { interactive: false }));
-    const observer = new ResizeObserver(() => { inner.style.transform = `scale(${preview.clientWidth / 720})`; });
-    observer.observe(preview);
-    previewObservers.push(observer);
-  });
+  const journeyPreview = mountJourneyPreview(mounts.journeyPreview);
+  const demoSessions = new Map<DemoId, HTMLElement>();
+  const demoParking = document.createElement('div');
+  demoParking.hidden = true;
+  root.append(demoParking);
+  const demoDialog = mountDemoDialog();
   root.querySelectorAll<HTMLButtonElement>('button[data-demo]').forEach(button => {
-    button.addEventListener('click', () => catalogue.open(button.dataset.demo as DemoId), listenerOptions);
+    button.addEventListener('click', () => {
+      const id = button.dataset.demo as DemoId;
+      let demo = demoSessions.get(id);
+      if (!demo) {
+        demo = createDemo(id);
+        demoParking.append(demo);
+        demoSessions.set(id, demo);
+      }
+      demoDialog.open(id, demo);
+    }, listenerOptions);
   });
   root.querySelectorAll<HTMLAnchorElement>('a[href="#projektfinder"]').forEach(link => {
     link.addEventListener('click', event => {
@@ -142,41 +129,19 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   window.addEventListener('scroll', updateHeader, { ...listenerOptions, passive: true });
   updateHeader();
 
-  const sceneReady = Promise.resolve().then(() => {
-    if (disposed) return;
-    return (options.loadScene ?? (() => import('./scene')))();
-  }).then(async module => {
-    if (!module || disposed) return;
-    const controller = await module.initScene({ container: mounts.scene, demoElement: mounts.demoSlot });
-    if (disposed) { controller.dispose(); return; }
-    scene = controller;
-    // Selection and mode may have changed during either import or initialization.
-    const latest = catalogue.getState();
-    scene.setGoal(latest.goal);
-    scene.setMode(latest.mode);
-  }).catch(error => {
-    if (disposed) return;
-    console.warn('Die 3D-Ansicht konnte nicht geladen werden. Die HTML-Demo bleibt verfügbar.', error);
-    mounts.scene.classList.add('scene-host--fallback');
-    mounts.demoSlot.classList.add('demo--responsive');
-    mounts.demoSlot.querySelector('.demo')?.classList.add('demo--responsive');
-    mounts.demoSlot.inert = false;
-    mounts.demoSlot.style.pointerEvents = 'auto';
-  });
-
   return {
-    catalogue,
-    sceneReady,
     dispose() {
       if (disposed) return;
       disposed = true;
       events.abort();
-      scene?.dispose();
-      catalogue.dispose();
+      journeyPreview.dispose();
+      demoDialog.dispose();
+      demoSessions.forEach(disposeDemo);
+      demoSessions.clear();
+      demoParking.remove();
       finder.dispose();
       unsubscribeExtensions();
       clearTimeout(toastTimer);
-      previewObservers.forEach(observer => observer.disconnect());
     },
   };
 }

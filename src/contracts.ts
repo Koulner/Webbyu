@@ -3,9 +3,7 @@ import type { DemoId, Goal } from './data';
 /** Stable DOM surfaces shared by the shell and independently owned features. */
 export interface PageMounts {
   story: HTMLElement;
-  scene: HTMLElement;
-  demoSlot: HTMLElement;
-  catalogue: HTMLElement;
+  journeyPreview: HTMLElement;
   finder: HTMLElement;
 }
 

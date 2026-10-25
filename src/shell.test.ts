@@ -7,16 +7,15 @@ describe('page shell contract', () => {
   it('returns distinct feature mounts belonging to the supplied root', () => {
     const root = document.createElement('div');
     const mounts = renderPage(root);
-    expect(Object.keys(mounts).sort()).toEqual(['catalogue', 'demoSlot', 'finder', 'scene', 'story']);
-    expect(new Set(Object.values(mounts)).size).toBe(5);
+    expect(Object.keys(mounts).sort()).toEqual(['finder', 'journeyPreview', 'story']);
+    expect(new Set(Object.values(mounts)).size).toBe(3);
     for (const mount of Object.values(mounts)) expect(root.contains(mount)).toBe(true);
-    expect(mounts.scene.contains(mounts.demoSlot)).toBe(true);
-    expect(mounts.scene.contains(mounts.catalogue)).toBe(false);
-    expect(mounts.demoSlot.children).toHaveLength(0);
-    expect(mounts.catalogue.children).toHaveLength(0);
+    expect(mounts.journeyPreview.querySelector('iframe')?.getAttribute('src')).toBe(`${import.meta.env.BASE_URL}reise/?embed=1`);
+    expect(mounts.journeyPreview.querySelector('iframe')?.getAttribute('title')).toContain('Die Reise');
+    expect(mounts.journeyPreview.querySelector('[data-journey-fullscreen]')).not.toBeNull();
     expect(mounts.finder.children).toHaveLength(0);
     const gallery = root.querySelector('#arbeiten')!;
-    for (const mount of [mounts.scene, mounts.demoSlot, mounts.catalogue]) {
+    for (const mount of [mounts.journeyPreview]) {
       expect(gallery.contains(mount)).toBe(true);
       expect(mounts.story.contains(mount)).toBe(false);
     }
@@ -68,14 +67,12 @@ describe('page shell contract', () => {
     expect(description.textContent).toContain('Simulationen');
   });
 
-  it('links the separate journey from both navigation surfaces and the about preview', () => {
+  it('links the separate journey from both navigation surfaces without a duplicate about teaser', () => {
     const root = document.createElement('div');
     renderPage(root);
     const destination = `${import.meta.env.BASE_URL}reise/`;
     expect(root.querySelector('.site-header nav')?.querySelector(`a[href="${destination}"]`)).not.toBeNull();
     expect(root.querySelector('.mobile-nav')?.querySelector(`a[href="${destination}"]`)).not.toBeNull();
-    const teaser = root.querySelector('.about-section .journey-teaser');
-    expect(teaser?.getAttribute('href')).toBe(destination);
-    expect(teaser?.querySelector('svg')).not.toBeNull();
+    expect(root.querySelector('.about-section .journey-teaser')).toBeNull();
   });
 });
