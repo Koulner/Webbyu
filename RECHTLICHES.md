@@ -2,7 +2,29 @@
 
 Stand: 25.10.2026. Rechtsform vom Betreiber bestätigt: Einzelunternehmen.
 
+## Aktueller Ergänzungsstand · Betreiberangaben und Cookie-Hinweis
+
+Dieser Abschnitt ersetzt abweichende frühere Bearbeitungsstände weiter unten und dokumentiert die Vorbereitung vor der Veröffentlichung. Der Betreiber hat anschließend die Veröffentlichung dieses Zwischenstands einschließlich seiner Kontaktdaten über das bestehende GitHub-Repository nach webbyu.de ausdrücklich freigegeben. Die offenen Hosting-/AVV-Punkte bleiben gekennzeichnet.
+
+- Vom Betreiber ausdrücklich zur Verwendung mitgeteilte Daten in Impressum und Datenschutz eingetragen: Lukas Wagner, Pölitzer Weg 57b, 23843 Bad Oldesloe, Deutschland; w.lukas99@gmx.net; +49 176 42090983. Kontaktlinks auch im Projektfinder ergänzt.
+- Noch keine zugeteilte USt-ID/Wirtschafts-ID mitgeteilt. Den optionalen USt-ID-Abschnitt entfernt; die persönliche Einkommensteuernummer wird nicht verwendet. Keine Kleinunternehmerbesteuerung aus der bloßen Gewerbeanmeldung abgeleitet; Preis- und Steuertexte bleiben getrennt zu prüfen.
+- Impressum ohne Datenplatzhalter und Entwurfshinweis. Die unbestätigte freiwillige Erklärung zur Verbraucherschlichtung entfernt. Der Datenschutztext behält einen konkreten Prüfhinweis und `noindex`, solange Hosting-Einstellungen und AVV nicht bestätigt sind.
+- IONOS SE mit Anschrift und Hosting-Daten ergänzt; keine bestehende AVV behauptet. Anfrageverarbeitung per E-Mail/Telefon und das GMX-Postfach beschrieben. Ergänzungen sind im HTML als Webbyu-Texte abgegrenzt, das gelieferte Generator-Original bleibt separat erhalten.
+- Der Betreiber möchte IONOS WebAnalytics von Beginn an nutzen. Vorbereitet wird ausschließlich die Auswertung der Server-Logdaten; kein Pixel/Tracking-Skript wurde eingebaut. IONOS beschreibt WebAnalytics als standardmäßig aktiv und ohne Cookies, mit Logdateien oder Pixeln als möglichen Datenquellen. Die Betriebsart, Datenfristen der Statistikberichte und Vertragsgrundlage müssen im konkreten Konto bestätigt werden. [Offizielle WebAnalytics-Information](https://www.ionos.de/hilfe/datenschutz/datenverarbeitung-durch-ihr-ionos-produktes/webanalytics), [aktuelle Hosting-Information](https://www.ionos.de/hilfe/datenschutz/datenverarbeitung-durch-ihr-ionos-produktes/datenverarbeitung-durch-webhosting-produkte/).
+- „Nicht genutzt“ wurde im Gespräch vorläufig als Rückmeldung zum CDN verstanden; keine endgültige Bestätigung für WebAnalytics oder AVV daraus abgeleitet. Kein CDN aktiviert und keine IONOS-Kontoeinstellung verändert.
+- Auf ausdrücklichen Wunsch ein kompakter Hinweis ohne Hintergrundsperre eingebaut: „Alles ablehnen“, Schließen mit gleicher Wirkung, Details und direkte Rechtslinks. Keine Einwilligung für nicht vorhandene optionale Dienste vorgetäuscht. Bereits auf der ersten Ebene steht, dass die vorgesehene IONOS-Logauswertung nicht abschaltbar ist. Keine neuen Analyse-/Werbeanfragen aus dem Anwendungscode.
+- Die Auswahl wird erst nach Betätigung in `webbyu-privacy` im localStorage gespeichert: Version, `optional: false`, Zeitpunkt; keine individuelle Kennung, kein Versand. Gültigkeit 180 Tage, Löschung ungültiger/abgelaufener Einträge beim nächsten Besuch. Footer-Schaltflächen auf allen vier Seiten; die eingebettete Reise zeigt keinen zweiten Hinweis. Rechtstexte bleiben ohne JavaScript lesbar.
+- Die lokale `dev`-Workflowdatei führt künftig nur Prüfungen/Build aus: keine GitHub-Pages-Veröffentlichung und kein QA-Artefakt-Upload. Die automatische Freigabeprüfung hat den zunächst geplanten QA-Artefakt-Upload wegen der enthaltenen Kontaktdaten und fehlender spezifischer Freigabe für dieses Ziel abgelehnt. Als sichere Alternative wurde der Upload vollständig weggelassen; keine Umgehung durch ein anderes Uploadverfahren.
+- Live-Leseprüfung: webbyu.de liefert HTTP 200, Apache, beim geprüften Startseitenabruf kein Set-Cookie und kein CF-Ray. Release `f11f006b6377319a916c4852a6a1ef82951a693d`. Die veröffentlichten Rechtsseiten enthalten weiterhin alte Platzhalter. Die GitHub-Pages-Adresse liefert ebenfalls noch HTTP 200. Eine Workflow-Änderung entfernt eine bestehende Pages-Veröffentlichung nicht; im Repository unter **Settings → Pages → Unpublish site** separat abschalten.
+- Browsersteuerung für die Konto-/Sichtprüfung wurde wegen fehlender URL-Policy-Unterstützung im Windows-Browser beendet. Keine weiteren UI-Eingaben danach; keine visuelle Freigabe und keine vollständige Live-Netzwerkprüfung behauptet.
+
+Fachlich noch offen: Bestätigung der WebAnalytics-Betriebsart und AVV sowie abschließender Hosting-Abgleich im Datenschutztext. Für die freigegebene Veröffentlichung werden ausschließlich die zu diesem Zwischenstand gehörenden Dateien übernommen, dev und prod ohne erzwungenen Push aktualisiert und anschließend die öffentliche Version geprüft. Die alte Pages-Seite ist separat abzuschalten. Der Cookie-Hinweis ist kein Ersatz für diese Schritte oder eine rechtliche Gesamtprüfung.
+
+Prüfung dieses Ergänzungsstands: TypeScript-Prüfung, alle 124 Website-Tests (davon elf zur Datenschutzauswahl), alle fünf Deployment-Tests und Produktionsbuild erfolgreich. Alle vier gebauten HTML-Einstiege samt lokalen Links/Assets geprüft; beide Rechtstexte enthalten die konsistenten Betreiberangaben und keine Datenplatzhalter mehr. Bestehende Build-Warnungen zu Schriftpfaden und Chunkgröße bleiben; die Sichtprüfung ist durch die oben dokumentierte Browser-Sperre nicht erfolgt.
+
 ## Bearbeitungsstand
+
+Die folgenden Abschnitte dokumentieren die vorherige Vorbereitung.
 
 Die kostenlosen eRecht24-Generatoren für Impressum und Datenschutzerklärung wurden mit der Mustertext-Funktion durchlaufen. Der Betreiber hat die Haftungsausschlüsse sowie die kostenlose Anforderung mit Zugang und Rechts-Updates/Angebots-E-Mails ausdrücklich freigegeben.
 

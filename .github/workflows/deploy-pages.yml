@@ -1,4 +1,4 @@
-name: Deploy dev preview to GitHub Pages
+name: Verify dev without public preview
 
 on:
   push:
@@ -8,11 +8,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages-preview
+  group: dev-qa
   cancel-in-progress: true
 
 jobs:
@@ -40,22 +38,4 @@ jobs:
         env:
           SITE_NOINDEX: 'true'
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    if: github.ref == 'refs/heads/dev'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages-dev
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # QA runs checks and a build only. No Pages deployment or build upload.

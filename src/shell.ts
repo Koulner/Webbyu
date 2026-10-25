@@ -163,7 +163,7 @@ export function renderPage(root: HTMLElement): PageMounts {
               <p>Was sollen Ihre Kunden besser verstehen oder leichter erledigen können? Was kostet Sie im Alltag unnötig Zeit? Ein paar Fragen helfen, Ihr Vorhaben zu ordnen.</p>
               <p class="finder-assurance">Sie brauchen dafür kein technisches Vorwissen.</p>
               <p class="finder-local-note">Sie können Ihre Zusammenfassung am Ende kopieren. In diesem Prototyp wird nichts versendet.</p>
-              <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Geschäftliche E-Mail und Telefonnummer werden noch bestätigt.</p>
+              <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:w.lukas99@gmx.net">w.lukas99@gmx.net</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
             </div>
             <div id="finder-mount"></div>
           </div>
@@ -172,10 +172,10 @@ export function renderPage(root: HTMLElement): PageMounts {
     </main>
     <footer class="site-footer section-shell">
       <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">webbyu<span class="wordmark-dot" aria-hidden="true"></span></a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
-      <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="${import.meta.env.BASE_URL}impressum/">Impressum</a><a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutz</a></nav>
+      <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="${import.meta.env.BASE_URL}impressum/">Impressum</a><a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav>
       <div class="legal-notes">
-        <details id="impressum"><summary>Impressum · Entwurf</summary><p>Das <a href="${import.meta.env.BASE_URL}impressum/">Impressum ist als eigene Unterseite vorbereitet</a>. Betreiber- und Kontaktdaten sind noch zu ergänzen.</p></details>
-        <details id="datenschutz"><summary>Datenschutz · Entwurf</summary><p>Die <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung ist als eigene Unterseite vorbereitet</a>. Betreiberangaben und Hosting sind vor Veröffentlichung zu vervollständigen. Der Projektfinder versendet keine Daten; Eingaben bleiben im Arbeitsspeicher dieser Website, bis sie neu geladen wird.</p></details>
+        <details id="impressum"><summary>Impressum</summary><p>Betreiber: Lukas Wagner · Webbyu. Anschrift und Kontakt finden Sie im <a href="${import.meta.env.BASE_URL}impressum/">Impressum</a>.</p></details>
+        <details id="datenschutz"><summary>Datenschutz</summary><p>Informationen zum Hosting, zur Kontaktaufnahme und zu Ihrer Cookie-Auswahl finden Sie in der <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a>. Die Hosting-Prüfung ist noch offen. Der Projektfinder versendet keine Daten; Eingaben bleiben bis zum Neuladen im Arbeitsspeicher.</p></details>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} Webbyu</span><span>Hamburg · Bad Oldesloe · Umgebung</span><span>Designprototyp · Angaben noch in Abstimmung</span></div>
     </footer>

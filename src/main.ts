@@ -8,6 +8,7 @@ import { createDemo, disposeDemo, mountDemoDialog } from './demos';
 import { mountJourneyPreview } from './journey-preview';
 import { mountFinder } from './finder';
 import { renderPage } from './shell';
+import { mountPrivacy } from './privacy';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 interface AppOptions {
@@ -18,6 +19,7 @@ interface AppOptions {
 export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   const store = options.store ?? briefStore;
   const mounts = renderPage(root);
+  const privacy = mountPrivacy();
   const events = new AbortController();
   const listenerOptions = { signal: events.signal };
   const finder = mountFinder(mounts.finder, store);
@@ -134,6 +136,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
       if (disposed) return;
       disposed = true;
       events.abort();
+      privacy.dispose();
       journeyPreview.dispose();
       demoDialog.dispose();
       demoSessions.forEach(disposeDemo);

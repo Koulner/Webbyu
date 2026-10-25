@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f3f1eb" />
-    <!-- Entfernen, sobald alle Angaben ergänzt und zur Veröffentlichung freigegeben sind. -->
-    <meta name="robots" content="noindex" />
     <title>Impressum — Webbyu</title>
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <link rel="stylesheet" href="/src/legal.css" />
@@ -19,48 +17,30 @@
     <main id="inhalt" tabindex="-1">
       <p class="legal-eyebrow">Webbyu / Rechtliche Angaben</p>
       <h1>Impressum</h1>
-      <aside class="legal-draft" aria-label="Entwurfsstatus">
-        <strong>Entwurf – Angaben noch zu ergänzen.</strong>
-        <p>Die markierten Felder enthalten noch keine bestätigten Betreiberangaben. Dieses Impressum ist noch nicht zur Veröffentlichung freigegeben.</p>
-      </aside>
-
-      <!-- DATEN NACHFLEGEN: Alle eckigen Klammern ersetzen. Optionale Abschnitte
-           einschließlich Überschrift entfernen, sofern sie nicht zutreffen. -->
       <section aria-labelledby="anbieter">
         <h2 id="anbieter">Angaben zum Anbieter</h2>
-        <p><span class="legal-placeholder">[VORNAME UND NACHNAME]</span><br />
+        <p>Lukas Wagner<br />
           Webbyu (Einzelunternehmen)<br />
-          <span class="legal-placeholder">[STRASSE UND HAUSNUMMER]</span><br />
-          <!-- Optional: Adresszusatz, etwa Gebäude oder c/o, nur falls zutreffend ergänzen. -->
-          <span class="legal-placeholder">[POSTLEITZAHL UND ORT]</span></p>
+          Pölitzer Weg 57b<br />
+          23843 Bad Oldesloe<br />Deutschland</p>
       </section>
 
       <section aria-labelledby="kontakt">
         <h2 id="kontakt">Kontakt</h2>
-        <p>Telefon: <span class="legal-placeholder">[GESCHÄFTLICHE TELEFONNUMMER]</span><br />
-          <!-- Optional: Telefax nur bei tatsächlich vorhandener Faxnummer ergänzen. -->
-          E-Mail: <span class="legal-placeholder">[GESCHÄFTLICHE E-MAIL-ADRESSE]</span></p>
+        <p>Telefon: <a href="tel:+4917642090983">+49 176 42090983</a><br />
+          E-Mail: <a href="mailto:w.lukas99@gmx.net">w.lukas99@gmx.net</a></p>
       </section>
 
-      <!-- OPTIONAL: Diesen gesamten Abschnitt entfernen, falls keine USt-ID zugeteilt ist.
-           Hier niemals eine persönliche Steuernummer einsetzen. -->
-      <section aria-labelledby="umsatzsteuer">
-        <h2 id="umsatzsteuer">Umsatzsteuer-ID</h2>
-        <p>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br />
-          <span class="legal-placeholder">[UMSATZSTEUER-ID – NUR SOFERN ZUGETEILT]</span></p>
-      </section>
-
-      <!-- Vor Freigabe bestätigen, dass diese Aussage für Webbyu zutrifft. -->
-      <section aria-labelledby="streitbeilegung">
-        <h2 id="streitbeilegung">Verbraucherstreitbeilegung/<wbr />Universalschlichtungsstelle</h2>
-        <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
-      </section>
+      <!-- Noch keine USt-ID/Wirtschafts-ID mitgeteilt. Nach Zuteilung ergänzen.
+           Die persönliche Steuernummer wird nicht veröffentlicht. Keine unbestätigte
+           Erklärung zur freiwilligen Verbraucherschlichtung übernommen. -->
 
       <p class="legal-source">Quelle: <a href="https://www.e-recht24.de/impressum-generator.html">eRecht24 Impressum-Generator</a></p>
     </main>
     <footer class="legal-footer">
       <span>Webbyu</span>
-      <nav aria-label="Weitere Seiten"><a href="%BASE_URL%">Startseite</a><a href="%BASE_URL%reise/">Die Reise</a><a href="%BASE_URL%datenschutz/">Datenschutz</a></nav>
+      <nav aria-label="Weitere Seiten"><a href="%BASE_URL%">Startseite</a><a href="%BASE_URL%reise/">Die Reise</a><a href="%BASE_URL%datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav>
     </footer>
+    <script type="module" src="/src/legal.ts"></script>
   </body>
 </html>
