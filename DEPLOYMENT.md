@@ -49,7 +49,7 @@ Bereits vorhandene, vom Build nicht belegte Dateien werden nicht gelöscht. Dadu
 
 Nach erfolgreichem Upload prüft GitHub `webbyu-release.json` auf den erwarteten Commit sowie Startseite, Reise, Impressum und Datenschutz. Schlägt nur diese Prüfung fehl, können Domain, SSL, www-Weiterleitung oder CDN noch nicht zum Ziel passen; das bedeutet nicht automatisch, dass der Upload fehlgeschlagen ist. Nach Korrektur den fehlgeschlagenen Lauf erneut starten.
 
-Später Änderungen auf `dev` prüfen und nach `prod` übernehmen. Fehlerhafte Änderungen über einen Revert auf `prod` zurücknehmen; der nächste Push veröffentlicht den zurückgesetzten Code erneut. Alternativ kann der Workflow manuell für den Branch `prod` gestartet werden. Ein manueller Start auf einem anderen Branch veröffentlicht nichts.
+Später Änderungen auf `dev` prüfen und nach `prod` übernehmen. Fehlerhafte Änderungen über einen Revert auf `prod` zurücknehmen; der nächste Push veröffentlicht den zurückgesetzten Code erneut. Fehlgeschlagene Läufe über **Actions → Lauf öffnen → Re-run jobs** wiederholen. Der zusätzliche manuelle Workflow-Start ist bei GitHub erst verfügbar, wenn die Workflow-Datei auch im Repository-Standardbranch liegt. Dieser ist aktuell `codex/webbyu-redesign` und wurde nicht verändert. Pushes auf `prod` benötigen diese Voraussetzung nicht. Ein manueller Start auf einem anderen Branch veröffentlicht nichts.
 
 ## Vorschau, Pfade und Freigabe
 
@@ -60,3 +60,5 @@ Die Umstellung des Hostings vervollständigt keine Betreiberangaben, Rechtstexte
 ## Geprüft am 25.10.2026
 
 TypeScript-Prüfung, alle 113 Website-Tests und fünf Deployment-Tests erfolgreich. IONOS- und Pages-Build separat erzeugt; lokale Links und Assets aller vier Einstiegsseiten für beide Basispfade geprüft. Die Vorschau enthält genau eine `noindex`-Angabe je Seite; im Produktionsbuild bleiben nur die vorhandenen rechtlichen Entwürfe damit markiert. Der IONOS-Build enthält 242 übertragbare Dateien, einschließlich Apache-Konfiguration und Versionsdatei. Fehlerhafte Zielpfade, fehlende Secrets, eine abweichende Serveridentität, ein falscher Build-Commit und SFTP-Fehler wurden ohne echte Kontodaten getestet. Die tatsächliche Verbindung, Serverunterstützung für das Ersetzen per SFTP-Rename und die öffentliche IONOS-Website können erst nach der privaten Einrichtung geprüft werden.
+
+Die Vorbereitung wurde auf `dev` gepusht. Der anschließende GitHub-Actions-Lauf für die Vorschau hat Build und Veröffentlichung erfolgreich abgeschlossen. Der Branch `prod` wird erst nach dem privaten Hinterlegen der Secrets aus dem freigegebenen Stand erstellt; bisher keine Veröffentlichung nach IONOS.
