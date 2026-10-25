@@ -89,14 +89,28 @@ export function deploy(env = process.env, run = spawnSync) {
     writeFileSync(knownHosts, verifiedHostKey(scan.stdout, config.fingerprint), { mode: 0o600 });
     const batchFile = join(directory, 'upload.sftp');
     writeFileSync(batchFile, batch, { mode: 0o600 });
-    const result = run('sshpass', ['-e', 'sftp', '-q', '-b', batchFile, '-P', '22',
-      '-oBatchMode=no', '-oStrictHostKeyChecking=yes', `-oUserKnownHostsFile=${knownHosts}`,
+    // OpenSSH keeps the first BatchMode value. -b adds BatchMode=yes, so the
+    // password-enabled override must precede -b, not follow it.
+    const result = run('sshpass', ['-e', 'sftp', '-q', '-oBatchMode=no', '-b', batchFile, '-P', '22',
+      '-oStrictHostKeyChecking=yes', `-oUserKnownHostsFile=${knownHosts}`,
       '-oConnectTimeout=30', '-oNumberOfPasswordPrompts=1', '-oPreferredAuthentications=password,keyboard-interactive',
       '-oPubkeyAuthentication=no', `${config.user}@${config.host}`], {
       cwd: root, env: { ...env, SSHPASS: config.password }, encoding: 'utf8', timeout: 10 * 60 * 1000, maxBuffer: 8 * 1024 * 1024,
     });
     // Never print raw client output: it can contain private account details.
-    if (result.status !== 0) throw new Error(`SFTP upload failed (exit ${result.status ?? 'timeout'}). Check credentials, existing destination, permissions and available space.`);
+    if (result.status !== 0) {
+      const diagnostic = result.stderr ?? '';
+      const reason = /Permission denied.*(?:password|publickey|keyboard-interactive)|Authentication failed/i.test(diagnostic) || result.status === 5
+        ? 'The SFTP login was rejected. Check the username and SFTP password in GitHub.'
+        : /No such file|not found|Couldn.t canonicalize/i.test(diagnostic)
+          ? 'A required path was not found. Check the existing target directory as seen by this SFTP account.'
+          : /remote rename|rename .*Failure|File exists/i.test(diagnostic)
+            ? 'The server could not replace a destination file. Check SFTP rename support and permissions.'
+            : /Permission denied/i.test(diagnostic)
+              ? 'The account lacks permission to write to the target directory.'
+              : 'Check connection availability, target directory, permissions and available space.';
+      throw new Error(`SFTP upload failed (exit ${result.status ?? 'timeout'}). ${reason}`);
+    }
     console.log(`Published ${files.length} files. Existing files outside this build were preserved.`);
   } finally {
     rmSync(directory, { recursive: true, force: true });
@@ -104,5 +118,9 @@ export function deploy(env = process.env, run = spawnSync) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try { deploy(); } catch (error) { console.error(error.message); process.exitCode = 1; }
+  try { deploy(); } catch (error) {
+    const message = error.message.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+    console.error(`::error::${message}`);
+    process.exitCode = 1;
+  }
 }

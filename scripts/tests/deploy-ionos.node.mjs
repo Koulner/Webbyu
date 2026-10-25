@@ -81,6 +81,7 @@ test('verified connection uses strict host checking and keeps password out of ar
       assert.equal(command, 'sshpass');
       assert(args.includes('-oStrictHostKeyChecking=yes'));
       assert(args.includes('-oBatchMode=no'));
+      assert(args.indexOf('-oBatchMode=no') < args.indexOf('-b'), 'password mode must be set before -b implicitly enables BatchMode');
       assert(!args.join(' ').includes(env.IONOS_SFTP_PASSWORD));
       assert.equal(options.env.SSHPASS, env.IONOS_SFTP_PASSWORD);
       const batch = readFileSync(args[args.indexOf('-b') + 1], 'utf8');
