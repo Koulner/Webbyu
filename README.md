@@ -68,7 +68,7 @@ Die Safran-Atelier-Demo enthält jetzt die gerenderte 3D-Kamerafahrt aus dem Ref
 - Leistungen, Start / Business / Complete, Über mich, Zusammenarbeit und Kontakt sind über direkte Abschnittslinks erreichbar. Eingaben und Demo-Sitzungen bleiben beim Navigieren erhalten.
 - 599 €, 1.099 € und 2.499 € sind **interne Preisentwürfe mit offener Steuerbasis**. Seitenzählung, Zusatzseitenpreise und mehrere Produktionsdetails bleiben abzustimmen. Ablauf und Grenzen sind in aufklappbaren Details beschrieben.
 - Foto- und Content-Wünsche fließen in die Paketorientierung ein. Verkauf und Buchung führen zur individuellen Umfangsklärung. Eine manuelle Paketwahl überschreibt das Geschäftsziel nicht; die kopierbare Zusammenfassung enthält Preisstatus und Leistungsabgrenzung.
-- Kontaktadressen, Impressum und Datenschutz sind ausdrücklich Platzhalter. Der Finder erstellt ausschließlich ein lokales Briefing.
+- Impressum und Datenschutzerklärung sind als statische Unterseiten unter `/impressum/` und `/datenschutz/` eingebunden und auch ohne JavaScript lesbar. Betreiberangaben und Hosting-Abgleich bleiben markierte offene Punkte; beide Seiten tragen bis zur Freigabe `noindex`. Details und Prüfnachweise stehen in `RECHTLICHES.md`. Der Finder erstellt ausschließlich ein lokales Briefing.
 - AP5, die unabhängige Gesamt-Abnahme, bleibt offen. Die technischen Prüfbelege für AP6 stehen in `WORK_PACKAGES.md`.
 
 Prüfbilder und der responsive Prüfstand liegen lokal in `artifacts/ap6-preview/` und werden nicht von Git erfasst.

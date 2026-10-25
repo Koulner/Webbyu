@@ -120,9 +120,10 @@ describe('homepage integration', () => {
     document.querySelector<HTMLAnchorElement>('#mobile-nav a[href="#ueber-uns"]')!.click();
     expect(document.querySelector<HTMLElement>('#mobile-nav')!.hidden).toBe(true);
     expect(document.activeElement).toBe(document.querySelector('#about-title'));
-    document.querySelector<HTMLAnchorElement>('.footer-nav a[href="#datenschutz"]')!.click();
+    expect(document.querySelector<HTMLAnchorElement>(`.footer-nav a[href="${import.meta.env.BASE_URL}datenschutz/"]`)).not.toBeNull();
+    location.hash = '#datenschutz';
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
     expect(document.querySelector<HTMLDetailsElement>('#datenschutz')!.open).toBe(true);
-    expect(document.activeElement).toBe(document.querySelector('#datenschutz summary'));
   });
 
   it('keeps extension buttons synchronized with Finder selection, removal, and unsure', () => {

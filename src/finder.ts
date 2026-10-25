@@ -116,7 +116,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>
           <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">*</span><input type="text" name="name" data-focus="name" autocomplete="name" required maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">*</span><input type="email" name="email" data-focus="email" autocomplete="email" required maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-unternehmen.de"></label></div>
-          <p class="finder-privacy">* Erforderlich für Ihre Zusammenfassung. Dieser lokale Prototyp versendet keine Daten. Ihre Angaben bleiben nur bis zum Neuladen in dieser Seite.</p>`;
+          <p class="finder-privacy">* Erforderlich für Ihre Zusammenfassung. Dieser lokale Prototyp versendet keine Daten. Ihre Angaben bleiben nur bis zum Neuladen in dieser Seite. <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a></p>`;
       }
 
       body += `<div class="finder-actions">${step > 0 ? '<button class="finder-back" type="button" data-action="back">← Zurück</button>' : '<span class="finder-time">Etwa 2 Minuten. Ganz unverbindlich.</span>'}<button class="finder-next" type="submit">${step === 3 ? 'Zusammenfassung erstellen' : 'Weiter'} <span aria-hidden="true">↗</span></button></div>`;

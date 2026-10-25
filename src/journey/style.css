@@ -125,6 +125,8 @@ button:disabled { cursor: wait; }
 .has-open-demo .journey-dock, .has-open-demo .journey-guide { visibility: hidden; }
 .journey-footer { position: relative; z-index: 3; background: #10272f; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 70px 4vw 160px; border-top: 1px solid #c0cbbb26; }
 .journey-footer p { font-size: 12px; line-height: 1.8; color: #a7bdb3; }
+.journey-legal { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; }
+.journey-legal a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; }
 .journey-footer > a:last-child { display: flex; align-items: center; gap: 25px; min-height: 44px; font-size: 12px; }
 .journey-status:not(:empty) { position: fixed; z-index: 100; left: 50%; top: 110px; transform: translateX(-50%); padding: 16px 20px; max-width: calc(100vw - 32px); width: max-content; background: #f1f1e7; color: #20373c; box-shadow: 0 8px 35px #00192433; font-size: 13px; }
 

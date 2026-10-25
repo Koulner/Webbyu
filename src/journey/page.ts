@@ -78,6 +78,6 @@ export function renderJourney(root: HTMLElement): void {
       <div class="journey-progress" aria-hidden="true"><span></span></div>
     </div>
     <p class="journey-map-hint" data-map-hint>Scrollen führt Sie durch die Erlebnisräume. Alle Stationen sind auch direkt anwählbar.</p>
-    <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">webbyu<span>.</span></a><p>Ein Gründer. Ein direkter Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><a href="${home}">Zur Startseite ${arrow}</a></footer>
+    <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">webbyu<span>.</span></a><p>Ein Gründer. Ein direkter Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><nav class="journey-legal" aria-label="Rechtliche Angaben"><a href="${home}impressum/">Impressum</a><a href="${home}datenschutz/">Datenschutz</a></nav><a href="${home}">Zur Startseite ${arrow}</a></footer>
     <div class="journey-status" role="status" aria-live="polite"></div><div data-demo-parking hidden></div>`;
 }

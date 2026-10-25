@@ -16,6 +16,6 @@ export default defineConfig({
   // files while they are copied can terminate the Windows development server.
   server: { watch: { ignored: ['**/artifacts/**'] } },
   build: {
-    rollupOptions: { input: { main: 'index.html', journey: 'reise/index.html' } },
+    rollupOptions: { input: { main: 'index.html', journey: 'reise/index.html', imprint: 'impressum/index.html', privacy: 'datenschutz/index.html' } },
   },
 });
