@@ -37,8 +37,8 @@ describe('privacy choice', () => {
     expect(xhr).not.toHaveBeenCalled();
     expect(panel().querySelector('script, iframe, img, input')).toBeNull();
     expect(document.body.style.overflow).toBe('');
-    expect(panel().querySelector('a[href="/impressum/"]')).not.toBeNull();
-    expect(panel().querySelector('a[href="/datenschutz/"]')).not.toBeNull();
+    expect(panel().querySelector(`a[href="${import.meta.env.BASE_URL}impressum/"]`)).not.toBeNull();
+    expect(panel().querySelector(`a[href="${import.meta.env.BASE_URL}datenschutz/"]`)).not.toBeNull();
   });
 
   it('rejects with one click, remembers only the choice, and stays dismissed after navigation', () => {
