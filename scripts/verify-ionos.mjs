@@ -22,3 +22,12 @@ await Promise.all(['', 'reise/', 'impressum/', 'datenschutz/'].map(async route =
   if (!response.ok || !response.headers.get('content-type')?.includes('text/html')) throw new Error(`Published page check failed: /${route}`);
   console.log(`Published page OK: /${route}`);
 }));
+const plainUrl = new URL('reise/?https-check=1', site);
+plainUrl.protocol = 'http:';
+const redirect = await fetch(plainUrl, { signal: AbortSignal.timeout(10000), redirect: 'manual' });
+const location = redirect.headers.get('location');
+const target = location ? new URL(location, plainUrl) : null;
+if (redirect.status !== 301 || target?.protocol !== 'https:' || !['webbyu.de', 'www.webbyu.de'].includes(target.hostname) || target.pathname !== plainUrl.pathname || target.search !== plainUrl.search) {
+  throw new Error('The HTTP-to-HTTPS redirect is missing or does not preserve the requested page.');
+}
+console.log('HTTP redirects permanently to HTTPS and preserves path and query.');

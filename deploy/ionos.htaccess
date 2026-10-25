@@ -2,6 +2,13 @@
 DirectoryIndex index.html
 Options -Indexes
 
+# HTTPS is already provisioned at IONOS. Preserve paths and query strings;
+# respect an HTTPS connection terminated by a reverse proxy/CDN as well.
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+RewriteRule ^ https://webbyu.de%{REQUEST_URI} [R=301,L,NE]
+
 <IfModule mod_headers.c>
   # Revalidate entry points after each deployment, including behind the CDN.
   <FilesMatch "\.(html|json)$">
