@@ -24,7 +24,7 @@ export function mountPrivacy() {
     <button class="privacy-close" type="button" aria-label="Hinweis schließen – alles Optionale ablehnen">×</button>
     <p class="privacy-eyebrow">Ihre Privatsphäre</p>
     <h2 id="privacy-title">Sie entscheiden.</h2>
-    <p class="privacy-copy">Wir setzen keine optionalen Cookies. Für IONOS-Besuchsstatistiken sind Server-Logdaten vorgesehen; diese lassen sich hier nicht abschalten. Ihre Auswahl merken wir uns nur in diesem Browser.</p>
+    <p class="privacy-copy">Wir setzen keine optionalen Cookies. IONOS stellt beim Hosting Besuchsstatistiken bereit; diese lassen sich hier nicht abschalten. Ihre Auswahl merken wir uns nur in diesem Browser.</p>
     <div class="privacy-actions">
       <button class="privacy-reject" type="button">Alles ablehnen</button>
       <details class="privacy-details"><summary>Details</summary>
