@@ -1,4 +1,4 @@
-import { concepts, extensions, packages, packageQuestions, priceDraftNotice, scopeNotice, services, situations } from './data';
+import { concepts, extensions, packages, packageQuestions, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
 
 const arrow = '<span aria-hidden="true">↗</span>';
@@ -106,23 +106,23 @@ export function renderPage(root: HTMLElement): PageMounts {
         <div class="development-note"><span>INDIVIDUELL ENTWICKELT</span><p>Gestaltung und Funktionen richten sich nach Ihrem Unternehmen. Wenn ein vorhandener Shop- oder Buchungsdienst gut passt, kann er angebunden werden. Wie Sie Inhalte später pflegen und was im laufenden Betrieb nötig ist, legen wir gemeinsam fest.</p></div>
       </section>
 
-      <section id="pakete" class="packages-section section-shell" aria-labelledby="packages-title" aria-describedby="price-draft-note">
+      <section id="pakete" class="packages-section section-shell" aria-labelledby="packages-title" aria-describedby="package-offer-note">
         <div class="section-kicker"><span>04 / PAKETE & INDIVIDUELLE VORHABEN</span><span>Ein klarer Rahmen für Ihren Einstieg.</span></div>
         <div class="section-heading">
           <h2 id="packages-title">Ein passender Einstieg.<br><em>Ein geklärter Umfang.</em></h2>
           <p>Die Pakete geben Orientierung für Unternehmenswebsites und passende Inhalte. Besondere Funktionen und angebundene Dienste planen wir als eigenes Vorhaben.</p>
         </div>
-        <p id="price-draft-note" class="draft-note"><strong>Die Preise sind interne Entwürfe.</strong> Steuerbasis und endgültiger Leistungsumfang sind noch offen. Ein verbindliches Angebot entsteht erst nach Abstimmung.</p>
+        <p id="package-offer-note" class="offer-note"><strong>Alle Pakete: Angebot auf Anfrage.</strong> Wir klären Ihre Anforderungen und halten Inhalte, Funktionen und Ablauf in einem individuellen Angebot fest.</p>
         <div class="package-list">${packages.map(p => `
           <article class="package-row">
             <span class="package-number">${p.number}</span>
             <div class="package-intro"><h3>${p.name}</h3><p>${p.description}</p><details class="package-details"><summary>Ablauf & Umfang</summary>${p.details.map(detail => `<p>${detail}</p>`).join('')}</details></div>
             <ul>${p.features.map(f => `<li><span aria-hidden="true">↗</span>${f}</li>`).join('')}</ul>
-            <div class="package-action"><div><strong class="package-price">${p.price}</strong><span class="package-price-note">${priceDraftNotice}</span></div><button type="button" data-package="${p.id}" class="round-arrow" aria-label="Paket ${p.name} vormerken">${arrow}</button></div>
+            <div class="package-action"><div><strong class="package-price">${p.price}</strong><span class="package-price-note">Umfang individuell vereinbart</span></div><button type="button" data-package="${p.id}" class="round-arrow" aria-label="Paket ${p.name} vormerken">${arrow}</button></div>
           </article>`).join('')}
         </div>
-        <div class="package-included"><span>IMMER MIT DABEI</span><ul><li>Individuelle Gestaltung</li><li>Für Handy und Computer entwickelt</li><li>Technische Grundlagen für Suchmaschinen</li><li>Prüfung & vollständige Übergabe</li></ul></div>
-        <p class="package-scope-note">${scopeNotice} Seitenzählung und Zusatzseitenpreise werden vor Angebotsfreigabe bestätigt.</p>
+        <div class="package-included"><span>GEMEINSAM KLÄREN</span><ul><li>Gestaltung & Besucherführung</li><li>Darstellung auf Handy und Computer</li><li>Inhalte & benötigte Funktionen</li><li>Prüfung, Übergabe & Betrieb</li></ul></div>
+        <p class="package-scope-note">${scopeNotice}</p>
         <div class="package-faq"><h3>Vor dem Start<br><em>gut zu wissen.</em></h3><div>${packageQuestions.map(item => `<details><summary>${item.question}<span aria-hidden="true">+</span></summary><p>${item.answer}</p></details>`).join('')}</div></div>
         <div class="extensions-heading"><h3>Raum für mehr.</h3><p>Erweiterungen, die zu Ihrem Alltag passen.</p></div>
         <div class="extensions-grid">${extensions.map((e, i) => `
@@ -163,7 +163,7 @@ export function renderPage(root: HTMLElement): PageMounts {
               <p>Was sollen Ihre Kunden besser verstehen oder leichter erledigen können? Was kostet Sie im Alltag unnötig Zeit? Ein paar Fragen helfen, Ihr Vorhaben zu ordnen.</p>
               <p class="finder-assurance">Sie brauchen dafür kein technisches Vorwissen.</p>
               <p class="finder-local-note">Am Ende prüfen Sie eine Vorschau und können die Anfrage ausdrücklich senden oder kopieren. Bis zum Versand bleiben Ihre Eingaben nur im Speicher dieser Seite.</p>
-              <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:w.lukas99@gmx.net">w.lukas99@gmx.net</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
+              <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
             </div>
             <div id="finder-mount"></div>
           </div>
@@ -177,7 +177,7 @@ export function renderPage(root: HTMLElement): PageMounts {
         <details id="impressum"><summary>Impressum</summary><p>Betreiber: Lukas Wagner · Webbyu. Anschrift und Kontakt finden Sie im <a href="${import.meta.env.BASE_URL}impressum/">Impressum</a>.</p></details>
         <details id="datenschutz"><summary>Datenschutz</summary><p>Informationen zum Hosting, zur Kontaktaufnahme und zu Ihrer Cookie-Auswahl finden Sie in der <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a>. Im Projektfinder bleiben Ihre Eingaben bis zum ausdrücklichen Versand im Arbeitsspeicher dieser Seite. Beim Versand werden die Anfrage und Kontaktdaten an den Webbyu-Server übertragen und per E-Mail versendet.</p></details>
       </div>
-      <div class="footer-bottom"><span>© ${new Date().getFullYear()} Webbyu</span><span>Hamburg · Bad Oldesloe · Umgebung</span><span>Designprototyp · Angaben noch in Abstimmung</span></div>
+      <div class="footer-bottom"><span>© ${new Date().getFullYear()} Webbyu</span><span>Hamburg · Bad Oldesloe · Umgebung</span><span>Individuelle Websites & Funktionen</span></div>
     </footer>
     <div class="toast" role="status" aria-live="polite"></div>
   `;

@@ -96,8 +96,10 @@ describe('project finder', () => {
     choose(goal);
     next(); next(); next();
     expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(recommendation);
+    expect(container.querySelector('.finder-price')!.textContent).toBe('Angebot auf Anfrage');
     change('selectedPackage', recommendation === 'complete' ? 'start' : 'complete');
     expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Ihre Paketauswahl');
+    expect(container.querySelector('.finder-price')!.textContent).toBe('Angebot auf Anfrage');
     finder.openAtStart();
     expect(document.activeElement).toBe(container.querySelector('.finder-heading'));
     choose(goal === 'sales' ? 'presence' : 'sales');
@@ -126,6 +128,8 @@ describe('project finder', () => {
     expect(summary).not.toBeNull();
     expect(summary.textContent).toContain('Produkte verkaufen');
     expect(summary.textContent).toContain('Webbyu Complete');
+    expect(summary.textContent).toContain('Angebot auf Anfrage');
+    expect(summary.textContent).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf/);
     expect(summary.textContent).toContain('Inhalte selbst pflegen');
     expect(summary.textContent).toContain('Etwas Besonderes erleben');
     expect(summary.textContent).toContain('Eine bestehende Website erneuern');
@@ -142,16 +146,18 @@ describe('project finder', () => {
     expect(store.get().name).toBe('Ada Beispiel');
   });
 
-  it('copies the completed briefing only after the copy button is pressed', async () => {
+  it.each(['start', 'business', 'complete', 'custom'] as const)('copies the %s briefing with an offer on request only after the copy button is pressed', async selectedPackage => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
-    store.update({ name: 'Ada Beispiel', email: 'ada@example.com', description: 'Ein neuer Auftritt.' });
+    store.update({ selectedPackage, name: 'Ada Beispiel', email: 'ada@example.com', description: 'Ein neuer Auftritt.' });
     next(); next(); next(); next();
     expect(writeText).not.toHaveBeenCalled();
     container.querySelector<HTMLButtonElement>('[data-action="copy"]')!.click();
     await Promise.resolve();
     expect(writeText).toHaveBeenCalledTimes(1);
     expect(writeText.mock.calls[0][0]).toContain('Ihre Idee: Ein neuer Auftritt.');
+    expect(writeText.mock.calls[0][0]).toContain('Angebot: Angebot auf Anfrage');
+    expect(writeText.mock.calls[0][0]).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf/);
     expect(writeText.mock.calls[0][0]).toContain('Vorschau – nichts versendet.');
     expect(container.querySelector('.finder-copy-status')!.textContent).toContain('wurde kopiert');
   });
@@ -170,7 +176,7 @@ describe('project finder', () => {
     container.querySelector<HTMLButtonElement>('[data-action="copy"]')!.click();
     await Promise.resolve();
     expect(writeText.mock.calls[0][0]).toContain('Paketwunsch: Webbyu Complete');
-    expect(writeText.mock.calls[0][0]).toContain('Steuerbasis noch offen');
+    expect(writeText.mock.calls[0][0]).toContain('Angebot: Angebot auf Anfrage');
     expect(writeText.mock.calls[0][0]).toContain('Shops, komplexe Buchungen');
     expect(writeText.mock.calls[0][0]).toContain('Produkte verkaufen');
   });
@@ -184,6 +190,8 @@ describe('project finder', () => {
     expect(container.querySelector('[data-summary]')).not.toBeNull();
     const fallback = container.querySelector<HTMLTextAreaElement>('[data-focus="copy-fallback"]')!;
     expect(fallback.value).toContain('ada@example.com');
+    expect(fallback.value).toContain('Angebot: Angebot auf Anfrage');
+    expect(fallback.value).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf/);
     expect(fallback.selectionStart).toBe(0);
     expect(fallback.selectionEnd).toBe(fallback.value.length);
     expect(document.activeElement).toBe(fallback);

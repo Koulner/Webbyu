@@ -3,7 +3,7 @@ export type DemoId = 'meisterwerk' | 'nordlicht' | 'sales' | 'raumgut';
 export type PackageId = 'start' | 'business' | 'complete';
 export type PackageChoice = PackageId | 'custom';
 
-export const priceDraftNotice = 'Interner Preisentwurf · Steuerbasis noch offen · kein verbindliches Angebot';
+export const offerNotice = 'Angebot auf Anfrage';
 export const scopeNotice = 'Shops, komplexe Buchungen und individuelle Integrationen benötigen einen gesonderten Umfang und ein eigenes Angebot.';
 
 export const goals: { id: Goal; label: string; description: string }[] = [
@@ -14,9 +14,9 @@ export const goals: { id: Goal; label: string; description: string }[] = [
 ];
 
 export const packages: { id: PackageId; number: string; name: string; price: string; description: string; features: string[]; details: string[] }[] = [
-  { id: 'start', number: '01', name: 'Webbyu Start', price: '599 €', description: 'Ein kompakter Auftritt. Individuell gestaltet, mit den Texten und Bildern, die Sie mitbringen.', features: ['Bis zu drei Unterseiten', 'Ihre Texte und Bilder integriert', 'Kontaktmöglichkeit & klare Besucherführung'], details: ['Drei Termine: Planung, Entwurfsbesprechung und Übergabe.', 'Eine gebündelte Änderungsrunde innerhalb der vereinbarten Gestaltungsrichtung.', 'Planungsentwurf: regulär 14 Kalendertage, sobald Umfang, Inhalte und Freigaben vorliegen. Der konkrete Termin wird vereinbart.'] },
-  { id: 'business', number: '02', name: 'Webbyu Business', price: '1.099 €', description: 'Mehr Raum für Ihr Unternehmen. Mit einer durchdachten Inhaltsstruktur und eigenen Aufnahmen.', features: ['Sechs Unterseiten', 'Vor-Ort-Fotografie & 15 bearbeitete Fotos', 'Kontakt- und Anfragewege im vereinbarten Umfang'], details: ['Persönliche Beratung und individuelle Gestaltung.', 'Zwei gebündelte Korrekturrunden.', 'Planungsentwurf: regulär 21 Kalendertage bei rechtzeitiger Zuarbeit. Produktionsumfang und Nutzungsrechte stimme ich vorher mit Ihnen ab.'] },
-  { id: 'complete', number: '03', name: 'Webbyu Complete', price: '2.499 €', description: 'Website und Inhalte aus einem Guss. Mit eigener Foto-, Video- und Textproduktion.', features: ['30 professionell bearbeitete Fotos', 'Zwei Kurzvideos mit jeweils bis zu 30 Sekunden', 'Konzeption & professionelle Texterstellung'], details: ['Seitenzahl, Produktionsumfang, Korrekturrunden und Liefertermin werden individuell geklärt.', 'Drohnen- und 360°-Aufnahmen nach Abstimmung und nur, soweit rechtlich und praktisch durchführbar.', 'Nutzungsrechte, Ausspielung und technische Einbindung werden vor Beauftragung festgelegt. Ein Shop ist keine Inklusivleistung.'] },
+  { id: 'start', number: '01', name: 'Webbyu Start', price: offerNotice, description: 'Ein kompakter Auftritt. Individuell gestaltet, mit den Texten und Bildern, die Sie mitbringen.', features: ['Kompakter Unternehmensauftritt', 'Ihre Texte und Bilder integriert', 'Kontaktmöglichkeit & klare Besucherführung'], details: ['Seitenstruktur und Kontaktmöglichkeiten planen wir passend zu Ihrem Angebot.', 'Inhalte, Freigaben und Nutzungsrechte klären wir vor Projektbeginn.', 'Ablauf, Überarbeitungen und Termine werden individuell vereinbart.'] },
+  { id: 'business', number: '02', name: 'Webbyu Business', price: offerNotice, description: 'Mehr Raum für Ihr Unternehmen. Mit einer durchdachten Inhaltsstruktur und eigener Fotografie nach Vereinbarung.', features: ['Durchdachte Inhaltsstruktur', 'Eigene Fotografie nach Vereinbarung', 'Kontakt- und Anfragewege nach Bedarf'], details: ['Seitenumfang und Fotoproduktion stimmen wir passend zu Ihrem Vorhaben ab.', 'Motive und Nutzungsrechte werden vor Projektbeginn geklärt.', 'Ablauf, Überarbeitungen und Termine werden individuell vereinbart.'] },
+  { id: 'complete', number: '03', name: 'Webbyu Complete', price: offerNotice, description: 'Website und Inhalte aus einem Guss. Foto, Video und Text im individuell vereinbarten Umfang.', features: ['Website und Inhalte gemeinsam konzipiert', 'Foto, Video & Text nach Vereinbarung', 'Produktion & Einbindung passend zum Projekt'], details: ['Seitenstruktur und Produktion richten sich nach Ihrem Vorhaben.', 'Formate, Nutzungsrechte und technische Einbindung werden vor Beauftragung festgelegt.', 'Ablauf, Überarbeitungen und Termine werden individuell vereinbart.'] },
 ];
 
 export const services = [
@@ -32,16 +32,16 @@ export const situations = [
 ];
 
 export const packageQuestions = [
-  { question: 'Wie werden die Seiten gezählt?', answer: 'Start sieht bis zu drei, Business sechs Unterseiten vor. Ob Startseite und Rechtstextseiten zusätzlich zählen, ist noch offen und wird vor Angebotsfreigabe festgelegt. Für Complete sind Seitenzahl und Liefertermin individuell zu vereinbaren. Zusätzliche Standardseiten sind möglich; ein Einzelpreis ist noch nicht bestätigt.' },
-  { question: 'Was bringen Sie mit, was übernehme ich?', answer: 'Für Start liefern Sie Texte, Bilder und Kontaktdaten. Business ergänzt eigene Fotografien; Complete enthält zusätzlich Text- und Videoproduktion im vereinbarten Umfang. Material, Freigaben, Nutzungsrechte und freigegebene Rechtstexte stimme ich vor Projektbeginn mit Ihnen ab.' },
+  { question: 'Wie wird der Umfang festgelegt?', answer: 'Wir klären gemeinsam, welche Seiten, Inhalte und Funktionen Ihr Vorhaben braucht. Das Angebot hält den vereinbarten Umfang fest – einschließlich Abstimmungen, Überarbeitungen und Terminen.' },
+  { question: 'Was bringen Sie mit, was übernehme ich?', answer: 'Bei Start arbeiten wir mit Ihren Texten, Bildern und Kontaktdaten. Business legt zusätzlich den Schwerpunkt auf eigene Fotografie; Complete verbindet Website und Foto-, Video- und Textproduktion. Den genauen Produktionsumfang, Material, Freigaben, Nutzungsrechte und freigegebene Rechtstexte stimmen wir vor Projektbeginn ab.' },
   { question: 'Was passiert nach der Übergabe?', answer: 'Sie erhalten die vereinbarten Dateien und Zugänge. Domain und Hosting laufen auf Ihren Namen. Ein monatlicher Betreuungsvertrag mit Webbyu ist nicht verpflichtend. Hostingkosten und mögliche Fremdlizenzen kläre ich vorher mit Ihnen; spätere Änderungen können Sie separat beauftragen.' },
   { question: 'Sind Shops und Buchungssysteme enthalten?', answer: scopeNotice + ' Die interaktiven Konzeptdemos zeigen Möglichkeiten und sind keine Zusage einer enthaltenen Paketleistung.' },
-  { question: 'Welche Ergänzungen sind vorgesehen?', answer: 'Für Business ist ein Video-Zusatzpaket mit drei Kurzvideos von jeweils bis zu 30 Sekunden vorgesehen: 349 € als interner Preisentwurf. Für Start ist eine ausdrücklich neu beauftragte Gestaltungsrichtung mit 199 € angesetzt. Vereinbarte Korrekturen bleiben davon getrennt. Steuerbasis, Aufnahmezeit, Korrekturgrenzen und genaue Bedingungen sind noch zu bestätigen.' },
+  { question: 'Wie werden Ergänzungen vereinbart?', answer: 'Die unten gezeigten Erweiterungen sind Möglichkeiten für Ihr Projekt. Wir besprechen, was Sie benötigen, und halten Leistungen und Kosten im individuellen Angebot fest. Auch spätere Änderungen werden gesondert vereinbart.' },
 ];
 
 export const extensions = [
-  { id: 'photos', name: 'Eigene Fotos produzieren', short: 'Fotografie', description: 'Im Paketentwurf: 15 bearbeitete Fotos bei Business, 30 bei Complete. Motive, Aufnahmeumfang und Nutzungsrechte stimme ich vorher mit Ihnen ab.' },
-  { id: 'videos', name: 'Foto, Video & Text verbinden', short: 'Texte & Videos', description: 'Complete sieht zwei Kurzvideos bis je 30 Sekunden und Texterstellung vor. Produktion, Formate und Nutzungsrechte werden individuell vereinbart.' },
+  { id: 'photos', name: 'Eigene Fotos produzieren', short: 'Fotografie', description: 'Eigene Aufnahmen passend zu Ihrem Unternehmen. Motive, Aufnahmeumfang und Nutzungsrechte stimmen wir individuell ab.' },
+  { id: 'videos', name: 'Foto, Video & Text verbinden', short: 'Texte & Videos', description: 'Bilder, Videos und Texte gemeinsam für Ihren Auftritt planen. Produktion, Formate und Nutzungsrechte werden individuell vereinbart.' },
   { id: 'cms', name: 'Inhalte selbst pflegen', short: 'Inhalte bearbeiten', description: 'Texte, Bilder und neue Inhalte bei Bedarf selbst bearbeiten. Die passende Möglichkeit zur Pflege wird für Ihr Projekt ausgewählt.' },
   { id: 'booking', name: 'Termine einfacher buchen', short: 'Buchung', description: 'Leistungen und verfügbare Zeiten in einen passenden Buchungsablauf einbinden.' },
   { id: 'seo', name: 'Besser gefunden werden', short: 'Suchmaschinen', description: 'Seiten und Inhalte auf die Fragen ausrichten, mit denen Kunden nach Ihrem Angebot suchen. Zusätzliche Maßnahmen stimmen wir gesondert ab.' },

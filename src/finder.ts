@@ -1,4 +1,4 @@
-import { extensions, goals, packages, priceDraftNotice, scopeNotice, type Goal, type PackageChoice } from './data';
+import { extensions, goals, packages, offerNotice, scopeNotice, type Goal, type PackageChoice } from './data';
 import { recommendPackage, type BriefState, type BriefStore } from './state';
 import type { InquiryField, InquiryRequest, InquiryResponse } from './inquiry-contract';
 import { createInquiryId, INQUIRY_CONTACT, inquiryFingerprint, inquiryFits, InquiryUncertain, invalidInquiryFields, postInquiry } from './inquiry-client';
@@ -56,7 +56,7 @@ function summaryEntries(state: BriefState): [string, string][] {
   return [
     ['Ihr Ziel', goals.find(item => item.id === state.goal)?.label ?? state.goal],
     ['Paketwunsch', `${state.selectedPackage === null ? 'Automatische Empfehlung: ' : ''}${chosen?.name ?? 'Individuellen Umfang klären'}`],
-    ['Preisrahmen', chosen ? `${chosen.price} – ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'],
+    ['Angebot', chosen?.price ?? offerNotice],
     ['Leistungsabgrenzung', scopeNotes(state)],
     ['Erweiterungen', extensionNames(state)],
     ['Projekt', projectNames[state.projectType] ?? state.projectType],
@@ -209,7 +209,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           : chosen!.description;
         body = `<p class="finder-eyebrow">04 / Ein Vorschlag für Ihren Auftritt.</p>
           <h3 class="finder-heading" tabindex="-1">Ein erster Rahmen<br>für Ihr Vorhaben.</h3>
-          <div class="finder-recommendation"><span class="finder-recommendation-label">${isRecommended ? 'Meine erste Orientierung' : 'Ihre Paketauswahl'}</span><h4>${chosen?.name ?? 'Individuellen Umfang klären'}</h4><p>${reason}</p><span class="finder-price">${chosen ? `${chosen.price} · ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'}</span></div>
+          <div class="finder-recommendation"><span class="finder-recommendation-label">${isRecommended ? 'Meine erste Orientierung' : 'Ihre Paketauswahl'}</span><h4>${chosen?.name ?? 'Individuellen Umfang klären'}</h4><p>${reason}</p><span class="finder-price">${chosen?.price ?? offerNotice}</span></div>
           <label class="finder-field finder-package-field">Paketwunsch selbst wählen<select name="selectedPackage" data-focus="selectedPackage"><option value="custom" ${choice === 'custom' ? 'selected' : ''}>Individuellen Umfang klären</option>${packages.map(item => `<option value="${item.id}" ${choice === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select></label>
           <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>
@@ -217,7 +217,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           <p class="finder-privacy">* Erforderlich für Ihre Anfrage. Bis zum ausdrücklichen Versand bleiben Ihre Eingaben nur im Speicher dieser Seite. Als Nächstes prüfen Sie eine Vorschau; erst danach können Sie die Anfrage an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> senden. Beim Neuladen gehen die Eingaben verloren. <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a></p>`;
       }
 
-      body += `<div class="finder-actions">${step > 0 ? '<button class="finder-back" type="button" data-action="back" data-focus="back">← Zurück</button>' : '<span class="finder-time">Etwa 2 Minuten. Ganz unverbindlich.</span>'}<button class="finder-next" type="submit" data-focus="next">${step === 3 ? 'Anfrage prüfen' : 'Weiter'} <span aria-hidden="true">↗</span></button></div>`;
+      body += `<div class="finder-actions">${step > 0 ? '<button class="finder-back" type="button" data-action="back" data-focus="back">← Zurück</button>' : '<span class="finder-time">Schritt für Schritt. Ganz unverbindlich.</span>'}<button class="finder-next" type="submit" data-focus="next">${step === 3 ? 'Anfrage prüfen' : 'Weiter'} <span aria-hidden="true">↗</span></button></div>`;
     }
 
     container.innerHTML = `<div class="finder"><div class="finder-topline"><span>Ihr Projektfinder</span><span>${completed ? 'Ihre Anfrage prüfen' : `${String(step + 1).padStart(2, '0')} — 04`}</span></div><ol class="finder-progress" aria-label="Fortschritt">${stepNames.map((name, index) => `<li class="${index <= step || completed ? 'is-active' : ''}" ${!completed && index === step ? 'aria-current="step"' : ''}><span class="finder-progress-number">${index < step || completed ? '✓' : `0${index + 1}`}</span><span>${name}</span></li>`).join('')}</ol><form class="finder-form" aria-busy="${Boolean(inFlight)}">${statusMarkup(key)}${body}<div hidden aria-hidden="true"><label>Dieses Feld bitte leer lassen<input type="text" name="website" tabindex="-1" autocomplete="off" value="${escape(website)}"></label></div></form></div>`;

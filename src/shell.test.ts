@@ -67,6 +67,29 @@ describe('page shell contract', () => {
     expect(description.textContent).toContain('Simulationen');
   });
 
+  it('publishes inquiry-based offers and the business contact without internal drafts or blanket prototype notes', () => {
+    const root = document.createElement('div');
+    renderPage(root);
+    expect(Array.from(root.querySelectorAll('.package-price'), item => item.textContent)).toEqual([
+      'Angebot auf Anfrage', 'Angebot auf Anfrage', 'Angebot auf Anfrage',
+    ]);
+    expect(Array.from(root.querySelectorAll('.package-intro h3'), item => item.textContent)).toEqual([
+      'Webbyu Start', 'Webbyu Business', 'Webbyu Complete',
+    ]);
+    expect(root.querySelector('.package-row:nth-child(1)')!.textContent).toContain('Ihre Texte und Bilder');
+    expect(root.querySelector('.package-row:nth-child(2)')!.textContent).toContain('Fotografie nach Vereinbarung');
+    expect(root.querySelector('.package-row:nth-child(3)')!.textContent).toContain('Foto, Video & Text nach Vereinbarung');
+    expect(root.querySelector('.package-scope-note')!.textContent).toContain('eigenes Angebot');
+    const offers = root.querySelector('#pakete')!;
+    expect(root.querySelector(`#${offers.getAttribute('aria-describedby')}`)!.textContent).toContain('Angebot auf Anfrage');
+    expect(offers.textContent).not.toMatch(/\b(?:\d+|drei|sechs|zwei|eine)\s+(?:Unterseiten?|Fotos|Kalendertage|Kurzvideos?|Sekunden|Termine|Korrekturrunden?|Änderungsrunden?)/i);
+    expect(root.textContent).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf|Designprototyp|Angaben (?:noch )?in Abstimmung|Hosting.{0,80}(?:prüfen|Prüfung|offen)|@gmx\./i);
+    const contacts = Array.from(root.querySelectorAll<HTMLAnchorElement>('a[href^="mailto:"]'));
+    expect(contacts.length).toBeGreaterThan(0);
+    expect(contacts.every(link => link.getAttribute('href') === 'mailto:lukas.wagner@webbyu.de' && link.textContent === 'lukas.wagner@webbyu.de')).toBe(true);
+    expect(root.querySelector('.finder-local-note')!.textContent).toContain('ausdrücklich senden oder kopieren');
+  });
+
   it('links the separate journey from both navigation surfaces without a duplicate about teaser', () => {
     const root = document.createElement('div');
     renderPage(root);

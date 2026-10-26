@@ -9,10 +9,10 @@
 .service-footnote p { max-width: 72ch; }
 .service-footnote strong { color: var(--color-ink); font-weight: 500; }
 .service-footnote a { flex-shrink: 0; }
-.draft-note { padding: 22px 24px; margin-bottom: 28px; border-left: 2px solid var(--color-aubergine); background: #ece5df; color: var(--color-muted); font-size: 16px; line-height: 1.7; }
-.draft-note strong { color: var(--color-ink); font-weight: 500; }
+.offer-note { padding: 22px 24px; margin-bottom: 28px; border-left: 2px solid var(--color-aubergine); background: #ece5df; color: var(--color-muted); font-size: 16px; line-height: 1.7; }
+.offer-note strong { color: var(--color-ink); font-weight: 500; }
 .package-action > div { width: 100%; }
-.package-price { display: block; white-space: nowrap; font: 400 36px/1.2 var(--font-serif); color: var(--color-ink); }
+.package-price { display: block; font: 400 36px/1.2 var(--font-serif); color: var(--color-ink); }
 .package-price-note { display: block; margin-top: 8px; font-size: 12px; line-height: 1.6; }
 .package-details { margin-top: 18px; }
 .package-details summary { display: list-item; padding-block: 12px; cursor: pointer; font-size: 14px; color: var(--color-aubergine); }
@@ -54,7 +54,7 @@
   .services-section { padding-block: 52px 12px; }
   .services-grid { grid-template-columns: 1fr; gap: 28px; }
   .services-grid h3 { margin-block: 16px 12px; font-size: 32px; }
-  .draft-note { padding: 18px; }
+  .offer-note { padding: 18px; }
   .package-action > div { max-width: 230px; }
   .package-action .round-arrow { flex-shrink: 0; }
   .package-faq { margin-top: 40px; grid-template-columns: 1fr; gap: 24px; }
@@ -131,7 +131,7 @@
 .development-note > span { font-size: 12px; letter-spacing: .06em; padding-top: 4px; }
 .development-note p { max-width: 70ch; font-size: 16px; line-height: 1.75; }
 .packages-section { border-top: 1px solid var(--color-border); }
-.draft-note { background: #e8e8df; }
+.offer-note { background: #e8e8df; }
 .package-intro h3, .package-price, .package-faq h3, .extensions-heading h3, .process-list h3 { font-family: var(--font-sans); font-weight: 550; letter-spacing: -.04em; }
 .package-faq h3 em { font-style: normal; font-weight: inherit; }
 .about-section { background: #e5e7df; }
