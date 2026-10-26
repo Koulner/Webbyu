@@ -162,7 +162,7 @@ export function renderPage(root: HTMLElement): PageMounts {
               <h2 id="finder-title">Was haben<br>Sie <em>vor?</em></h2>
               <p>Was sollen Ihre Kunden besser verstehen oder leichter erledigen können? Was kostet Sie im Alltag unnötig Zeit? Ein paar Fragen helfen, Ihr Vorhaben zu ordnen.</p>
               <p class="finder-assurance">Sie brauchen dafür kein technisches Vorwissen.</p>
-              <p class="finder-local-note">Sie können Ihre Zusammenfassung am Ende kopieren. In diesem Prototyp wird nichts versendet.</p>
+              <p class="finder-local-note">Am Ende prüfen Sie eine Vorschau und können die Anfrage ausdrücklich senden oder kopieren. Bis zum Versand bleiben Ihre Eingaben nur im Speicher dieser Seite.</p>
               <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:w.lukas99@gmx.net">w.lukas99@gmx.net</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
             </div>
             <div id="finder-mount"></div>
@@ -175,7 +175,7 @@ export function renderPage(root: HTMLElement): PageMounts {
       <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="${import.meta.env.BASE_URL}impressum/">Impressum</a><a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav>
       <div class="legal-notes">
         <details id="impressum"><summary>Impressum</summary><p>Betreiber: Lukas Wagner · Webbyu. Anschrift und Kontakt finden Sie im <a href="${import.meta.env.BASE_URL}impressum/">Impressum</a>.</p></details>
-        <details id="datenschutz"><summary>Datenschutz</summary><p>Informationen zum Hosting, zur Kontaktaufnahme und zu Ihrer Cookie-Auswahl finden Sie in der <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a>. Die Hosting-Prüfung ist noch offen. Der Projektfinder versendet keine Daten; Eingaben bleiben bis zum Neuladen im Arbeitsspeicher.</p></details>
+        <details id="datenschutz"><summary>Datenschutz</summary><p>Informationen zum Hosting, zur Kontaktaufnahme und zu Ihrer Cookie-Auswahl finden Sie in der <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a>. Im Projektfinder bleiben Ihre Eingaben bis zum ausdrücklichen Versand im Arbeitsspeicher dieser Seite. Beim Versand werden die Anfrage und Kontaktdaten an den Webbyu-Server übertragen und per E-Mail versendet.</p></details>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} Webbyu</span><span>Hamburg · Bad Oldesloe · Umgebung</span><span>Designprototyp · Angaben noch in Abstimmung</span></div>
     </footer>

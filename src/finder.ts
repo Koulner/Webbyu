@@ -1,10 +1,27 @@
 import { extensions, goals, packages, priceDraftNotice, scopeNotice, type Goal, type PackageChoice } from './data';
 import { recommendPackage, type BriefState, type BriefStore } from './state';
+import type { InquiryField, InquiryRequest, InquiryResponse } from './inquiry-contract';
+import { createInquiryId, INQUIRY_CONTACT, inquiryFingerprint, inquiryFits, InquiryUncertain, invalidInquiryFields, postInquiry } from './inquiry-client';
 import './finder.css';
 
 const stepNames = ['Ihr Ziel', 'Funktionen', 'Ihr Projekt', 'Ihre Empfehlung'];
 const projectNames: Record<string, string> = { new: 'Eine neue Website', existing: 'Eine bestehende Website erneuern' };
 const timingNames: Record<string, string> = { flexible: 'Zeitlich flexibel', soon: 'Möglichst bald', later: 'In den nächsten Monaten' };
+const fieldNames: Record<InquiryField, string> = {
+  goal: 'Ziel', extensions: 'Erweiterungen', projectType: 'Ausgangspunkt', timing: 'Gewünschter Start',
+  description: 'Projektbeschreibung (höchstens 5.000 Zeichen)', name: 'Name (höchstens 120 Zeichen)',
+  email: 'Gültige E-Mail-Adresse (höchstens 254 Zeichen, ASCII-Schreibweise)', selectedPackage: 'Paketwunsch',
+  requestId: 'Anfragekennung', website: 'Formularprüfung',
+};
+const fieldSteps: Partial<Record<InquiryField, number>> = { goal: 0, extensions: 1, projectType: 2, timing: 2, description: 2, name: 3, email: 3, selectedPackage: 3 };
+type Attempt = {
+  key: string;
+  requestId: string;
+  result: 'sending' | InquiryResponse | InquiryUncertain;
+  retryAt: number;
+  hadUnknown: boolean;
+};
+let finderSequence = 0;
 const reasons: Record<Goal, string> = {
   presence: 'Sie möchten sichtbar werden. Ein präziser Unternehmensauftritt stellt Ihr Angebot vor und macht den Kontakt einfach.',
   inquiries: 'Sie möchten aus Interesse konkrete Anfragen machen. Klare Besucherführung und passende Anfragewege unterstützen dieses Ziel.',
@@ -37,8 +54,8 @@ function scopeNotes(state: BriefState): string {
 function summaryEntries(state: BriefState): [string, string][] {
   const chosen = selectedPackage(state);
   return [
-    ['Ihr Ziel', goals.find(item => item.id === state.goal)!.label],
-    ['Paketwunsch', chosen?.name ?? 'Individuellen Umfang klären'],
+    ['Ihr Ziel', goals.find(item => item.id === state.goal)?.label ?? state.goal],
+    ['Paketwunsch', `${state.selectedPackage === null ? 'Automatische Empfehlung: ' : ''}${chosen?.name ?? 'Individuellen Umfang klären'}`],
     ['Preisrahmen', chosen ? `${chosen.price} – ${priceDraftNotice}` : 'Eigenes Angebot nach Abstimmung'],
     ['Leistungsabgrenzung', scopeNotes(state)],
     ['Erweiterungen', extensionNames(state)],
@@ -55,29 +72,110 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
   let completed = false;
   let localUpdate = false;
   let disposed = false;
+  let website = '';
+  let localIssue: 'uuid' | 'size' | 'invalid' | null = null;
+  let fieldErrors: InquiryField[] = [];
+  let copyFeedback = '';
+  let copyFallback = '';
+  const attempts = new Map<string, Attempt>();
+  let lastAttempt: Attempt | undefined;
+  let inFlight: Attempt | undefined;
+  const statusId = `finder-status-${++finderSequence}`;
+
+  function currentKey() { return inquiryFingerprint(store.get(), website); }
+
+  function sendLabel(attempt: Attempt | undefined): string {
+    if (inFlight) return 'Wird übermittelt …';
+    if (!attempt) return 'Anfrage jetzt senden';
+    const result = attempt.result;
+    if (result !== 'sending' && !(result instanceof InquiryUncertain) && result.status === 'success') return 'Annahme bestätigt';
+    if (attempt.hadUnknown) return 'Bewusst erneut versuchen';
+    return 'Später erneut versuchen';
+  }
+
+  function statusCopy(attempt: Attempt): [string, string] {
+    const result = attempt.result;
+    if (result === 'sending') return ['Ihre Anfrage wird übermittelt.', 'Bitte warten Sie auf die Antwort. Ein weiterer Versand ist währenddessen gesperrt. Sie können Ihre Angaben weiterhin kopieren oder bearbeiten.'];
+    if (result instanceof InquiryUncertain || (result.status === 'temporary' && result.outcome === 'unknown')) {
+      const reason = result instanceof InquiryUncertain
+        ? { timeout: 'Die Wartezeit ist abgelaufen.', network: 'Die Verbindung wurde unterbrochen.', response: 'Die Serverantwort war nicht auswertbar.' }[result.reason]
+        : 'Der Mailserver konnte die Annahme nicht eindeutig bestätigen.';
+      return ['Versandausgang unklar.', `${reason} Die Anfrage kann bereits angenommen worden sein. Es erfolgt keine automatische Wiederholung. Klären Sie den Eingang bitte mit ${INQUIRY_CONTACT} unter Angabe der Anfragekennung. Ein bewusst gewählter weiterer Versuch verwendet für unveränderte Angaben dieselbe Kennung. Der serverseitige Duplikatschutz ist auf 24 Stunden begrenzt; laden Sie die Seite bei ungeklärtem Ausgang bitte nicht neu, um die Kennung zu behalten.`];
+    }
+    if (result.status === 'success') return [
+      result.duplicate ? 'Ihre Anfrage wurde bereits zum Versand angenommen.' : 'Ihre Anfrage wurde zum Versand angenommen.',
+      `${result.duplicate ? 'Der Server hat eine frühere Annahme durch den Mailserver bestätigt und keine weitere E-Mail versendet. ' : 'Der Mailserver hat die Annahme Ihrer Nachricht bestätigt. '}Das bestätigt keinen Eingang im Postfach. Sie erhalten keine automatische Bestätigungs-E-Mail.`,
+    ];
+    const prior = attempt.hadUnknown ? ' Der Ausgang eines früheren Versuchs bleibt unklar. Bitte klären Sie den Eingang unter Angabe der Anfragekennung mit ' + INQUIRY_CONTACT + '.' : '';
+    if (result.status === 'invalid') return ['Bitte prüfen Sie Ihre Anfrage.', `Der Server hat diesen Versuch wegen ungültiger Angaben oder einer Formularprüfung abgelehnt. ${result.fields.length ? 'Prüfen Sie die unten genannten Felder.' : 'Ihre Angaben sind erhalten. Bei wiederholter Ablehnung kontaktieren Sie mich bitte direkt.'}${prior}`];
+    if (result.status === 'rate_limit') return ['Bitte warten Sie vor einem weiteren Versuch.', `Das Schutzlimit wurde erreicht. Dieser Versuch wurde nicht versendet. Bitte warten Sie ab dieser Antwort mindestens ${result.retryAfter} Sekunden und lösen Sie danach selbst einen weiteren Versuch aus. Es gibt keinen automatischen Versand.${prior}`];
+    return ['Dieser Versuch wurde sicher nicht versendet.', `Der Versand ist vorübergehend nicht verfügbar. Ihre Angaben bleiben erhalten. ${result.retryAfter ? `Bitte warten Sie ab dieser Antwort mindestens ${result.retryAfter} Sekunden. ` : ''}Sie können später ausdrücklich erneut versuchen, dieselbe Anfrage zu senden. Es gibt keine automatische Wiederholung.${prior}`];
+  }
+
+  function errorLinks(errors: InquiryField[]) {
+    return errors.length ? `<ul class="finder-field-errors">${errors.map(field => `<li>${fieldSteps[field] === undefined ? escape(fieldNames[field]) : `<button type="button" data-action="fix" data-field="${field}" data-focus="fix-${field}">${escape(fieldNames[field])} prüfen</button>`}</li>`).join('')}</ul>` : '';
+  }
+
+  function statusMarkup(key: string) {
+    let content = '';
+    if (localIssue) {
+      const messages = {
+        uuid: ['Versand in diesem Browser nicht verfügbar.', `Eine sichere Anfragekennung konnte nicht erstellt werden. Dieser Klick hat nichts versendet. Ihre Angaben bleiben erhalten; kopieren Sie die Zusammenfassung und kontaktieren Sie ${INQUIRY_CONTACT}.`],
+        size: ['Ihre Anfrage ist zu groß.', 'Dieser Klick hat nichts versendet. Bitte kürzen Sie Ihre Beschreibung. Der vollständige Datensatz darf höchstens 32 KiB umfassen. Ihre Angaben bleiben erhalten.'],
+        invalid: ['Bitte prüfen Sie Ihre Angaben.', 'Dieser Klick hat nichts versendet. Bitte korrigieren Sie die genannten Felder. Ihre Angaben bleiben erhalten.'],
+      };
+      const [title, detail] = messages[localIssue];
+      content += `<div class="finder-notice finder-notice-error"><strong>${title}</strong>${escape(detail)}${errorLinks(fieldErrors)}</div>`;
+    }
+    const attempt = inFlight ?? attempts.get(key) ?? lastAttempt;
+    if (attempt) {
+      const [title, detail] = statusCopy(attempt);
+      const result = attempt.result;
+      const success = result !== 'sending' && !(result instanceof InquiryUncertain) && result.status === 'success';
+      const id = success ? result.requestId : attempt.requestId;
+      content += `<div class="finder-notice ${success ? 'finder-notice-success' : ''}">${attempt.key !== key ? '<p class="finder-previous">Status der vorherigen Angaben. Die aktuellen Angaben wurden mit diesem Versuch nicht versendet.</p>' : ''}<strong>${escape(title)}</strong>${escape(detail)}<p class="finder-request-id">Anfragekennung: <span>${escape(id)}</span></p>${result !== 'sending' && !(result instanceof InquiryUncertain) && result.status === 'invalid' && attempt.key === key ? errorLinks(result.fields) : ''}<a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a></div>`;
+    }
+    return `<div id="${statusId}" class="finder-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1" data-focus="status">${content}</div>`;
+  }
 
   function update(patch: Partial<BriefState>) {
+    localIssue = null;
+    fieldErrors = [];
+    copyFeedback = copyFallback = '';
     localUpdate = true;
     store.update(patch);
     localUpdate = false;
+    // Refresh only the notice while typing; keep the live input and caret intact.
+    const status = container.querySelector('.finder-status');
+    if (status) status.outerHTML = statusMarkup(currentKey());
   }
 
-  function render(focusHeading = false) {
+  function copyMarkup() {
+    return `${escape(copyFeedback)}${copyFallback ? `<label class="finder-copy-label">Kopierfassung vom letzten Kopierklick<textarea readonly rows="8" data-focus="copy-fallback" aria-label="Vollständige Anfrage zum Kopieren">${escape(copyFallback)}</textarea></label>` : ''}`;
+  }
+
+  function render(focusHeading: boolean | 'status' = false) {
     const state = store.get();
+    const key = currentKey();
+    const attempt = attempts.get(key);
     const active = container.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
     const focusedName = active?.dataset.focus;
+    const focusedHref = active instanceof HTMLAnchorElement ? active.getAttribute('href') : null;
+    const selection = active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement
+      ? { start: active.selectionStart, end: active.selectionEnd, direction: active.selectionDirection } : null;
     let body = '';
 
     if (completed) {
       body = `
         <div class="finder-complete-mark" aria-hidden="true">↗</div>
         <p class="finder-eyebrow">Ihr Projekt auf einen Blick</p>
-        <h3 class="finder-heading" tabindex="-1">Ein guter Anfang.<br>Ihre Idee nimmt Form an.</h3>
-        <p class="finder-step-intro">Hier ist die Zusammenfassung Ihres Vorhabens. Sie können sie kopieren oder Ihre Angaben noch einmal bearbeiten.</p>
-        <div class="finder-notice" role="status"><strong>Zusammenfassung erstellt. Nichts versendet.</strong> Dies ist ein lokaler Prototyp. Ihre Angaben bleiben nur im Speicher dieser Seite und werden beim Neuladen gelöscht.</div>
+        <h3 class="finder-heading" tabindex="-1">Ihre Anfrage.<br>In Ruhe prüfen.</h3>
+        <p class="finder-step-intro">Prüfen Sie die vollständige Anfrage. Sie können sie kopieren oder Ihre Angaben bearbeiten. Erst ein Klick auf „Anfrage jetzt senden“ übermittelt sie an Webbyu.</p>
+        ${!attempt ? '<div class="finder-notice"><strong>Vorschau erstellt. Nichts versendet.</strong> Diese Angaben bleiben bis zum Versand nur im Speicher dieser Seite. Beim Neuladen gehen Eingaben und Anfragekennungen verloren.</div>' : ''}
         <div class="finder-summary" data-summary><dl>${summaryEntries(state).map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><p>Ein Angebot entsteht nach dem Gespräch. Den endgültigen Umfang stimmen wir gemeinsam ab.</p></div>
-        <div class="finder-actions finder-actions-summary"><button class="finder-back" type="button" data-action="edit">← Angaben bearbeiten</button><button class="finder-next" type="button" data-action="copy">Zusammenfassung kopieren <span aria-hidden="true">↗</span></button></div>
-        <p class="finder-copy-status" role="status" aria-live="polite"></p>`;
+        <p class="finder-privacy">Beim Versand werden die oben gezeigten Projekt- und Kontaktdaten sowie eine Anfragekennung an den Webbyu-Server übertragen und per E-Mail an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> gesendet. Zur Missbrauchsabwehr verarbeitet der Server technische Schutzdaten. Es gibt keine automatische Besucher-E-Mail. <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a></p>
+        <div class="finder-actions finder-actions-summary"><button class="finder-back" type="button" data-action="edit" data-focus="edit">← Angaben bearbeiten</button><button class="finder-back" type="button" data-action="copy" data-focus="copy">Zusammenfassung kopieren</button><button class="finder-next" type="button" data-action="send" data-focus="send" ${inFlight || (attempt?.result !== undefined && attempt.result !== 'sending' && !(attempt.result instanceof InquiryUncertain) && attempt.result.status === 'success') ? 'disabled' : ''}>${sendLabel(attempt)} <span aria-hidden="true">↗</span></button></div>
+        <div class="finder-copy-status" role="status" aria-live="polite">${copyMarkup()}</div>`;
     } else {
       if (step === 0) {
         body = `<p class="finder-eyebrow">01 / Erst das Ziel. Dann die Website.</p>
@@ -116,23 +214,38 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>
           <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">*</span><input type="text" name="name" data-focus="name" autocomplete="name" required maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">*</span><input type="email" name="email" data-focus="email" autocomplete="email" required maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-unternehmen.de"></label></div>
-          <p class="finder-privacy">* Erforderlich für Ihre Zusammenfassung. Dieser lokale Prototyp versendet keine Daten. Ihre Angaben bleiben nur bis zum Neuladen in dieser Seite. <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a></p>`;
+          <p class="finder-privacy">* Erforderlich für Ihre Anfrage. Bis zum ausdrücklichen Versand bleiben Ihre Eingaben nur im Speicher dieser Seite. Als Nächstes prüfen Sie eine Vorschau; erst danach können Sie die Anfrage an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> senden. Beim Neuladen gehen die Eingaben verloren. <a href="${import.meta.env.BASE_URL}datenschutz/">Datenschutzerklärung</a></p>`;
       }
 
-      body += `<div class="finder-actions">${step > 0 ? '<button class="finder-back" type="button" data-action="back">← Zurück</button>' : '<span class="finder-time">Etwa 2 Minuten. Ganz unverbindlich.</span>'}<button class="finder-next" type="submit">${step === 3 ? 'Zusammenfassung erstellen' : 'Weiter'} <span aria-hidden="true">↗</span></button></div>`;
+      body += `<div class="finder-actions">${step > 0 ? '<button class="finder-back" type="button" data-action="back" data-focus="back">← Zurück</button>' : '<span class="finder-time">Etwa 2 Minuten. Ganz unverbindlich.</span>'}<button class="finder-next" type="submit" data-focus="next">${step === 3 ? 'Anfrage prüfen' : 'Weiter'} <span aria-hidden="true">↗</span></button></div>`;
     }
 
-    container.innerHTML = `<div class="finder"><div class="finder-topline"><span>Ihr Projektfinder</span><span>${completed ? 'Bereit zum Weiterdenken' : `${String(step + 1).padStart(2, '0')} — 04`}</span></div><ol class="finder-progress" aria-label="Fortschritt">${stepNames.map((name, index) => `<li class="${index <= step || completed ? 'is-active' : ''}" ${!completed && index === step ? 'aria-current="step"' : ''}><span class="finder-progress-number">${index < step || completed ? '✓' : `0${index + 1}`}</span><span>${name}</span></li>`).join('')}</ol><form class="finder-form">${body}</form></div>`;
+    container.innerHTML = `<div class="finder"><div class="finder-topline"><span>Ihr Projektfinder</span><span>${completed ? 'Ihre Anfrage prüfen' : `${String(step + 1).padStart(2, '0')} — 04`}</span></div><ol class="finder-progress" aria-label="Fortschritt">${stepNames.map((name, index) => `<li class="${index <= step || completed ? 'is-active' : ''}" ${!completed && index === step ? 'aria-current="step"' : ''}><span class="finder-progress-number">${index < step || completed ? '✓' : `0${index + 1}`}</span><span>${name}</span></li>`).join('')}</ol><form class="finder-form" aria-busy="${Boolean(inFlight)}">${statusMarkup(key)}${body}<div hidden aria-hidden="true"><label>Dieses Feld bitte leer lassen<input type="text" name="website" tabindex="-1" autocomplete="off" value="${escape(website)}"></label></div></form></div>`;
+    container.querySelector<HTMLElement>('.finder-heading')!.dataset.focus = 'heading';
 
-    if (focusHeading) container.querySelector<HTMLElement>('.finder-heading')?.focus();
-    else if (focusedName) container.querySelector<HTMLElement>(`[data-focus="${focusedName}"]`)?.focus({ preventScroll: true });
+    const errors = [...fieldErrors, ...(attempt?.result !== undefined && attempt.result !== 'sending' && !(attempt.result instanceof InquiryUncertain) && attempt.result.status === 'invalid' ? attempt.result.fields : [])];
+    errors.forEach(field => {
+      const selector = field === 'goal' ? '[name="finder-goal"]' : field === 'extensions' ? '[name="finder-extension"]' : `[name="${field}"]`;
+      container.querySelectorAll(selector).forEach(input => { input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-describedby', statusId); });
+    });
+
+    if (focusHeading === 'status') container.querySelector<HTMLElement>('.finder-status')?.focus();
+    else if (focusHeading) container.querySelector<HTMLElement>('.finder-heading')?.focus();
+    else if (focusedName) {
+      const replacement = container.querySelector<HTMLElement>(`[data-focus="${focusedName}"]`);
+      replacement?.focus({ preventScroll: true });
+      if (selection?.start !== null && selection?.start !== undefined && (replacement instanceof HTMLInputElement || replacement instanceof HTMLTextAreaElement)) replacement.setSelectionRange(selection.start, selection.end, selection.direction ?? undefined);
+    } else if (focusedHref) Array.from(container.querySelectorAll('a')).find(link => link.getAttribute('href') === focusedHref)?.focus({ preventScroll: true });
   }
 
   function onInput(event: Event) {
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+    if (target.name === 'website') { website = target.value; return; }
     if (target.name === 'name' || target.name === 'email' || target.name === 'description') {
       target.setCustomValidity('');
+      target.removeAttribute('aria-invalid');
+      target.removeAttribute('aria-describedby');
       update({ [target.name]: target.value });
     }
   }
@@ -163,21 +276,72 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
   function onSubmit(event: SubmitEvent) {
     event.preventDefault();
     if (completed) return;
+    website = container.querySelector<HTMLInputElement>('[name="website"]')?.value ?? website;
+    const invalid = invalidInquiryFields(store.get()).filter(field => step === 3 || fieldSteps[field] === step);
+    if (invalid.length) { showInvalid(invalid); return; }
     if (step < 3) {
       step += 1;
       render(true);
       return;
     }
     const form = container.querySelector<HTMLFormElement>('form')!;
-    const name = form.elements.namedItem('name') as HTMLInputElement;
-    const email = form.elements.namedItem('email') as HTMLInputElement;
-    if (!name.value.trim()) name.setCustomValidity('Bitte geben Sie Ihren Namen ein.');
-    if (!email.value.trim()) email.setCustomValidity('Bitte geben Sie Ihre E-Mail-Adresse ein.');
-    else if (!email.validity.valid) email.setCustomValidity('Bitte geben Sie eine gültige E-Mail-Adresse ein.');
     if (!form.reportValidity()) return;
-    update({ name: name.value.trim(), email: email.value.trim() });
+    localIssue = null;
+    fieldErrors = [];
     completed = true;
     render(true);
+  }
+
+  function focusField(field: InquiryField) {
+    const selector = field === 'goal' ? '[name="finder-goal"]:checked' : field === 'extensions' ? '[name="finder-extension"]' : `[name="${field}"]`;
+    container.querySelector<HTMLElement>(selector)?.focus();
+  }
+
+  function showInvalid(errors: InquiryField[]) {
+    fieldErrors = errors;
+    localIssue = 'invalid';
+    completed = false;
+    step = fieldSteps[errors[0]] ?? step;
+    render();
+    focusField(errors[0]);
+  }
+
+  async function send() {
+    if (!completed || inFlight || disposed) return;
+    website = container.querySelector<HTMLInputElement>('[name="website"]')?.value ?? website;
+    const state = store.get();
+    const invalid = invalidInquiryFields(state);
+    if (invalid.length) { showInvalid(invalid); return; }
+    const key = currentKey();
+    let attempt = attempts.get(key);
+    if (attempt && attempt.result !== 'sending' && !(attempt.result instanceof InquiryUncertain) && attempt.result.status === 'success') return;
+    if (attempt && Date.now() < attempt.retryAt) { render('status'); return; }
+    const requestId = attempt?.requestId ?? createInquiryId();
+    if (!requestId) { localIssue = 'uuid'; render('status'); return; }
+    const request: InquiryRequest = { ...state, requestId, website };
+    if (!inquiryFits(request)) { localIssue = 'size'; render('status'); return; }
+    attempt ??= { key, requestId, result: 'sending', retryAt: 0, hadUnknown: false };
+    attempt.result = 'sending';
+    attempts.set(key, attempt);
+    lastAttempt = inFlight = attempt;
+    localIssue = null;
+    render('status');
+    try {
+      const response = await postInquiry(request);
+      attempt.result = response;
+      if (response.status === 'temporary' && response.outcome === 'unknown') attempt.hadUnknown = true;
+      attempt.retryAt = 'retryAfter' in response && response.retryAfter ? Date.now() + response.retryAfter * 1000 : 0;
+    } catch (error) {
+      attempt.result = error instanceof InquiryUncertain ? error : new InquiryUncertain('network');
+      attempt.hadUnknown = true;
+      attempt.retryAt = 0;
+    } finally {
+      inFlight = undefined;
+      if (!disposed) {
+        const focusResult = container.contains(document.activeElement) && document.activeElement?.getAttribute('data-focus') === 'status';
+        render(focusResult ? 'status' : false);
+      }
+    }
   }
 
   async function onClick(event: MouseEvent) {
@@ -191,24 +355,39 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
       completed = false;
       step = 0;
       render(true);
+    } else if (action === 'send') {
+      await send();
+    } else if (action === 'fix') {
+      const field = target.closest<HTMLButtonElement>('[data-field]')?.dataset.field as InquiryField;
+      if (fieldSteps[field] === undefined) return;
+      completed = false;
+      step = fieldSteps[field]!;
+      render();
+      focusField(field);
     } else if (action === 'copy') {
-      const text = `Webbyu – mein Vorhaben\n\n${summaryEntries(store.get()).map(([label, value]) => `${label}: ${value}`).join('\n\n')}\n\nEin Angebot entsteht nach dem Gespräch. Lokaler Prototyp – nichts versendet.`;
+      const attempt = attempts.get(currentKey());
+      const id = attempt?.result !== undefined && attempt.result !== 'sending' && !(attempt.result instanceof InquiryUncertain) && attempt.result.status === 'success' ? attempt.result.requestId : attempt?.requestId;
+      const status = attempt ? statusCopy(attempt).join(' ') : 'Vorschau – nichts versendet.';
+      const text = `Webbyu – mein Vorhaben\n\n${summaryEntries(store.get()).map(([label, value]) => `${label}: ${value}`).join('\n\n')}\n\n${status}${id ? `\nAnfragekennung: ${id}` : ''}\n\nEin Angebot entsteht nach dem Gespräch.`;
       try {
         if (!navigator.clipboard) throw new Error('Clipboard unavailable');
         await navigator.clipboard.writeText(text);
+        if (disposed) return;
+        copyFeedback = 'Ihre Zusammenfassung wurde kopiert.';
+        copyFallback = '';
         const status = container.querySelector('.finder-copy-status');
-        if (!disposed && status) status.textContent = 'Ihre Zusammenfassung wurde kopiert.';
+        if (status) status.innerHTML = copyMarkup();
       } catch {
         if (disposed) return;
-        const summary = container.querySelector('[data-summary]');
-        if (summary) {
-          const range = document.createRange();
-          range.selectNodeContents(summary);
-          window.getSelection()?.removeAllRanges();
-          window.getSelection()?.addRange(range);
-        }
+        copyFeedback = 'Kopieren Sie die markierte Anfrage mit Strg+C oder der Kopierfunktion Ihres Geräts. Die Fassung enthält auch den Versandstatus und eine vorhandene Anfragekennung.';
+        copyFallback = text;
         const status = container.querySelector('.finder-copy-status');
-        if (status) status.textContent = 'Ihre Zusammenfassung ist markiert. Kopieren Sie sie mit Strg+C oder der Kopierfunktion Ihres Geräts.';
+        if (status) {
+          status.innerHTML = copyMarkup();
+          const fallback = status.querySelector('textarea');
+          fallback?.focus({ preventScroll: true });
+          fallback?.select();
+        }
       }
     }
   }
@@ -217,7 +396,9 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
   container.addEventListener('change', onChange);
   container.addEventListener('submit', onSubmit);
   container.addEventListener('click', onClick);
-  const unsubscribe = store.subscribe(() => { if (!localUpdate) render(); });
+  const unsubscribe = store.subscribe(() => {
+    if (!localUpdate) { localIssue = null; fieldErrors = []; copyFeedback = copyFallback = ''; render(); }
+  });
   render();
 
   return {

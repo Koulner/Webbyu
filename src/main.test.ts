@@ -108,6 +108,42 @@ describe('homepage integration', () => {
     expect(store.get().goal).toBe('sales');
   });
 
+  it('keeps the preview, send status and request ID through embedded journey and demo navigation', async () => {
+    const id = '12345678-1234-4123-8123-123456789abc';
+    let finish!: (value: Response) => void;
+    const fetchMock = vi.fn().mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubGlobal('crypto', { randomUUID: vi.fn().mockReturnValue(id) });
+    mount();
+    store.update({ name: 'Ada', email: 'ada@example.com', description: 'Bleibt über Navigation erhalten' });
+    for (let i = 0; i < 4; i++) root.querySelector('form.finder-form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    const preview = root.querySelector('[data-summary]')!.textContent;
+    button('[data-action="send"]').click();
+    const launch = button('[data-demo="sales"]');
+    launch.focus(); launch.click();
+    const focusedInDemo = document.activeElement;
+    finish(new Response(JSON.stringify({ status: 'temporary', outcome: 'unknown' }), { status: 503, headers: { 'Content-Type': 'application/json' } }));
+    for (let i = 0; i < 15; i++) await Promise.resolve();
+    expect(document.activeElement).toBe(focusedInDemo);
+    expect(document.querySelector<HTMLDialogElement>('.concept-dialog')!.open).toBe(true);
+    button('.concept-dialog-close').click();
+    expect(document.activeElement).toBe(launch);
+    const frame = root.querySelector<HTMLIFrameElement>('.journey-preview iframe') ?? root.querySelector<HTMLIFrameElement>('iframe');
+    expect(frame).not.toBeNull();
+    window.dispatchEvent(new MessageEvent('message', { origin: new URL(frame!.src).origin, source: frame!.contentWindow, data: { type: 'webbyu:journey-home', hash: '#projektfinder' } }));
+    expect(document.activeElement).toBe(root.querySelector('.finder-heading'));
+    expect(root.querySelector('[data-summary]')!.textContent).toBe(preview);
+    expect(root.querySelector('.finder-status')!.textContent).toContain('Versandausgang unklar');
+    expect(root.querySelector('.finder-request-id')!.textContent).toContain(id);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ status: 'temporary', outcome: 'not_sent' }), { status: 503, headers: { 'Content-Type': 'application/json' } }));
+    button('[data-action="send"]').click();
+    for (let i = 0; i < 15; i++) await Promise.resolve();
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body).requestId).toBe(id);
+    expect(root.querySelector('.finder-status')!.textContent).toContain('früheren Versuchs bleibt unklar');
+    expect(store.get().description).toBe('Bleibt über Navigation erhalten');
+  });
+
   it('closes mobile navigation with Escape or destination selection and reveals legal placeholders', () => {
     mount();
     const menu = button('.mobile-menu-button');
