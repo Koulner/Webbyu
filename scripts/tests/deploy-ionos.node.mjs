@@ -19,7 +19,7 @@ function withBuild(callback) {
   const directory = mkdtempSync(join(tmpdir(), 'webbyu-deploy-test-'));
   const cwd = process.cwd();
   try {
-    for (const file of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'assets/app-123.js', 'webbyu-release.json']) {
+    for (const file of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'assets/app-123.js', 'webbyu-release.json', '_inquiry/.htaccess', 'api/inquiry.php', 'api/health.php', `_inquiry/releases/${commit}/vendor/autoload.php`, `_inquiry/releases/${commit}/src/Application.php`]) {
       const path = join(directory, 'dist', file);
       mkdirSync(dirname(path), { recursive: true });
       writeFileSync(path, file === 'webbyu-release.json' ? JSON.stringify({ commit }) : 'fixture');
@@ -65,7 +65,8 @@ test('complete uploads precede publication; dependencies precede HTML; release m
   const firstRename = lines.findIndex(line => line.startsWith('rename '));
   assert(lastUpload < firstRename);
   const publishes = lines.filter(line => line.startsWith('rename '));
-  assert(publishes[0].endsWith('"assets/main-abc.js"'));
+  assert(publishes[0].endsWith('".htaccess"'));
+  assert(publishes[1].endsWith('"assets/main-abc.js"'));
   assert(publishes.at(-2).endsWith('"index.html"'));
   assert(publishes.at(-1).endsWith('"webbyu-release.json"'));
   assert(!lines.some(line => /^(?:rm|rmdir|!|get)\b/.test(line)));

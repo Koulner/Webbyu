@@ -1,0 +1,15 @@
+{
+  "name": "webbyu/inquiry",
+  "description": "Private dependencies for the Webbyu inquiry endpoint",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.3",
+    "ext-filter": "*",
+    "ext-json": "*",
+    "ext-openssl": "*",
+    "phpmailer/phpmailer": "^7.1.1"
+  },
+  "autoload": { "psr-4": { "Webbyu\\Inquiry\\": "src/" } },
+  "config": { "allow-plugins": false, "sort-packages": true }
+}

@@ -63,7 +63,8 @@ export function batchPlan(files, remote, id) {
   // Upload every file before replacing any live file. Failures here preserve all live files.
   const temporary = file => posix.join(posix.dirname(file), `.webbyu-upload-${id}-${posix.basename(file)}`);
   for (const file of files) lines.push(`put ${quote(file)} ${quote(temporary(file))}`);
-  const priority = file => file === 'webbyu-release.json' ? 4 : file === 'index.html' ? 3 : file.endsWith('.html') ? 2 : file === '.htaccess' ? 1 : 0;
+  // Guards first, versioned PHP dependencies next, public entry points after them.
+  const priority = file => file === '.htaccess' ? -2 : file.endsWith('.htaccess') ? -1 : file === 'webbyu-release.json' ? 5 : file === 'index.html' ? 4 : file.endsWith('.html') ? 3 : file.startsWith('api/') ? 2 : 0;
   for (const file of [...files].sort((a, b) => priority(a) - priority(b) || a.localeCompare(b))) {
     lines.push(`rename ${quote(temporary(file))} ${quote(file)}`);
   }
@@ -74,11 +75,15 @@ export function deploy(env = process.env, run = spawnSync) {
   const config = configuration(env);
   const root = resolve('dist');
   const files = listFiles(root);
-  for (const required of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'webbyu-release.json']) {
+  for (const required of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'webbyu-release.json', '_inquiry/.htaccess', 'api/inquiry.php', 'api/health.php']) {
     if (!files.includes(required)) throw new Error('Incomplete production build.');
   }
   const { commit } = JSON.parse(readFileSync(join(root, 'webbyu-release.json'), 'utf8'));
   if (commit !== env.GITHUB_SHA) throw new Error('Build does not match the checked-out commit.');
+  for (const file of ['vendor/autoload.php', 'src/Application.php']) {
+    if (!files.includes(`_inquiry/releases/${commit}/${file}`)) throw new Error('Incomplete production backend.');
+  }
+  if (files.some(file => /(?:^|\/)(?:\.env(?:\..*)?|private-config[^/]*|inquiry-state\.json|auth\.json|php\.ini)$/.test(file))) throw new Error('Private file in deployment artifact.');
   const batch = batchPlan(files, config.remote, commit);
   const directory = mkdtempSync(join(tmpdir(), 'webbyu-sftp-'));
   try {

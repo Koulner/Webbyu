@@ -1,5 +1,13 @@
 # Webbyu auf IONOS Webhosting Plus
 
+## AP02-Erweiterung am 26.10.2026: PHP-Anfrage-Backend
+
+Für den neuen Go-live-Kandidaten gelten ergänzend die [Backend-Betriebsanleitung und der gemeinsame AP03-Vertrag](backend/README.md). Der Build enthält jetzt auch die beiden PHP-Einstiegspunkte und versionierte Composer-/PHPMailer-Abhängigkeiten unter einem per Apache gesperrten `_inquiry`-Verzeichnis. `prepare-ionos.mjs` erfordert zuvor `composer install --no-dev` aus dem Lock. Beide Workflows prüfen Backend/PHP/HTTP und das Produktionspaket mit Apache; das Produktionspaket enthält keine SMTP-Secrets.
+
+SMTP-Passwort, HMAC-Schlüssel und Schutzdaten müssen **serverprivat außerhalb aller öffentlichen Domainverzeichnisse** eingerichtet werden. Sie gehören nicht in `dist`, Repository oder CI-Artefakte. Diese Einrichtung, der Bereinigungszeitplan und die tatsächliche PHP-/Postfach-/SMTP-Funktion sind noch nicht live bestätigt. Fehlende Konfiguration ergibt 503. Die öffentliche Nachprüfung fordert Readiness und gesperrte Quellen; sie verschickt keine Anfrage. Für die Betriebsfreigabe bleibt ein gekennzeichneter eigener Test mit belegtem Geschäftspostfach-Eingang erforderlich. Nur AP08 veröffentlicht nach Gesamtabnahme; AP02 hat weder gepusht noch veröffentlicht.
+
+SFTP veröffentlicht Schutzregeln vor Quellen, danach versionierte Abhängigkeiten und dann API/HTML. Alte Backend-Releases bleiben wie alte Assets erhalten. Beim Rücksetzen private Schutzdaten bewahren; ein früherer rein statischer Build entfernt eine bereits veröffentlichte API nicht automatisch. Die folgenden früheren Einrichtungs-/Prüfstände sind historisch zu lesen.
+
 ## Ziel und aktueller Stand
 
 - **Aktualisierung 25.10.2026:** Der Betreiber möchte ausschließlich `webbyu.de` öffentlich nutzen. Die aktualisierte `dev`-Workflowdatei führt deshalb nur Prüfungen und einen Build aus, ohne Pages-Veröffentlichung oder QA-Artefakt-Upload. QA erfolgt lokal. Die alte Pages-Seite ist separat abzuschalten; alternativ über **Repository → Settings → Pages → Unpublish site**. Das Unterbinden neuer Deployments allein entfernt bestehende Veröffentlichungen nicht. Ältere Branch-Versionen des Workflows können weiterhin veröffentlichen, solange sie nicht aktualisiert oder Pages auf Repository-Ebene abgeschaltet sind.
