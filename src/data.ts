@@ -3,6 +3,7 @@ export type DemoId = 'meisterwerk' | 'nordlicht' | 'sales' | 'raumgut';
 export type PackageId = 'start' | 'business' | 'complete';
 export type PackageChoice = PackageId | 'custom';
 
+export const businessNotice = 'Unser Angebot richtet sich ausschließlich an Unternehmen und Selbstständige, die für ihre geschäftliche Tätigkeit handeln.';
 export const priceDraftNotice = 'Interner Preisentwurf · Steuerbasis noch offen · kein verbindliches Angebot';
 export const scopeNotice = 'Shops, komplexe Buchungen und individuelle Integrationen benötigen einen gesonderten Umfang und ein eigenes Angebot.';
 

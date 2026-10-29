@@ -1,4 +1,4 @@
-import { concepts, extensions, packages, packageQuestions, priceDraftNotice, scopeNotice, services, situations } from './data';
+import { businessNotice, concepts, extensions, packages, packageQuestions, priceDraftNotice, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
 
 const arrow = '<span aria-hidden="true">↗</span>';
@@ -122,7 +122,7 @@ export function renderPage(root: HTMLElement): PageMounts {
           </article>`).join('')}
         </div>
         <div class="package-included"><span>IMMER MIT DABEI</span><ul><li>Individuelle Gestaltung</li><li>Für Handy und Computer entwickelt</li><li>Technische Grundlagen für Suchmaschinen</li><li>Prüfung & vollständige Übergabe</li></ul></div>
-        <p class="package-scope-note">${scopeNotice} Seitenzählung und Zusatzseitenpreise werden vor Angebotsfreigabe bestätigt.</p>
+        <p class="package-scope-note">${businessNotice} ${scopeNotice} Seitenzählung und Zusatzseitenpreise werden vor Angebotsfreigabe bestätigt.</p>
         <div class="package-faq"><h3>Vor dem Start<br><em>gut zu wissen.</em></h3><div>${packageQuestions.map(item => `<details><summary>${item.question}<span aria-hidden="true">+</span></summary><p>${item.answer}</p></details>`).join('')}</div></div>
         <div class="extensions-heading"><h3>Raum für mehr.</h3><p>Erweiterungen, die zu Ihrem Alltag passen.</p></div>
         <div class="extensions-grid">${extensions.map((e, i) => `
@@ -162,8 +162,9 @@ export function renderPage(root: HTMLElement): PageMounts {
               <h2 id="finder-title">Was haben<br>Sie <em>vor?</em></h2>
               <p>Was sollen Ihre Kunden besser verstehen oder leichter erledigen können? Was kostet Sie im Alltag unnötig Zeit? Ein paar Fragen helfen, Ihr Vorhaben zu ordnen.</p>
               <p class="finder-assurance">Sie brauchen dafür kein technisches Vorwissen.</p>
+              <p class="finder-assurance">${businessNotice}</p>
               <p class="finder-local-note">Sie können Ihre Zusammenfassung am Ende kopieren. In diesem Prototyp wird nichts versendet.</p>
-              <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:w.lukas99@gmx.net">w.lukas99@gmx.net</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
+              <p class="finder-contact-note">Hamburg, Bad Oldesloe & Umgebung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
             </div>
             <div id="finder-mount"></div>
           </div>

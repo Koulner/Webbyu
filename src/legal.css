@@ -13,7 +13,7 @@ main { max-width: 850px; margin: 0 auto; padding: 70px 24px 90px; overflow-wrap:
 .legal-eyebrow { color: #536168; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
 h1 { margin: 12px 0 32px; font-family: Georgia, serif; font-size: clamp(44px, 8vw, 80px); line-height: 1.1; font-weight: 400; letter-spacing: -.04em; }
 h2 { font-size: 21px; line-height: 1.4; margin: 0 0 14px; }
-main > h2 { font-size: 27px; margin: 48px 0 20px; padding-top: 24px; border-top: 1px solid #d1d5d1; }
+main > h2, .legal-provider h2 { font-size: 27px; margin: 48px 0 20px; padding-top: 24px; border-top: 1px solid #d1d5d1; }
 h3 { font-size: 20px; line-height: 1.45; margin: 28px 0 12px; }
 h4 { font-size: 16px; line-height: 1.5; margin: 22px 0 10px; }
 li { margin-bottom: 10px; }
@@ -28,6 +28,7 @@ p { margin: 0 0 14px; }
 .legal-draft p { margin: 8px 0 0; }
 .legal-placeholder { background: #f5e3bb; padding: 2px 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .legal-source { margin-top: 48px; padding-top: 24px; border-top: 1px solid #d1d5d1; color: #536168; }
+.legal-provider #itkanzlei_txt_copyright { margin-top: 2rem !important; }
 .legal-footer { border-top: 1px solid #d1d5d1; font-size: 14px; }
 .legal-footer nav { display: flex; gap: 24px; flex-wrap: wrap; }
 .legal-skip { position: absolute; top: 10px; left: 20px; padding: 10px; background: #fff; transform: translateY(-200%); }

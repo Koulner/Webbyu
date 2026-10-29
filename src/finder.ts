@@ -1,4 +1,4 @@
-import { extensions, goals, packages, priceDraftNotice, scopeNotice, type Goal, type PackageChoice } from './data';
+import { businessNotice, extensions, goals, packages, priceDraftNotice, scopeNotice, type Goal, type PackageChoice } from './data';
 import { recommendPackage, type BriefState, type BriefStore } from './state';
 import './finder.css';
 
@@ -75,6 +75,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
         <h3 class="finder-heading" tabindex="-1">Ein guter Anfang.<br>Ihre Idee nimmt Form an.</h3>
         <p class="finder-step-intro">Hier ist die Zusammenfassung Ihres Vorhabens. Sie können sie kopieren oder Ihre Angaben noch einmal bearbeiten.</p>
         <div class="finder-notice" role="status"><strong>Zusammenfassung erstellt. Nichts versendet.</strong> Dies ist ein lokaler Prototyp. Ihre Angaben bleiben nur im Speicher dieser Seite und werden beim Neuladen gelöscht.</div>
+        <p class="finder-privacy">${businessNotice}</p>
         <div class="finder-summary" data-summary><dl>${summaryEntries(state).map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><p>Ein Angebot entsteht nach dem Gespräch. Den endgültigen Umfang stimmen wir gemeinsam ab.</p></div>
         <div class="finder-actions finder-actions-summary"><button class="finder-back" type="button" data-action="edit">← Angaben bearbeiten</button><button class="finder-next" type="button" data-action="copy">Zusammenfassung kopieren <span aria-hidden="true">↗</span></button></div>
         <p class="finder-copy-status" role="status" aria-live="polite"></p>`;
