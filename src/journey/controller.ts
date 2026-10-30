@@ -48,6 +48,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   let dialog: ReturnType<DemoModule['mountDemoDialog']> | undefined;
   let request = 0;
   let previewRequest = 0;
+  let viewportWidth = window.innerWidth;
   const sessions = new Map<DemoId, HTMLElement>();
 
   function loadDemoModule() {
@@ -255,8 +256,11 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   },listen);
   window.addEventListener('scroll',schedule,{...listen,passive:true});
   window.addEventListener('resize',()=>{
-    // Fullscreen changes the chapter heights. Keep the chosen station in view.
-    if (options.embedded && active >= -1) go(active, false, false);
+    // Width/breakpoint and embedded fullscreen changes alter chapter heights.
+    // Height-only mobile browser chrome changes must not reset reading position.
+    const widthChanged = viewportWidth !== window.innerWidth;
+    viewportWidth = window.innerWidth;
+    if ((options.embedded || widthChanged) && active >= -1) go(active, false, false);
     else schedule();
   },listen);
   const fromHistory=()=>go(stationIndex(location.hash),false,false);

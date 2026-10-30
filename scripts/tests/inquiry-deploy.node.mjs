@@ -12,7 +12,7 @@ function fixture(callback) {
   const directory = mkdtempSync(join(tmpdir(), 'webbyu-package-test-'));
   const original = process.cwd();
   const files = {
-    'dist/index.html': 'fixture', 'dist/reise/index.html': 'fixture', 'dist/impressum/index.html': 'fixture', 'dist/datenschutz/index.html': 'fixture',
+    'dist/index.html': 'fixture', 'dist/reise/index.html': 'fixture', 'dist/impressum/index.html': 'fixture', 'dist/datenschutz/index.html': 'fixture', 'dist/404.html': 'fixture',
     'deploy/ionos.htaccess': 'guard', 'deploy/inquiry.htaccess': 'Require all denied',
     'backend/composer.lock': JSON.stringify({ packages: [{ name: 'phpmailer/phpmailer', version: 'v7.1.1', source: { reference: 'test' } }] }),
     'backend/vendor/composer/installed.json': JSON.stringify({ dev: false, packages: [{ name: 'phpmailer/phpmailer', version: 'v7.1.1', source: { reference: 'test' } }] }),

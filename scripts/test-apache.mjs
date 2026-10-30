@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { request } from 'node:http';
 import { verifyInquiry } from './verify-inquiry.mjs';
+import { verifySite } from './verify-site.mjs';
 
 const commit = JSON.parse(readFileSync('dist/webbyu-release.json', 'utf8')).commit;
 const port = process.env.APACHE_TEST_PORT || '8088';
@@ -18,6 +19,7 @@ const fetcher = (url, options = {}) => new Promise((resolve, reject) => {
   req.end(options.body);
 });
 await verifyInquiry(new URL('https://webbyu.de'), commit, fetcher);
+await verifySite(new URL('https://webbyu.de'), fetcher, { noindex: /<meta name="robots" content="noindex/.test(readFileSync('dist/index.html', 'utf8')) });
 const healthy = await fetcher(new URL('https://webbyu.de/api/health.php'));
 assert.equal((await healthy.json()).status, 'ready');
 console.log('Apache/PHP production-package integration passed.');

@@ -1,4 +1,6 @@
 import { defineConfig } from 'vite';
+import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 // GitHub Pages serves project repositories below /<repository>/ while local
 // development and user pages are rooted at /. Keep the same build portable in
@@ -19,15 +21,29 @@ export default defineConfig({
   base,
   plugins: [{
     name: 'preview-noindex',
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        response.setHeader('X-Robots-Tag', 'noindex, nofollow');
+        if (request.url?.split('?')[0] === `${base}robots.txt`) {
+          response.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          response.end('User-agent: *\nDisallow: /\n');
+          return;
+        }
+        next();
+      });
+    },
     transformIndexHtml(html) {
-      if (process.env.SITE_NOINDEX !== 'true' || /<meta\s+name=["']robots["']/i.test(html)) return html;
+      if ((process.env.NODE_ENV !== 'development' && process.env.SITE_NOINDEX !== 'true') || /<meta\s+name=["']robots["']/i.test(html)) return html;
       return { html, tags: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' }, injectTo: 'head' }] };
+    },
+    writeBundle(output) {
+      if (process.env.SITE_NOINDEX === 'true') writeFileSync(resolve(output.dir ?? 'dist', 'robots.txt'), 'User-agent: *\nDisallow: /\n');
     },
   }],
   // QA screenshots and alternate builds are not application source. Watching
   // files while they are copied can terminate the Windows development server.
   server: { watch: { ignored: ['**/artifacts/**'] } },
   build: {
-    rollupOptions: { input: { main: 'index.html', journey: 'reise/index.html', imprint: 'impressum/index.html', privacy: 'datenschutz/index.html' } },
+    rollupOptions: { input: { main: 'index.html', journey: 'reise/index.html', imprint: 'impressum/index.html', privacy: 'datenschutz/index.html', notFound: '404.html' } },
   },
 });

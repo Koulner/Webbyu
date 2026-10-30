@@ -1,6 +1,26 @@
 # Webbyu – Betriebsbereitschaft
 
-Stand: 26.10.2026. Dieser Auftrag wurde vom Betreiber ausdrücklich zur Umsetzung einschließlich separater Arbeitschats und abschließender Veröffentlichung freigegeben.
+Stand: 30.10.2026. Dieser Auftrag wurde vom Betreiber ausdrücklich zur Umsetzung einschließlich separater Arbeitschats und abschließender Veröffentlichung freigegeben.
+
+## Aktueller Zwischenstand · 30.10.2026
+
+Die öffentliche Website steht auf `prod` bei `b7a2fd5b6f9fae4d9b21582dc1f6cb74f0a75e63`. Darin sind das veröffentlichte IONOS-/IT-Recht-Kanzlei-Update `f1324df` sowie die heute geprüften SEO-Grundlagen enthalten: Sitemap, robots.txt, Canonicals auf allen vier Seiten und der Titel „Webdesign in Bad Oldesloe & Hamburg | Webbyu“. Produktionsprüfung und IONOS-Lauf [41139016542](https://github.com/Koulner/Webbyu/actions/runs/41139016542) erfolgreich. Dies ist eine begrenzte Weiterentwicklung des bisherigen statischen Auftritts; der Anfrageversand wurde damit nicht veröffentlicht. Nachweise: `artifacts/seo-2026-10-30/`.
+
+Existenz und manueller Empfang des Geschäftspostfachs wurden inzwischen vom Betreiber mit „test angekommen“ bestätigt. Ältere Hinweise auf ein vollständig unbestätigtes Postfach sind insoweit überholt. Produktive SMTP-Authentifizierung aus PHP, private Konfiguration, Schutzdatenrechte und regelmäßige Bereinigung bleiben unbestätigt. Die neue lokale Serverprüfung ersetzt diese Live-Nachweise nicht.
+
+AP06 wurde in diesem Chat fertig geprüft und wird gezielt lokal gesichert. Die im Arbeitsordner vorhandenen neueren IONOS-Rechtstexte und Geschäftskundenhinweise gehören zu den gesonderten Änderungen; ihre Inhalte werden durch den AP06-Commit nicht mit übernommen. Vor AP07/AP08 den vollständigen Kandidaten einschließlich dieses Bestands und des aktuellen `prod`-Stands zusammenführen. Insbesondere den neuen SEO-Titel und die veröffentlichten Rechtstexte erhalten; die Datenschutz-Ergänzungen zum tatsächlichen Anfrageversand müssen dabei erhalten bleiben. Kein pauschaler Reset, Checkout oder Commit des Arbeitsordners.
+
+Google Search Console: Anmeldung wurde für den Betreiber geöffnet; ein verifiziertes Property, Indexstatus oder eine Platzierung wurde bisher nicht nachgewiesen. Technische Indexierbarkeit bedeutet keine zugesicherte Aufnahme oder Platzierung.
+
+### AP06 – Abschlussnachweise
+
+Übernommene Korrekturen aus dem begonnenen AP06: Reise behält die aktuelle Station beim Breitenwechsel; ein unsichtbarer Hintergrundrahmen verwirft die letzte gültige Projektionsgröße nicht mehr. Fehlende Demobilder erhalten einen verständlichen Hinweis und nutzbare Textalternativen. Schriften werden mit gültigen lokalen Pfaden geladen. Statische Kontaktmöglichkeit ohne JavaScript, eindeutige Metadaten, Sitemap/robots und eine echte HTTP-404-Seite ergänzt. Medien-/Reisegrößenfehler sind durch fünf neue Regressionen abgesichert.
+
+Browsernachweise vom 28.10.: Startseite, alle vier Demos und Finder bei 360/390/768/1024/1440 Pixeln ohne horizontalen Überlauf; mobile Navigation, Tastatur/Escape und Fokusrückkehr, verschachtelte Dialoge, lokale Demoergebnisse, Finderentwurf, Reise/Großansicht/Vollbild und Zustandserhalt. Reduzierte Bewegung, fehlendes WebGL und künstlicher Medienausfall im lokalen Prüfharness. Protokolle und Bilder unter `artifacts/ap06-qa/`. Ergänzende Sichtprüfung der inzwischen aktualisierten Rechtsseiten am 30.10. bei 360 und 1440 Pixeln, ebenfalls ohne horizontalen Überlauf; `continuation-legal.json` und vier Bilder.
+
+Am 30.10. erneut bestanden: **196 Website-Tests in 16 Dateien**, **neun Deploymenttests**, TypeScript und Produktionsbuild, **146 PHP-Prüfungen** einschließlich HTTP-Einstiegspunkten, sowie echte **Apache/PHP-Produktionspaketprüfung** mit Docker 29.8.2 und PHP 8.3. Die Apache-Prüfung bestätigt Readiness mit ausschließlich künstlicher Konfiguration, API-Vertrag/Schutzpfade, Metadaten, Sitemap/robots, lokale Assets/Schriften und HTTP 404. Keine produktive SMTP-Verbindung und keine echte Anfrage versendet. Die zunächst lokal eingeschränkte PHP-HTTP-Prüfung wurde nach Netzwerkfreigabe erfolgreich wiederholt. Logs: `continuation-tests.log`, `continuation-build.log`, `continuation-backend.log`, `continuation-apache.log`.
+
+Die früheren Schriftpfadwarnungen entfallen. Die bekannte Warnung zur Größe des 3D-Chunks bleibt; kein beobachteter Grund für eine neue Architektur. Keine Realgerät-/Screenreader-Zertifizierung, keine produktive SMTP-/Cleanup-/Serverabnahme und keine unabhängige Gesamtabnahme behauptet. Nur die Metadaten der beiden Rechtsseiten gehören zu AP06, nicht deren neuere Rechtstextinhalte. Die bestehenden fremden Dateiinhalte bleiben erhalten.
 
 ## Verbindliche Entscheidungen
 
@@ -28,7 +48,7 @@ Ausgangsprüfung in diesem Chat: 124 Website-Tests, fünf Deployment-Tests, Type
 | AP03 Projektfinder anschließen | 01a175bb-c922-7450-925c-34f12895bb56 | lokal umgesetzt; Browser-/Live-Abnahme offen | AP02-Vertrag umgesetzt; produktiver AP01-Betrieb vor AP08 | vollständige Vorschau, ausdrücklicher Versand, geprüfte Antwortzustände, stabile Kennung, Eingabenerhalt und Kopieren/Bearbeiten mit DOM-/Mocknachweisen |
 | AP04 Angebot und Geschäftsinhalte | 01a175cb-7dab-74d2-9d3e-dcc0356c921e | lokal umgesetzt und geprüft | AP03 erhalten; AP05/AP06/AP07 folgen | Angebot auf Anfrage in Paketen/Finder/Kopierfassungen, qualitative Unterschiede, Geschäftskontakt und Hauptauftritt bereinigt |
 | AP05 Datenschutz und Kontaktangaben | 01a175d2-1ec5-7ec3-8625-4677a1eba846 | lokal umgesetzt und geprüft; Betriebsfreigabe offen | AP02–AP04 umgesetzt; produktiver AP01-/Cleanup-Nachweis vor AP08 | Geschäftspostfach, ausdrücklicher Finder-Versand, pseudonymisierte Schutzdaten und getrennte Mailaufbewahrung beschrieben; Betreiber-/Steuerangaben und IONOS-Bestand erhalten |
-| AP06 Bedienung und technische Qualität | ausstehend | wartet | AP03/AP04 | responsive/tastaturbedienbare Besucherwege, Medien/Fallbacks, SEO/Sitemap/Fehlerseite, relevante Fehler beheben |
+| AP06 Bedienung und technische Qualität | 01a18eeb-809e-7311-9a3a-119aee2861f8; Vorarbeit 01a175dd-4d12-7532-be62-7c64e9dd2247 | lokal umgesetzt und geprüft | AP03/AP04 | responsive Besucherwege, Fokus, Reisegrößenwechsel, Medien/Fallbacks, SEO/Sitemap, echte 404 und Apache/PHP-Paketprüfung bestanden; vollständige Integration und AP07/AP08 folgen |
 | AP07 Unabhängige Gesamtabnahme | ausstehend | wartet | AP02–AP06 | vollständiger Kandidat mit eindeutigem Commit; Fehler an Koordinator melden, nicht selbst verdeckt ändern |
 | AP08 Veröffentlichung und Betriebsübergabe | ausstehend | wartet | bestandene AP07 + echte Betriebszugänge | dev/prod, Live- und Mail-Eingangsprüfung, Rückkehr zur Vorgängerversion, Betriebsdokumentation |
 

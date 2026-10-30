@@ -2,6 +2,7 @@ import { concepts, type DemoId } from './data';
 import { mountReferenceDemo } from './reference-demos/runtime';
 import './demos.css';
 import { saffronChapters, saffronJourneyMarkup, mountSaffronJourney } from './saffron-journey';
+import { mountMediaFallback } from './media-fallback';
 
 let instance = 0;
 const arrow = '<span aria-hidden="true">↗</span>';
@@ -219,7 +220,10 @@ export function createDemo(goal: DemoId, options: { interactive?: boolean } = {}
   sessions.set(root, controller);
   root.className = `demo demo--${goal}`;
   root.dataset.demo = goal;
-  if (goal === 'sales') salesDemo(root, id, controller.signal);
+  if (goal === 'sales') {
+    salesDemo(root, id, controller.signal);
+    mountMediaFallback(root, controller.signal);
+  }
   else mountReferenceDemo(root, goal, controller.signal);
   if (options.interactive === false) {
     if (goal === 'sales') controller.abort();

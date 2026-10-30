@@ -9,6 +9,7 @@ import { mount as mountHandwerk } from './handwerk/app.js';
 import { mount as mountNordlicht } from './gebaeudetechnik/app.js';
 import { mount as mountRaumgut } from './raumgut/app';
 import './runtime.css';
+import { mountMediaFallback } from '../media-fallback';
 
 export interface ReferenceScope {
   host: HTMLElement;
@@ -47,6 +48,7 @@ export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales
     .reference-page .compare-dock { bottom: 12px; }
     .reference-page .toast { bottom: 80px; }
     .reference-page dialog { max-width: calc(100vw - 32px); max-height: 85dvh; }
+    .demo-media-status { margin: 0; padding: 14px 20px; background: #f3ead7; color: #352d2a; font: 14px/1.6 Arial, sans-serif; }
     @container reference (max-width: 480px) {
       .reference-page .compare-dock { flex-wrap: wrap; gap: 8px; justify-content: center; }
     }
@@ -125,6 +127,7 @@ export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales
     }
   }, { signal, capture: true });
   source.mount(scope, helpers, signal);
+  mountMediaFallback(shadow, signal);
   signal.addEventListener('abort', () => {
     shadow.querySelectorAll('dialog[open]').forEach(dialog => (dialog as HTMLDialogElement).close());
     shadow.querySelectorAll<HTMLElement>('*').forEach(element => {

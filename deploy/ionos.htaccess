@@ -1,6 +1,7 @@
 # IONOS/Apache only; copied into the production build, never the Pages preview.
 DirectoryIndex index.html
 Options -Indexes
+ErrorDocument 404 /404.html
 
 # HTTPS is already provisioned at IONOS. Preserve paths and query strings;
 # respect an HTTPS connection terminated by a reverse proxy/CDN as well.

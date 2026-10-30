@@ -6,7 +6,7 @@ import { listFiles } from './deploy-ionos.mjs';
 export function prepare(env = process.env) {
   const commit = env.GITHUB_SHA;
   if (!/^[a-f0-9]{40}$/.test(commit ?? '')) throw new Error('A valid GITHUB_SHA is required.');
-  for (const page of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html']) {
+  for (const page of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '404.html']) {
     const html = readFileSync(`dist/${page}`, 'utf8');
     if (html.includes('/Webbyu/') || html.includes('%BASE_URL%')) throw new Error(`Incorrect production base path in ${page}. Build with SITE_BASE_PATH=/.`);
   }

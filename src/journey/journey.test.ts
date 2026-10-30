@@ -69,6 +69,21 @@ function selectStation(id:string) {
 }
 
 describe('journey content and navigation',()=>{
+  it('keeps the chosen station across a responsive width change', async () => {
+    mount(); await app!.sceneReady; flush();
+    selectStation('meisterwerk');
+    vi.mocked(Element.prototype.scrollIntoView).mockClear();
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth - 100 });
+    window.dispatchEvent(new Event('resize'));
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalledOnce();
+    expect(vi.mocked(Element.prototype.scrollIntoView).mock.instances[0]).toBe(root.querySelector('#meisterwerk'));
+    expect(app!.getActive()).toBe(stationIndex('#meisterwerk'));
+    vi.mocked(Element.prototype.scrollIntoView).mockClear();
+    window.dispatchEvent(new Event('resize'));
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
+  });
   it('has unique linked stations, three notes and all existing concepts, without dated claims',()=>{
     renderJourney(root);
     expect(new Set(stations.map(s=>s.id)).size).toBe(7);

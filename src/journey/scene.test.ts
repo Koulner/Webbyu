@@ -22,6 +22,7 @@ let frames:Map<number,FrameRequestCallback>;
 let nextFrame:number;
 let elapsed:number;
 let intersect:(entries:{isIntersecting:boolean}[])=>void;
+let resize:()=>void;
 let media:{matches:boolean;addEventListener:ReturnType<typeof vi.fn>;removeEventListener:ReturnType<typeof vi.fn>};
 beforeEach(()=>{
   gpu.fail=false;gpu.render.mockReset();gpu.dispose.mockReset();gpu.lose.mockReset();
@@ -36,7 +37,7 @@ beforeEach(()=>{
   vi.stubGlobal('cancelAnimationFrame',(id:number)=>frames.delete(id));
   media={matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()};
   vi.stubGlobal('matchMedia',()=>media);
-  vi.stubGlobal('ResizeObserver',class {observe(){} disconnect(){}});
+  vi.stubGlobal('ResizeObserver',class {constructor(callback:typeof resize){resize=callback;}observe(){} disconnect(){}});
   vi.stubGlobal('IntersectionObserver',class {constructor(callback:typeof intersect){intersect=callback;}observe(){}disconnect(){}});
 });
 afterEach(()=>{controller?.dispose();controller=undefined;document.body.replaceChildren();vi.restoreAllMocks();vi.unstubAllGlobals();});
@@ -45,6 +46,16 @@ const renderedScene=()=>gpu.render.mock.calls.at(-1)![0] as THREE.Scene;
 const renderedCamera=()=>gpu.render.mock.calls.at(-1)![1] as THREE.PerspectiveCamera;
 
 describe('journey visual lifecycle',()=>{
+  it('retains a valid pin projection when a background frame briefly has no size',()=>{
+    controller=initLandscape(map);flush();
+    const original=[...map.querySelectorAll<HTMLElement>('[data-pin]')].map(pin=>pin.style.left);
+    Object.defineProperty(map,'clientWidth',{configurable:true,value:0});
+    resize();controller.setProgress(-1,true);flush();
+    expect([...map.querySelectorAll<HTMLElement>('[data-pin]')].map(pin=>pin.style.left)).toEqual(original);
+    Object.defineProperty(map,'clientWidth',{configurable:true,value:1024});
+    resize();flush();
+    expect([...map.querySelectorAll<HTMLElement>('[data-pin]')].every(pin=>parseFloat(pin.style.left)>0)).toBe(true);
+  });
   it.each([[1265,712],[1365,862],[800,480],[390,422],[320,400]])('fits all overview stations at %i × %i, including reduced motion',(width,height)=>{
     Object.defineProperty(map,'clientWidth',{configurable:true,value:width});
     Object.defineProperty(map,'clientHeight',{configurable:true,value:height});

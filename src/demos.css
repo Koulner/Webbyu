@@ -258,3 +258,4 @@
   .concept-dialog-close { gap: 8px; padding-inline: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .demo .demo-cta { transition: none; } }
+.demo-media-status { margin: 0; padding: 14px 20px; background: #f3ead7; color: #352d2a; font: 14px/1.6 Arial, sans-serif; }
