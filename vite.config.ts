@@ -1,4 +1,6 @@
 import { defineConfig } from 'vite';
+import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 // GitHub Pages serves project repositories below /<repository>/ while local
 // development and user pages are rooted at /. Keep the same build portable in
@@ -22,6 +24,9 @@ export default defineConfig({
     transformIndexHtml(html) {
       if (process.env.SITE_NOINDEX !== 'true' || /<meta\s+name=["']robots["']/i.test(html)) return html;
       return { html, tags: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' }, injectTo: 'head' }] };
+    },
+    writeBundle(output) {
+      if (process.env.SITE_NOINDEX === 'true') writeFileSync(resolve(output.dir ?? 'dist', 'robots.txt'), 'User-agent: *\nDisallow: /\n');
     },
   }],
   // QA screenshots and alternate builds are not application source. Watching

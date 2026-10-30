@@ -1,4 +1,5 @@
 import { setTimeout } from 'node:timers/promises';
+import { verifySeo } from './verify-seo.mjs';
 
 const site = new URL(process.env.IONOS_SITE_URL || 'https://webbyu.de');
 if (site.protocol !== 'https:' || !['webbyu.de', 'www.webbyu.de'].includes(site.hostname) || site.port || site.username || site.password || site.pathname !== '/' || site.search || site.hash) {
@@ -31,3 +32,4 @@ if (redirect.status !== 301 || target?.protocol !== 'https:' || !['webbyu.de', '
   throw new Error('The HTTP-to-HTTPS redirect is missing or does not preserve the requested page.');
 }
 console.log('HTTP redirects permanently to HTTPS and preserves path and query.');
+await verifySeo(site);
