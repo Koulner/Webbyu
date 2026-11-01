@@ -47,6 +47,7 @@ afterEach(()=>{app?.dispose();app=undefined;document.body.replaceChildren();docu
 function flush(){const batch=[...frames.values()];frames.clear();batch.forEach(callback=>callback(16));}
 function mockDemos() {
   return {
+    prepareDemo:vi.fn(async()=>{}),
     createDemo:vi.fn((id:DemoId)=>{
       const demo=document.createElement('div');
       demo.className='demo';
@@ -69,6 +70,70 @@ function selectStation(id:string) {
 }
 
 describe('journey content and navigation',()=>{
+  it('waits for the scene viewport to become visible before loading 3D', async () => {
+    let intersect!: IntersectionObserverCallback;
+    const disconnect = vi.fn();
+    vi.stubGlobal('IntersectionObserver', class {
+      constructor(callback: IntersectionObserverCallback) { intersect = callback; }
+      observe() {}
+      disconnect = disconnect;
+    });
+    const loadScene = vi.fn(async () => ({ initLandscape: () => scene }));
+    mount({ loadScene });
+    flush();
+    expect(loadScene).not.toHaveBeenCalled();
+    intersect([{ isIntersecting: false } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(loadScene).not.toHaveBeenCalled();
+    intersect([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    await app!.sceneReady;
+    expect(loadScene).toHaveBeenCalledOnce();
+    app!.dispose();
+    expect(disconnect).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the static illustration and functional chapters without loading 3D for reduced motion', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('prefers-reduced-motion'), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    const loadScene = vi.fn(async () => ({ initLandscape: () => scene }));
+    mount({ loadScene });
+    await app!.sceneReady; flush();
+    selectStation('die-idee');
+    expect(loadScene).not.toHaveBeenCalled();
+    expect(root.querySelector('[data-map]')?.getAttribute('data-render')).toBe('static');
+    expect(app!.getActive()).toBe(0);
+  });
+
+  it('honors data saving without automatic scene or demo downloads and allows explicit demo loading', async () => {
+    vi.stubGlobal('navigator', { connection: { saveData: true } });
+    const demos = mockDemos();
+    const loadDemos = vi.fn(async () => demos);
+    const loadScene = vi.fn(async () => ({ initLandscape: () => scene }));
+    mount({ loadDemos, loadScene });
+    await app!.sceneReady; flush();
+    selectStation('meisterwerk');
+    expect(loadScene).not.toHaveBeenCalled();
+    expect(loadDemos).not.toHaveBeenCalled();
+    expect(root.querySelector('[data-preview-loading]')?.textContent).toContain('Datensparmodus');
+    root.querySelector<HTMLButtonElement>('[data-preview-open]')!.click();
+    await vi.waitFor(() => expect(document.querySelector('dialog')?.open).toBe(true));
+    expect(demos.prepareDemo).toHaveBeenCalledExactlyOnceWith('meisterwerk');
+    expect(loadScene).not.toHaveBeenCalled();
+  });
+
+  it('keeps the chosen station across a responsive width change', async () => {
+    mount(); await app!.sceneReady; flush();
+    selectStation('meisterwerk');
+    vi.mocked(Element.prototype.scrollIntoView).mockClear();
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth - 100 });
+    window.dispatchEvent(new Event('resize'));
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalledOnce();
+    expect(vi.mocked(Element.prototype.scrollIntoView).mock.instances[0]).toBe(root.querySelector('#meisterwerk'));
+    expect(app!.getActive()).toBe(stationIndex('#meisterwerk'));
+    vi.mocked(Element.prototype.scrollIntoView).mockClear();
+    window.dispatchEvent(new Event('resize'));
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
+  });
   it('has unique linked stations, three notes and all existing concepts, without dated claims',()=>{
     renderJourney(root);
     expect(new Set(stations.map(s=>s.id)).size).toBe(7);
@@ -274,7 +339,7 @@ describe('journey demo lifecycle',()=>{
   it('reuses each live session and restores chapter focus and map rendering on close',async()=>{
     const createDemo=vi.fn(()=>{const demo=document.createElement('div');demo.className='demo';demo.innerHTML='<input aria-label="Auswahl" />';return demo;});
     const disposeDemo=vi.fn();
-    mount({loadDemos:async()=>({createDemo,disposeDemo,mountDemoDialog})});await app!.sceneReady;flush();
+    mount({loadDemos:async()=>({prepareDemo:async()=>{},createDemo,disposeDemo,mountDemoDialog})});await app!.sceneReady;flush();
     const trigger=root.querySelector<HTMLButtonElement>('[data-journey-demo="raumgut"]')!;
     trigger.click();await vi.waitFor(()=>expect(document.querySelector('dialog')?.open).toBe(true));
     const dialog=document.querySelector<HTMLDialogElement>('dialog')!;

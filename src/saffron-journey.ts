@@ -97,7 +97,7 @@ export function mountSaffronJourney(root: HTMLElement, signal: AbortSignal) {
     suspend();
     section.classList.remove('has-motion', 'is-scrollable', 'has-frames');
     controls.hidden = true;
-    status.textContent = 'Die Kamerafahrt ist gerade nicht verfügbar. Alle Kapitel bleiben als Bilder zugänglich.';
+    status.textContent = 'Die Kamerafahrt ist gerade nicht verfügbar. Alle Kapitel bleiben mit Bildbeschreibungen und Texten zugänglich.';
   }
 
   function scrollPort(): HTMLElement | null {

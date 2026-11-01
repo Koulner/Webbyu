@@ -1,5 +1,13 @@
 import { test } from 'node:test';
+import { assertStaticFiles } from '../static-release.mjs';
 import assert from 'node:assert/strict';
+
+test('static releases reject backend and private files before any upload', () => {
+  assert.doesNotThrow(() => assertStaticFiles(['index.html', '.htaccess', 'assets/main-12345678.js']));
+  for (const file of ['api/inquiry.php', '_inquiry/releases/test/src/Application.php', 'backend/src/test.js', 'webbyu-private/config.json', '.env', 'private-config.php', 'inquiry-state.json', 'auth.json', 'composer.lock', 'assets/main.js.map']) {
+    assert.throws(() => assertStaticFiles(['index.html', file]), /static release/);
+  }
+});
 import { createHash } from 'node:crypto';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';

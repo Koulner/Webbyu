@@ -1,14 +1,5 @@
-import type { DemoId } from '../data';
-import handwerkBody from './handwerk/body.html?raw';
-import handwerkStyle from './handwerk/style.css?raw';
-import nordlichtBody from './gebaeudetechnik/body.html?raw';
-import nordlichtStyle from './gebaeudetechnik/style.css?raw';
-import raumgutBody from './raumgut/body.html?raw';
-import raumgutStyle from './raumgut/style.css?raw';
-import { mount as mountHandwerk } from './handwerk/app.js';
-import { mount as mountNordlicht } from './gebaeudetechnik/app.js';
-import { mount as mountRaumgut } from './raumgut/app';
 import './runtime.css';
+import { mountMediaFallback } from '../media-fallback';
 
 export interface ReferenceScope {
   host: HTMLElement;
@@ -23,15 +14,14 @@ export interface ReferenceHelpers {
   asset(name: string): string;
 }
 
-const references = {
-  meisterwerk: { body: handwerkBody, css: handwerkStyle, mount: mountHandwerk },
-  nordlicht: { body: nordlichtBody, css: nordlichtStyle, mount: mountNordlicht },
-  raumgut: { body: raumgutBody, css: raumgutStyle, mount: mountRaumgut },
-};
+export interface ReferenceSource {
+  body: string;
+  css: string;
+  mount(scope: ReferenceScope, helpers: ReferenceHelpers, signal: AbortSignal): void;
+}
 
 /** Shadow DOM preserves the original designs and live state while the gallery reparents them. */
-export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales'>, signal: AbortSignal): void {
-  const source = references[id];
+export function mountReferenceDemo(host: HTMLElement, source: ReferenceSource, signal: AbortSignal): void {
   const shadow = host.attachShadow({ mode: 'open' });
   const assets = `${import.meta.env.BASE_URL}reference-assets`;
   const resolveAssets = (text: string) => text.replaceAll('__REFERENCE_ASSETS__', assets);
@@ -47,6 +37,7 @@ export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales
     .reference-page .compare-dock { bottom: 12px; }
     .reference-page .toast { bottom: 80px; }
     .reference-page dialog { max-width: calc(100vw - 32px); max-height: 85dvh; }
+    .demo-media-status { margin: 0; padding: 14px 20px; background: #f3ead7; color: #352d2a; font: 14px/1.6 Arial, sans-serif; }
     @container reference (max-width: 480px) {
       .reference-page .compare-dock { flex-wrap: wrap; gap: 8px; justify-content: center; }
     }
@@ -125,6 +116,7 @@ export function mountReferenceDemo(host: HTMLElement, id: Exclude<DemoId, 'sales
     }
   }, { signal, capture: true });
   source.mount(scope, helpers, signal);
+  mountMediaFallback(shadow, signal);
   signal.addEventListener('abort', () => {
     shadow.querySelectorAll('dialog[open]').forEach(dialog => (dialog as HTMLDialogElement).close());
     shadow.querySelectorAll<HTMLElement>('*').forEach(element => {

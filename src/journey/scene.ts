@@ -351,8 +351,11 @@ export function initLandscape(container: HTMLElement): LandscapeController {
     }
     function invalidate(){if(!frame&&!disposed&&enabled&&visible&&!document.hidden)frame=requestAnimationFrame(render);}
     function resize(){
-      width=container.clientWidth;height=container.clientHeight;
-      if(!width||!height)return;
+      const nextWidth=container.clientWidth,nextHeight=container.clientHeight;
+      // A background iframe can briefly report no size while a modal is open.
+      // Retain its last valid projection until it has a measurable surface again.
+      if(!nextWidth||!nextHeight)return;
+      width=nextWidth;height=nextHeight;
       camera.aspect=width/height;
       camera.setViewOffset(width,height,width<760?0:-width*.19,0,width,height);
       camera.updateProjectionMatrix();fitOverview();gpu.setSize(width,height,false);invalidate();

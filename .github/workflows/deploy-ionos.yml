@@ -31,8 +31,18 @@ jobs:
         run: npm run build
         env:
           SITE_BASE_PATH: /
+          VITE_INQUIRY_ENABLED: 'false'
       - name: Prepare production files
         run: node scripts/prepare-ionos.mjs
+      - name: Verify static package on Apache
+        run: |
+          docker build -t webbyu-static-test -f deploy/Static.Dockerfile dist
+          docker run -d --name webbyu-static-test -p 127.0.0.1:8088:80 webbyu-static-test
+          for attempt in {1..30}; do curl --silent --output /dev/null http://127.0.0.1:8088/ && break || sleep 1; done
+          node scripts/test-static-apache.mjs
+      - name: Remove static test container
+        if: always()
+        run: docker rm -f webbyu-static-test 2>/dev/null || true
       - uses: actions/upload-artifact@v4
         with:
           name: ionos-production

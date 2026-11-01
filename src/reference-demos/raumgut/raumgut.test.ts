@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createDemo, disposeDemo } from '../../demos';
+import { prepareDemo, createDemo, disposeDemo } from '../../demos';
 import { cartTotal, findProducts, setQuantity, type Filters } from './products';
 
 let host: HTMLElement;
@@ -17,7 +17,8 @@ const defaults: Filters = { query: '', category: 'Alle', max: 200000, available:
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal');
 const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close');
 
-beforeEach(() => {
+beforeEach(async () => {
+  await Promise.all(["raumgut"].map(id => prepareDemo(id as Parameters<typeof prepareDemo>[0])));
   Object.defineProperty(HTMLDialogElement.prototype, 'showModal', { configurable: true, value(this: HTMLDialogElement) { this.open = true; } });
   Object.defineProperty(HTMLDialogElement.prototype, 'close', { configurable: true, value(this: HTMLDialogElement) { this.open = false; this.dispatchEvent(new Event('close')); } });
   HTMLElement.prototype.scrollIntoView = vi.fn();

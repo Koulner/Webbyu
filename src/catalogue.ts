@@ -1,6 +1,6 @@
 import { concepts, type DemoId } from './data';
 import type { CatalogueController, CatalogueOptions, CatalogueState, SceneMode } from './contracts';
-import { createDemo, disposeDemo, mountDemoDialog } from './demos';
+import { createDemo, disposeDemo, mountDemoDialog, prepareDemo, isDemoPrepared } from './demos';
 import './catalogue.css';
 
 const modes: SceneMode[] = ['presentation', 'layers', 'interactive'];
@@ -10,6 +10,7 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
   const { container, demoSlot, onStateChange, onProjectRequest } = options;
   let state: CatalogueState = { goal: 'meisterwerk', mode: 'presentation' };
   let disposed = false;
+  let loadRequest = 0;
   const cache = new Map<DemoId, HTMLElement>();
   const syncLayout = () => {
     for (const demo of demoSlot.querySelectorAll<HTMLElement>(':scope > .demo')) {
@@ -66,19 +67,40 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
     onStateChange({ ...state });
   }
 
+  async function present(open = false): Promise<void> {
+    const ticket = ++loadRequest;
+    const goal = state.goal;
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    try {
+      if (!isDemoPrepared(goal)) {
+        container.querySelector('.catalogue-status')!.textContent = 'Die Konzeptdemo wird geladen …';
+        await prepareDemo(goal);
+      }
+      if (disposed || ticket !== loadRequest) return;
+      demoSlot.replaceChildren(currentDemo());
+      syncLayout();
+      renderState();
+      if (open) {
+        trigger?.focus({ preventScroll: true });
+        dialog.open(goal, currentDemo());
+      }
+    } catch {
+      if (!disposed && ticket === loadRequest) container.querySelector('.catalogue-status')!.textContent = 'Die Demo konnte nicht geladen werden. Mit „Groß öffnen“ erneut versuchen.';
+    }
+  }
+
   function selectGoal(goal: DemoId): void {
     if (disposed || state.goal === goal) return;
     dialog.close();
     state = { ...state, goal };
-    demoSlot.replaceChildren(currentDemo());
-    syncLayout();
     notify();
+    void present();
   }
 
   function open(goal = state.goal): void {
     if (disposed) return;
     selectGoal(goal);
-    dialog.open(state.goal, currentDemo());
+    void present(true);
   }
 
   function onClick(event: Event): void {
@@ -101,9 +123,8 @@ export function mountCatalogue(options: CatalogueOptions): CatalogueController {
   }
 
   container.addEventListener('click', onClick);
-  demoSlot.replaceChildren(currentDemo());
-  syncLayout();
   notify();
+  void present();
 
   return {
     getState: () => ({ ...state }),

@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { resolve, join, posix } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { assertStaticFiles } from './static-release.mjs';
 
 // IONOS's published ED25519 host fingerprint, checked 2026-10-25:
 // https://www.ionos.de/hilfe/hosting/ssh-zugaenge-einrichten-und-verwalten/uebersicht-der-ssh-fingerabdruecke-im-ionos-webhosting/
@@ -74,6 +75,7 @@ export function deploy(env = process.env, run = spawnSync) {
   const config = configuration(env);
   const root = resolve('dist');
   const files = listFiles(root);
+  assertStaticFiles(files);
   for (const required of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'webbyu-release.json']) {
     if (!files.includes(required)) throw new Error('Incomplete production build.');
   }

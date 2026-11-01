@@ -8,7 +8,7 @@ export interface LandscapeController {
   setEnabled(enabled: boolean): void;
   dispose(): void;
 }
-type DemoModule = Pick<typeof import('../demos'), 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
+type DemoModule = Pick<typeof import('../demos'), 'prepareDemo' | 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
 interface JourneyOptions {
   embedded?: boolean;
   loadScene?: () => Promise<{ initLandscape(container: HTMLElement): LandscapeController }>;
@@ -21,6 +21,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   const events = new AbortController();
   const listen = { signal: events.signal };
   const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; addEventListener?: (type: string, listener: () => void) => void; removeEventListener?: (type: string, listener: () => void) => void } }).connection;
   const compact = window.matchMedia('(max-width: 760px)');
   const sections = [...root.querySelectorAll<HTMLElement>('[data-chapter]')];
   const map = root.querySelector<HTMLElement>('[data-map]')!;
@@ -48,6 +49,12 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   let dialog: ReturnType<DemoModule['mountDemoDialog']> | undefined;
   let request = 0;
   let previewRequest = 0;
+  let viewportWidth = window.innerWidth;
+  let stageVisible = false;
+  let sceneLoading: Promise<void> | undefined;
+  let sceneFailed = false;
+  let settleScene!: () => void;
+  const sceneReady = new Promise<void>(resolve => { settleScene = resolve; });
   const sessions = new Map<DemoId, HTMLElement>();
 
   function loadDemoModule() {
@@ -84,12 +91,18 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     root.querySelector('[data-preview-name]')!.textContent=station.label;
     previewLoading.hidden=false;
     previewLoading.textContent='Website-Vorschau wird geladen …';
+    if(connection?.saveData && !sessions.has(id)) {
+      previewLoading.textContent='Datensparmodus aktiv. Zum Laden der Website-Vorschau öffnen.';
+      return;
+    }
     preview.setAttribute('aria-busy','true');
     sizePreview();
     try {
       const module=await loadDemoModule();
       if(disposed||ticket!==previewRequest) return;
       demoModule=module;
+      if(!sessions.has(id)) await module.prepareDemo(id);
+      if(disposed||ticket!==previewRequest) return;
       const demo=getSession(module,id);
       if(!demo.closest('dialog')) previewSlot.append(demo);
       sizePreview();
@@ -169,6 +182,11 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     preview.style.setProperty('--preview-reveal',String(media.matches?1:Math.max(0,1-Math.abs(progress-active)*2)));
     sizePreview();
     positionFallbackPins();
+    if(typeof IntersectionObserver === 'undefined') {
+      const rect = map.getBoundingClientRect();
+      stageVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+      void ensureScene();
+    }
   }
 
   function schedule() { if(!frame&&!disposed) frame=requestAnimationFrame(update); }
@@ -188,6 +206,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       heading.focus({preventScroll:true});
     }
     activate(index);
+    if(push) void ensureScene(true);
     schedule();
   }
 
@@ -200,7 +219,9 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       const module=await loadDemoModule();
       if(disposed||ticket!==request) return;
       demoModule=module;
-      dialog ??= module.mountDemoDialog({onRestore(){ if(!disposed) { scene?.setEnabled(true);root.classList.remove('has-open-demo');void showPreview(active); } }});
+      if(!sessions.has(id)) await module.prepareDemo(id);
+      if(disposed||ticket!==request) return;
+      dialog ??= module.mountDemoDialog({onRestore(){ if(!disposed) { scene?.setEnabled(!media.matches && !connection?.saveData);root.classList.remove('has-open-demo');void showPreview(active); } }});
       const demo=getSession(module,id);
       trigger.disabled=false;
       trigger.focus({preventScroll:true});
@@ -255,29 +276,62 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   },listen);
   window.addEventListener('scroll',schedule,{...listen,passive:true});
   window.addEventListener('resize',()=>{
-    // Fullscreen changes the chapter heights. Keep the chosen station in view.
-    if (options.embedded && active >= -1) go(active, false, false);
+    // Width/breakpoint and embedded fullscreen changes alter chapter heights.
+    // Height-only mobile browser chrome changes must not reset reading position.
+    const widthChanged = viewportWidth !== window.innerWidth;
+    viewportWidth = window.innerWidth;
+    if ((options.embedded || widthChanged) && active >= -1) go(active, false, false);
     else schedule();
   },listen);
   const fromHistory=()=>go(stationIndex(location.hash),false,false);
   window.addEventListener('popstate',fromHistory,listen);
   window.addEventListener('hashchange',fromHistory,listen);
-  media.addEventListener('change',schedule);
+  const preferenceChanged = () => {
+    scene?.setEnabled(!media.matches && !connection?.saveData && !root.classList.contains('has-open-demo'));
+    void ensureScene();
+    schedule();
+  };
+  media.addEventListener('change',preferenceChanged);
+  connection?.addEventListener?.('change',preferenceChanged);
   const resize=new ResizeObserver(schedule);
   resize.observe(root);
   resize.observe(previewSlot);
 
-  const sceneReady=(options.loadScene??(()=>import('./scene')))().then(module=>{
-    if(disposed) return;
-    scene=module.initLandscape(map);
-    scene.setProgress(progress,true);
-    if(dialog) scene.setEnabled(!document.querySelector('.concept-dialog[open]'));
-  }).catch(()=>{
-    if(disposed) return;
-    map.dataset.render='static';
-    root.querySelector('[data-map-hint]')!.textContent='Die Erlebnisräume werden als Illustration gezeigt. Alle Stationen und Demos sind erreichbar.';
-    positionFallbackPins();
-  });
+  function ensureScene(requested = false): Promise<void> | undefined {
+    if(disposed || scene || sceneLoading || (sceneFailed && !requested)) return sceneLoading;
+    if(media.matches || connection?.saveData) {
+      map.dataset.render='static';
+      settleScene();
+      return;
+    }
+    if(!stageVisible && !requested) return;
+    sceneLoading=(options.loadScene??(()=>import('./scene')))().then(module=>{
+      if(disposed || media.matches || connection?.saveData) return;
+      scene=module.initLandscape(map);
+      sceneFailed=false;
+      scene.setProgress(progress,true);
+      scene.setEnabled(!root.classList.contains('has-open-demo'));
+    }).catch(()=>{
+      if(disposed) return;
+      sceneFailed=true;
+      map.dataset.render='static';
+      root.querySelector('[data-map-hint]')!.textContent='Die Erlebnisräume werden als Illustration gezeigt. Alle Stationen und Demos sind erreichbar.';
+      positionFallbackPins();
+    }).finally(()=>{sceneLoading=undefined;settleScene();});
+    return sceneLoading;
+  }
+  let sceneObserver: IntersectionObserver | undefined;
+  if(typeof IntersectionObserver !== 'undefined') {
+    sceneObserver=new IntersectionObserver(entries=>{
+      stageVisible=entries.some(entry=>entry.isIntersecting);
+      void ensureScene();
+    });
+    sceneObserver.observe(map);
+  } else {
+    const rect=map.getBoundingClientRect();
+    stageVisible=rect.bottom>0 && rect.top<window.innerHeight;
+  }
+  void ensureScene();
   if(location.hash&&stationIndex(location.hash)>=0) requestAnimationFrame(()=>{ if(!disposed) go(stationIndex(location.hash),false,false); });
   schedule();
 
@@ -288,7 +342,10 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       if(disposed) return;
       disposed=true;
       events.abort();
-      media.removeEventListener('change',schedule);
+      media.removeEventListener('change',preferenceChanged);
+      connection?.removeEventListener?.('change',preferenceChanged);
+      sceneObserver?.disconnect();
+      settleScene();
       resize.disconnect();
       if(frame) cancelAnimationFrame(frame);
       dialog?.dispose();

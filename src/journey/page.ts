@@ -2,9 +2,8 @@ import { stations } from './data';
 import { landscapeSvg, mapProjection } from './map';
 
 const arrow = '<span aria-hidden="true">↗</span>';
-export function renderJourney(root: HTMLElement): void {
-  const home = import.meta.env.BASE_URL;
-  root.innerHTML = `
+export function renderJourneyHtml(home: string): string {
+  return `
     <a class="journey-skip" href="#reise-kapitel">Zu den Kapiteln springen</a>
     <header class="journey-header">
       <a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">webbyu<span>.</span></a>
@@ -80,4 +79,10 @@ export function renderJourney(root: HTMLElement): void {
     <p class="journey-map-hint" data-map-hint>Scrollen führt Sie durch die Erlebnisräume. Alle Stationen sind auch direkt anwählbar.</p>
     <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">webbyu<span>.</span></a><p>Ein Gründer. Ein direkter Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><nav class="journey-legal" aria-label="Rechtliche Angaben"><a href="${home}impressum/">Impressum</a><a href="${home}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav><a href="${home}">Zur Startseite ${arrow}</a></footer>
     <div class="journey-status" role="status" aria-live="polite"></div><div data-demo-parking hidden></div>`;
+}
+
+export function renderJourney(root: HTMLElement): void {
+  if (root.dataset.prerendered === 'true' && root.querySelector('#reise-kapitel')) return;
+  root.innerHTML = renderJourneyHtml(import.meta.env.BASE_URL);
+  root.dataset.prerendered = 'true';
 }
