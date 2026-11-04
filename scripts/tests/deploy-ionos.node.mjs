@@ -1,13 +1,5 @@
 import { test } from 'node:test';
-import { assertStaticFiles } from '../static-release.mjs';
 import assert from 'node:assert/strict';
-
-test('static releases reject backend and private files before any upload', () => {
-  assert.doesNotThrow(() => assertStaticFiles(['index.html', '.htaccess', 'assets/main-12345678.js']));
-  for (const file of ['api/inquiry.php', '_inquiry/releases/test/src/Application.php', 'backend/src/test.js', 'webbyu-private/config.json', '.env', 'private-config.php', 'inquiry-state.json', 'auth.json', 'composer.lock', 'assets/main.js.map']) {
-    assert.throws(() => assertStaticFiles(['index.html', file]), /static release/);
-  }
-});
 import { createHash } from 'node:crypto';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -27,7 +19,7 @@ function withBuild(callback) {
   const directory = mkdtempSync(join(tmpdir(), 'webbyu-deploy-test-'));
   const cwd = process.cwd();
   try {
-    for (const file of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'assets/app-123.js', 'webbyu-release.json']) {
+    for (const file of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '.htaccess', 'assets/app-123.js', 'webbyu-release.json', '_inquiry/.htaccess', 'api/inquiry.php', 'api/health.php', `_inquiry/releases/${commit}/vendor/autoload.php`, `_inquiry/releases/${commit}/src/Application.php`]) {
       const path = join(directory, 'dist', file);
       mkdirSync(dirname(path), { recursive: true });
       writeFileSync(path, file === 'webbyu-release.json' ? JSON.stringify({ commit }) : 'fixture');
@@ -73,7 +65,8 @@ test('complete uploads precede publication; dependencies precede HTML; release m
   const firstRename = lines.findIndex(line => line.startsWith('rename '));
   assert(lastUpload < firstRename);
   const publishes = lines.filter(line => line.startsWith('rename '));
-  assert(publishes[0].endsWith('"assets/main-abc.js"'));
+  assert(publishes[0].endsWith('".htaccess"'));
+  assert(publishes[1].endsWith('"assets/main-abc.js"'));
   assert(publishes.at(-2).endsWith('"index.html"'));
   assert(publishes.at(-1).endsWith('"webbyu-release.json"'));
   assert(!lines.some(line => /^(?:rm|rmdir|!|get)\b/.test(line)));

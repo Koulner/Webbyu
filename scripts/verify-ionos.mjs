@@ -1,5 +1,5 @@
 import { setTimeout } from 'node:timers/promises';
-
+import { verifyInquiry } from './verify-inquiry.mjs';
 import { verifySite, verifyRedirects } from './verify-site.mjs';
 import { SITE_ORIGIN } from '../site.config.mjs';
 
@@ -23,6 +23,6 @@ for (let attempt = 0; attempt < 3; attempt++) {
   if (attempt < 2) await setTimeout(5000);
 }
 if (!verified) throw new Error('Upload finished, but this release is not visible at the production URL. Check domain destination, HTTPS, canonical www redirect and CDN cache.');
-
+await verifyInquiry(site, commit);
 await verifySite(site);
 await verifyRedirects(site);

@@ -9,7 +9,10 @@
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:deploy": "node --test scripts/tests/*.node.mjs"
+    "test:deploy": "node --test scripts/tests/*.node.mjs",
+    "test:backend": "node scripts/test-backend.mjs",
+    "test:backend:package": "node scripts/test-backend.mjs --package",
+    "test:apache": "node scripts/test-apache.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",
