@@ -1,3 +1,4 @@
+import { renderPackageDemo } from './src/package-demos/page';
 import { defineConfig } from 'vitest/config';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -46,10 +47,10 @@ export default defineConfig({
         const page = pages.find(page => resolve(page.file) === resolve(context.filename));
         if (!page) return html;
         const noindex = process.env.NODE_ENV === 'development' || process.env.SITE_NOINDEX === 'true';
-        const renderers = { home: () => renderPageHtml(base), journey: () => renderJourneyHtml(base), content: () => renderContentPage(page.path, base) };
+        const renderers = { 'package-demo': () => renderPackageDemo(page.path, base), home: () => renderPageHtml(base), journey: () => renderJourneyHtml(base), content: () => renderContentPage(page.path, base) };
         const renderer = renderers[page.kind as keyof typeof renderers];
         if (renderer) {
-          const id = page.kind === 'home' ? 'app' : page.kind === 'journey' ? 'journey-app' : 'content-app';
+          const id = page.kind === 'package-demo' ? 'package-demo-app' : page.kind === 'home' ? 'app' : page.kind === 'journey' ? 'journey-app' : 'content-app';
           html = html.replace(`<div id="${id}"></div>`, `<div id="${id}" data-prerendered="true">${renderer()}</div>`);
         }
         return applyMetadata(html, page, { noindex });
@@ -63,7 +64,7 @@ export default defineConfig({
   }],
   // QA screenshots and alternate builds are not application source. Watching
   // files while they are copied can terminate the Windows development server.
-  server: { watch: { ignored: ['**/artifacts/**'] } },
+  server: { watch: { ignored: ['**/artifacts/**', '**/dist*/**'] } },
   build: {
     rollupOptions: { input: Object.fromEntries(pages.map(page => [page.id, page.file])) },
   },

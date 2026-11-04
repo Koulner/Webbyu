@@ -27,7 +27,8 @@ describe('page shell contract', () => {
     root.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(link => {
       if (link.hash) expect(root.querySelector(link.hash)).not.toBeNull();
     });
-    expect(root.querySelector('h1 em')?.textContent).toBe('Bad Oldesloe.');
+    expect(root.querySelector('h1 em')?.textContent).toBe('Stark im Alltag.');
+    expect(root.querySelector('.hero-story')?.textContent).toContain('Bad Oldesloe');
     // The gallery is now the single collection, not duplicated as decorative demos.
     expect(root.querySelector('[data-preview]')).toBeNull();
     expect(root.querySelector('#main')?.getAttribute('tabindex')).toBe('-1');
@@ -36,7 +37,7 @@ describe('page shell contract', () => {
   it('keeps all main-owned entry points and the mobile navigation contract', () => {
     const root = document.createElement('div');
     renderPage(root);
-    for (const concept of concepts) {
+    for (const concept of concepts.filter(c => c.goal === 'sales' || c.goal === 'raumgut')) {
       expect(root.querySelectorAll(`button[data-demo="${concept.goal}"]`)).toHaveLength(1);
     }
     for (const pkg of packages) {

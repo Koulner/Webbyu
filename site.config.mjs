@@ -1,8 +1,9 @@
+import { packageDemoPages } from './package-demo-pages.mjs';
 /** Single source for public routes, build entries, metadata and release checks. */
 export const SITE_ORIGIN = 'https://webbyu.de';
 export const pages = [
   { id: 'main', path: '/', file: 'index.html', kind: 'home', indexable: true, title: 'Webdesign in Bad Oldesloe für Unternehmen | Webbyu', description: 'Individuelle Websites für kleine Unternehmen in Bad Oldesloe und Stormarn. Planung, Gestaltung und hilfreiche Funktionen mit Lukas Wagner. Angebot auf Anfrage.' },
-  { id: 'journey', path: '/reise/', file: 'reise/index.html', kind: 'journey', indexable: true, title: 'Die Reise: vier interaktive Konzeptstudien | Webbyu', description: 'Entdecken Sie die Arbeitsweise von Webbyu: von der ersten Frage zur Website. Vier ausdrücklich fiktive Konzeptstudien zeigen Gestaltung und hilfreiche Funktionen.' },
+  { id: 'journey', path: '/reise/', file: 'reise/index.html', kind: 'journey', indexable: true, title: 'Die Reise: Paketbeispiele und Konzeptstudien | Webbyu', description: 'Entdecken Sie die Arbeitsweise von Webbyu: von der ersten Frage zur Website. Drei fiktive Paketbeispiele und zwei Konzeptstudien zeigen Gestaltung und hilfreiche Funktionen.' },
   { id: 'websites', path: '/websites-fuer-unternehmen/', file: 'websites-fuer-unternehmen/index.html', kind: 'content', indexable: true, title: 'Individuelle Website für Ihr Unternehmen | Webbyu', description: 'Eine Website erstellen lassen: Inhalte, Gestaltung, Funktionen und Übergabe gemeinsam planen. Für kleine Unternehmen, mit direktem Ansprechpartner bei Webbyu.' },
   { id: 'about', path: '/ueber-mich/', file: 'ueber-mich/index.html', kind: 'content', indexable: true, title: 'Lukas Wagner: der Gründer hinter Webbyu', description: 'Lernen Sie Lukas Wagner und seine Arbeitsweise kennen: ein Ansprechpartner für Planung, Gestaltung und Entwicklung Ihrer Unternehmenswebsite aus Bad Oldesloe.' },
   { id: 'inquiries', path: '/anfrageformulare-auswahlhilfen/', file: 'anfrageformulare-auswahlhilfen/index.html', kind: 'content', indexable: true, title: 'Anfrageformulare und Auswahlhilfen für Websites | Webbyu', description: 'Passende Fragen statt unvollständiger Anfragen: Webbyu entwickelt Anfragewege und Auswahlhilfen. Verständliche Beispiele, klare Grenzen und individuelle Planung.' },
@@ -12,4 +13,5 @@ export const pages = [
   { id: 'imprint', path: '/impressum/', file: 'impressum/index.html', kind: 'legal', indexable: true, title: 'Impressum | Webbyu', description: 'Impressum von Webbyu mit Anbieterangaben und direktem Geschäftskontakt zu Lukas Wagner.' },
   { id: 'privacy', path: '/datenschutz/', file: 'datenschutz/index.html', kind: 'legal', indexable: true, title: 'Datenschutzerklärung | Webbyu', description: 'Datenschutzhinweise von Webbyu zu Hosting, Kontaktaufnahme, dem Projektfinder und den interaktiven Konzeptstudien.' },
   { id: 'notFound', path: '/404.html', file: '404.html', kind: 'error', indexable: false, title: 'Seite nicht gefunden | Webbyu', description: 'Diese Seite ist nicht vorhanden. Hier finden Sie den Weg zur Webbyu-Startseite und den direkten Kontakt.' },
+  ...packageDemoPages,
 ];

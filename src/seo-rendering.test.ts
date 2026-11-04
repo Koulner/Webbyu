@@ -21,7 +21,7 @@ describe('static page enhancement', () => {
     root.innerHTML = renderJourneyHtml('/Webbyu/');
     root.dataset.prerendered = 'true';
     const chapters = [...root.querySelectorAll('[data-chapter]')];
-    expect(chapters).toHaveLength(8);
+    expect(chapters).toHaveLength(9);
     expect(root.textContent).toContain('keine Kundenreferenzen');
     renderJourney(root);
     expect([...root.querySelectorAll('[data-chapter]')]).toEqual(chapters);

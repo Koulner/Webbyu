@@ -1,0 +1,107 @@
+[
+  {
+    "file": "clear-office.webp",
+    "source": "https://images.unsplash.com/photo-1497366754035-f200968a6e72",
+    "download": "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1600&q=85&fit=crop&fm=webp",
+    "license": "https://unsplash.com/license",
+    "bytes": 216652,
+    "local_bytes": 74880
+  },
+  {
+    "file": "wood-interior.webp",
+    "source": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0",
+    "download": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1600&q=85&fit=crop&fm=webp",
+    "license": "https://unsplash.com/license",
+    "bytes": 348458,
+    "local_bytes": 168360
+  },
+  {
+    "file": "wood-kitchen.webp",
+    "source": "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1",
+    "download": "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=1600&q=85&fit=crop&fm=webp",
+    "license": "https://unsplash.com/license",
+    "bytes": 244168,
+    "local_bytes": 114630
+  },
+  {
+    "file": "food-room.webp",
+    "source": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+    "download": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=85&fit=crop&fm=webp",
+    "license": "https://unsplash.com/license",
+    "bytes": 443042,
+    "local_bytes": 220096
+  },
+  {
+    "file": "food-table.webp",
+    "source": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
+    "download": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=85&fit=crop&fm=webp",
+    "license": "https://unsplash.com/license",
+    "bytes": 328054,
+    "local_bytes": 120238
+  },
+  {
+    "file": "food-dish.webp",
+    "source": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1",
+    "download": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1600&q=85&fit=crop&fm=webp",
+    "license": "https://unsplash.com/license",
+    "bytes": 1140560,
+    "local_bytes": 192988
+  },
+  {
+    "file": "restaurant.mp4",
+    "source": "https://www.pexels.com/video/chef-cooking-in-front-of-customer-1858094/",
+    "creator": "Rene Terp",
+    "download": "https://videos.pexels.com/video-files/1858094/1858094-hd_1080_1920_30fps.mp4",
+    "license": "https://www.pexels.com/license/",
+    "source_bytes": 5062941,
+    "processing": "720px high, H.264, no audio; poster extracted from film",
+    "local_bytes": 740670
+  },
+  {
+    "file": "clear-home.webp",
+    "source": "https://www.pexels.com/photo/cozy-living-room-interior-with-sunlit-window-35617574/",
+    "creator": "Pexels; see source page",
+    "download": "https://images.pexels.com/photos/35617574/pexels-photo-35617574.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "license": "https://www.pexels.com/license/",
+    "local_bytes": 201118
+  },
+  {
+    "file": "wood-workshop.webp",
+    "source": "https://www.pexels.com/photo/carpenter-using-wooden-boards-and-tools-8447803/",
+    "creator": "Los Muertos Crew",
+    "download": "https://images.pexels.com/photos/8447803/pexels-photo-8447803.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "license": "https://www.pexels.com/license/",
+    "local_bytes": 162494
+  },
+  {
+    "file": "klarblick-concept.webp",
+    "source": "OpenAI ImageGen, erzeugt am 3. November 2026 für diese fiktive Designstudie",
+    "type": "KI-generierte Illustration; kein reales Kundenprojekt",
+    "local_bytes": 162256
+  },
+  {
+    "file": "klarblick-800.webp",
+    "source": "Responsive 800-Pixel-Ableitung von klarblick-concept.webp (OpenAI ImageGen)",
+    "type": "KI-generierte Illustration; kein reales Kundenprojekt",
+    "local_bytes": 57202
+  },
+  {
+    "file": "eiche-concept.webp",
+    "source": "OpenAI ImageGen, erzeugt am 3. November 2026 für diese fiktive Designstudie",
+    "type": "KI-generierte Illustration; kein reales Kundenprojekt",
+    "local_bytes": 232624
+  },
+  {
+    "file": "hof-concept.webp",
+    "source": "OpenAI ImageGen, erzeugt am 3. November 2026 für diese fiktive Designstudie",
+    "type": "KI-generierte Illustration; kein reales Kundenprojekt",
+    "local_bytes": 163946
+  },
+  {
+    "file": "hof-800.webp",
+    "source": "Ableitung von hof-concept.webp (OpenAI ImageGen, 3. November 2026)",
+    "type": "KI-generierte Illustration; mobile WebP-Variante, kein reales Kundenprojekt",
+    "processing": "Auf 800 × 533 Pixel verkleinert, WebP Qualität 78",
+    "local_bytes": 50394
+  }
+]

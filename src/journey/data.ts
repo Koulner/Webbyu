@@ -1,4 +1,4 @@
-import { concepts, type DemoId } from '../data';
+import { concepts, type DemoId, type PackageId } from '../data';
 
 export interface JourneyStation {
   id: string;
@@ -12,6 +12,8 @@ export interface JourneyStation {
   visual: { color: string; caption: string };
   story?: { task: string; approach: string; benefit: string };
   demoId?: DemoId;
+  packageId?: PackageId;
+  image?: string;
   note?: string;
 }
 
@@ -39,27 +41,41 @@ export const stations: readonly JourneyStation[] = [
     position: [-13.2, -3.1], landmark: 'atelier',
     visual: { color: '#a8c8bd', caption: 'Inhalt, Gestaltung und Funktion greifen ineinander.' },
   },
-  project('meisterwerk', {
-    id: 'meisterwerk', position: [-7.2, 3.2], landmark: 'room',
-    visual: { color: '#c9c7ab', caption: 'Aus einer Vorstellung wird eine Gesprächsgrundlage.' },
-    detail: 'Raumideen, Materialien und ein Bildvergleich machen Wünsche greifbar.',
-    story: { task: 'Ein Raum soll sich verändern. Die Vorstellung ist noch nicht konkret.', approach: 'Raumbeispiele, Materialauswahl und Bildvergleich machen Möglichkeiten sichtbar.', benefit: 'Aus einzelnen Wünschen entsteht ein nachvollziehbares Projektbriefing.' },
-  }),
-  project('nordlicht', {
-    id: 'nordlicht', position: [0, -3.6], landmark: 'technical',
-    visual: { color: '#9ec9ca', caption: 'Die passende Frage führt zum nächsten Schritt.' },
-    detail: 'Beratung, Wartung oder Störung: Die Antworten bestimmen, welche Frage als Nächstes sinnvoll ist.',
-    story: { task: 'Ein technisches Anliegen braucht zuerst eine verständliche Einordnung.', approach: 'Ein Bedarfscheck unterscheidet Beratung, Wartung und Störung mit passenden Folgefragen.', benefit: 'Der Kontakt beginnt mit den Angaben, die für das Anliegen relevant sind.' },
-    note: 'Ich plane die Funktion zusammen mit dem Auftritt. Beides soll dieselbe Aufgabe lösen.',
-  }),
+  {
+    id: 'klarblick', label: 'Klarblick', eyebrow: 'Paketbeispiel / Webbyu Start',
+    title: 'Eine klare Seite für den ersten Kontakt.',
+    description: 'Ein kompakter Auftritt für eine fiktive Fensterreinigung.',
+    detail: 'Leistungen, Einsatzgebiet und Kontakt auf einer Seite.',
+    position: [-8, 3.2], landmark: 'room', packageId: 'start', image: 'klarblick-concept.webp',
+    visual: { color: '#c9d4bd', caption: 'Ein Angebot auf einen Blick.' },
+    story: { task: 'Ein Dienstleistungsbetrieb möchte schnell zeigen, was er anbietet und wo er arbeitet.', approach: 'Ein Onepager bündelt Leistungen, Ablauf, Einsatzgebiet und Kontakt.', benefit: 'Besucher finden die wichtigsten Informationen und einen einfachen Weg zur Anfrage.' },
+  },
+  {
+    id: 'eiche-und-form', label: 'Eiche & Form', eyebrow: 'Paketbeispiel / Webbyu Business',
+    title: 'Mehr Raum für Handwerk und Projekte.',
+    description: 'Ein mehrseitiger Auftritt für eine fiktive Tischlerei.',
+    detail: 'Leistungen und Projektbeispiele zeigen die Arbeit der Tischlerei.',
+    position: [-2.5, -3.6], landmark: 'furniture', packageId: 'business', image: 'eiche-concept.webp',
+    visual: { color: '#bdc8ac', caption: 'Material und Arbeit werden sichtbar.' },
+    story: { task: 'Eine Tischlerei möchte ihre Leistungen und Arbeitsweise anschaulich erklären.', approach: 'Eigene Seiten für Leistungen und Projekte verbinden Bilder, Details und Kontakt.', benefit: 'Interessierte können sich ein Bild von der Arbeit machen und ihr Vorhaben beschreiben.' },
+  },
+  {
+    id: 'hof-und-flamme', label: 'Hof & Flamme', eyebrow: 'Paketbeispiel / Webbyu Complete',
+    title: 'Ein Abend bekommt eine eigene Welt.',
+    description: 'Ein mehrseitiger Auftritt für ein fiktives Restaurant.',
+    detail: 'Speisekarte, Einblicke und Film erzählen von Küche und Atmosphäre.',
+    position: [3, 3.6], landmark: 'garden', packageId: 'complete', image: 'hof-concept.webp',
+    visual: { color: '#c8b6a2', caption: 'Küche und Atmosphäre zusammen erzählt.' },
+    story: { task: 'Ein Restaurant möchte schon vor dem Besuch einen Eindruck seines Angebots vermitteln.', approach: 'Seiten für Küche und Speisekarte verbinden Fotografie, Film und Informationen.', benefit: 'Gäste entdecken das Restaurant und finden den Weg zum Kontakt.' },
+  },
   project('sales', {
-    id: 'safran-atelier', position: [6.4, 3.6], landmark: 'garden',
+    id: 'safran-atelier', position: [8, -3.1], landmark: 'garden',
     visual: { color: '#beb1cb', caption: 'Ein Produktdetail wird zur verständlichen Geschichte.' },
     detail: 'Von der Blüte zum Safranfaden: Die Kamerafahrt macht ein kleines Produktdetail zum Ausgangspunkt einer ganzen Geschichte.',
     story: { task: 'Ein besonderes Produkt braucht mehr als ein Produktfoto.', approach: 'Botanische Nahaufnahmen führen von der Blüte zum Faden und weiter zur Produktauswahl.', benefit: 'Entdeckung, Produktinformation und Einkauf bilden einen zusammenhängenden Weg.' },
   }),
   project('raumgut', {
-    id: 'raumgut', position: [13, -2.4], landmark: 'furniture',
+    id: 'raumgut', position: [13.5, 3.2], landmark: 'furniture',
     visual: { color: '#bacab4', caption: 'Ein Sortiment wird zu einer persönlichen Auswahl.' },
     detail: 'Suche, Filter, Varianten und Merkliste führen durch ein Sortiment.',
     story: { task: 'Viele Möbel, Materialien und Maße sollen übersichtlich bleiben.', approach: 'Suche, Filter und Varianten führen vom Sortiment zur eigenen Merkliste.', benefit: 'Die Auswahl lässt sich bis zur vollständigen lokalen Bestellvorschau erproben.' },
@@ -83,6 +99,7 @@ export const networkConnections: readonly { from: number; to: number; strand: 'c
   { from: 3, to: 4, strand: 'content' },
   { from: 4, to: 5, strand: 'design' },
   { from: 5, to: 6, strand: 'function' },
+  { from: 6, to: 7, strand: 'content' },
   { from: 1, to: 4, strand: 'content' },
   { from: 2, to: 5, strand: 'design' },
   { from: 3, to: 5, strand: 'function' },

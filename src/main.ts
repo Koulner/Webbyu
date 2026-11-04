@@ -1,13 +1,17 @@
+import { packageFromSearch } from './package-demos/catalogue';
 import './fonts.css';
 import './tokens.css';
 import './styles.css';
 import './content.css';
+import './home.css';
+import './home-motion.css';
 import { extensions, packages, type DemoId, type PackageId } from './data';
 import { briefStore, type BriefStore } from './state';
 import { mountJourneyPreview } from './journey-preview';
 import { mountFinder } from './finder';
 import { renderPage } from './shell';
 import { mountPrivacy } from './privacy';
+import { mountHomeMotion } from './home-motion';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 type DemoModule = Pick<typeof import('./demos'), 'prepareDemo' | 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
@@ -20,7 +24,10 @@ interface AppOptions {
 /** Main owns cross-feature wiring; feature modules only consume their contracts. */
 export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   const store = options.store ?? briefStore;
+  const requestedPackage = packageFromSearch(location.search);
+  if (requestedPackage) store.update({ selectedPackage: requestedPackage });
   const mounts = renderPage(root);
+  const motion = mountHomeMotion(root);
   const privacy = mountPrivacy();
   const events = new AbortController();
   const listenerOptions = { signal: events.signal };
@@ -33,7 +40,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
     if (restart) finder.openAtStart();
     else finder.focus();
     mounts.finder.closest('section')?.scrollIntoView({
-      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches || root.dataset.motion === 'quiet' ? 'instant' : 'smooth',
     });
   }
 
@@ -174,6 +181,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
       if (disposed) return;
       disposed = true;
       events.abort();
+      motion.dispose();
       privacy.dispose();
       journeyPreview.dispose();
       demoDialog?.dispose();

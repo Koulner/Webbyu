@@ -35,9 +35,10 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   const preview = root.querySelector<HTMLElement>('[data-scene-preview]')!;
   const previewSlot = root.querySelector<HTMLElement>('[data-preview-slot]')!;
   const previewOpen = root.querySelector<HTMLButtonElement>('[data-preview-open]')!;
+  const previewLink = root.querySelector<HTMLAnchorElement>('[data-preview-link]')!;
   const previewLoading = root.querySelector<HTMLElement>('[data-preview-loading]')!;
   const parking = root.querySelector<HTMLElement>('[data-demo-parking]')!;
-  const questions: Record<number,string> = {0:'Die Aufgabe verstehen.',3:'Gestaltung und Funktion verbinden.',6:'Das nächste Vorhaben klären.'};
+  const questions: Record<number,string> = {0:'Die Aufgabe verstehen.',3:'Gestaltung und Funktion verbinden.',7:'Das nächste Vorhaben klären.'};
   let disposed = false;
   let active = -2;
   let progress = -1;
@@ -83,8 +84,24 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     const station=stations[index];
     const id=station?.demoId;
     for(const demo of previewSlot.querySelectorAll<HTMLElement>(':scope > .demo')) parking.append(demo);
-    preview.hidden=!id;
+    preview.hidden=!(id || station?.packageId);
+    previewOpen.hidden=Boolean(station?.packageId);
+    previewLink.hidden=!station?.packageId;
+    previewSlot.querySelector('.journey-package-image')?.remove();
     delete previewOpen.dataset.previewDemo;
+    if(station?.packageId) {
+      previewLink.href=`${import.meta.env.BASE_URL}demos/${station.packageId}/`;
+      previewLink.setAttribute('aria-label',`${station.label}: Beispielwebsite ansehen`);
+      root.querySelector('[data-preview-name]')!.textContent=station.label;
+      previewLoading.hidden=true;
+      preview.removeAttribute('aria-busy');
+      const image=document.createElement('img');
+      image.className='journey-package-image';
+      image.src=`${import.meta.env.BASE_URL}package-demos/${station.image}`;
+      image.alt='';
+      previewSlot.append(image);
+      return;
+    }
     if(!id) return;
     previewOpen.dataset.previewDemo=id;
     previewOpen.setAttribute('aria-label',`${station.label}: sichtbare Website in Großansicht ausprobieren`);
@@ -133,7 +150,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     active = index;
     void showPreview(index);
     map.dataset.view=index<0?'overview':'travel';
-    map.dataset.project=String(Boolean(stations[index]?.demoId));
+    map.dataset.project=String(Boolean(stations[index]?.demoId || stations[index]?.packageId));
     sections.forEach((section,i)=>section.classList.toggle('is-current',i===index+1));
     root.querySelector('[data-scene-caption]')!.textContent=index<0?'Jede Idee eröffnet einen neuen Zusammenhang.':stations[index].visual.caption;
     root.querySelector('[data-scene-index]')!.textContent=index<0?'WEBBYU / VERBUNDENE ERLEBNISRÄUME':`${String(index+1).padStart(2,'0')} / ${stations[index].label.toUpperCase()}`;

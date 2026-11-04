@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 import { renderContentPage } from './content';
+import { packageDemoPages } from '../../package-demo-pages.mjs';
 
 const contentPaths = [
   '/websites-fuer-unternehmen/',
@@ -10,7 +11,7 @@ const contentPaths = [
   '/ratgeber/website-kosten/',
   '/ratgeber/website-planen-checkliste/',
 ];
-const sitePaths = new Set([...contentPaths, '/', '/reise/', '/impressum/', '/datenschutz/']);
+const sitePaths = new Set([...contentPaths, ...packageDemoPages.map(page => page.path), '/', '/reise/', '/impressum/', '/datenschutz/']);
 
 function render(path: string, base = '/') {
   const root = document.createElement('div');

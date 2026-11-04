@@ -62,7 +62,7 @@ export function verifyHtmlPage(page, html, { noindex = false, xRobotsTag = '' } 
   assert.equal(descriptions.length, 1, `Single description ${page.path}`);
   assert.equal(descriptions[0].content, page.description, `Page description ${page.path}`);
   const canonicals = tags(html, 'link').filter(link => link.rel?.toLowerCase().split(/\s+/).includes('canonical'));
-  if (page.kind === 'error') assert.equal(canonicals.length, 0, 'Error page must not claim a canonical content URL');
+  if (!page.indexable) assert.equal(canonicals.length, 0, 'Non-indexable page must not claim a canonical content URL');
   else {
     assert.equal(canonicals.length, 1, `Single canonical ${page.path}`);
     assert.equal(canonicals[0].href, new URL(page.path, SITE_ORIGIN).href, `Canonical ${page.path}`);

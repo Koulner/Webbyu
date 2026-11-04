@@ -16,7 +16,7 @@ function pageHtml(page, noindex = false) {
   if (page.kind === 'content' && /^\/ratgeber\/.+\/$/.test(page.path)) graph.push({ '@type': 'Article', headline: page.title, author: { '@type': 'Person', name: 'Lukas Wagner' } });
   return `<!doctype html><html lang="de"><head><title>${escape(page.title)}</title>
     <meta content="${escape(page.description)}" name="description">
-    ${page.kind === 'error' ? '' : `<link href="${SITE_ORIGIN}${page.path}" rel="canonical">`}
+    ${!page.indexable ? '' : `<link href="${SITE_ORIGIN}${page.path}" rel="canonical">`}
     ${noindex || !page.indexable ? '<meta content="noindex, follow" name="robots">' : ''}
     <script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}</script>
     <link rel="stylesheet" href="/assets/site-12345678.css"></head><body>

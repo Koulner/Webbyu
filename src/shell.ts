@@ -1,3 +1,4 @@
+import { packageDemoCards, packageDemos } from './package-demos/catalogue';
 import { businessNotice, concepts, extensions, packages, packageQuestions, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
 
@@ -8,55 +9,93 @@ export function renderPageHtml(base: string): string {
   return `
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <header class="site-header">
-      <a class="wordmark" href="#" aria-label="Webbyu – Startseite">webbyu<span class="wordmark-dot" aria-hidden="true"></span></a>
+      <a class="wordmark" href="#" aria-label="Webbyu – Startseite"><img src="${base}webbyu-wortmarke-entwurf.png" alt="" width="2172" height="724" /></a>
       <nav aria-label="Hauptnavigation">
+        <a href="#arbeiten">Beispiele <span>${String(2 + packageDemos.length).padStart(2, '0')}</span></a>
         <a href="#ansatz">Ansatz</a>
-        <a href="#arbeiten">Beispiele <span>${String(concepts.length).padStart(2, '0')}</span></a>
-        <a href="${base}reise/">Die Reise</a>
         <a href="#leistungen">Leistungen</a>
         <a href="#pakete">Pakete</a>
         <a href="#ueber-uns">Über mich</a>
+        <a href="${base}reise/">Die Reise</a>
       </nav>
       <a class="header-cta" href="#projektfinder">Projekt besprechen ${arrow}</a>
       <button type="button" class="mobile-menu-button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menü öffnen"><span></span><span></span></button>
     </header>
     <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile Navigation" hidden>
-      <a href="#ansatz">Ansatz <span>01</span></a>
-      <a href="#arbeiten">Beispiele <span>02</span></a>
-      <a href="${base}reise/">Die Reise <span>03</span></a>
-      <a href="#leistungen">Leistungen <span>04</span></a>
-      <a href="#pakete">Pakete <span>05</span></a>
-      <a href="#ueber-uns">Über mich <span>06</span></a>
+      <a href="#arbeiten">Beispiele <span>01</span></a>
+      <a href="#ansatz">Ansatz <span>02</span></a>
+      <a href="#leistungen">Leistungen <span>03</span></a>
+      <a href="#pakete">Pakete <span>04</span></a>
+      <a href="#ueber-uns">Über mich <span>05</span></a>
+      <a href="${base}reise/">Die Reise ${arrow}</a>
       <a href="#projektfinder">Kontakt & Projekt ${arrow}</a>
     </nav>
     <main id="main" tabindex="-1">
       <section id="hero-story" class="hero-story section-shell" aria-labelledby="hero-title">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Individuelle Websites & hilfreiche Funktionen</p>
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Webdesign aus Bad Oldesloe · Für Unternehmen mit Persönlichkeit</p>
         <div class="hero-layout">
           <div class="hero-copy">
-            <h1 id="hero-title">Webdesign in<br><em>Bad Oldesloe.</em></h1>
-            <p class="hero-description">Individuelle Websites für kleine Unternehmen in Bad Oldesloe und Stormarn. Ich bin Lukas Wagner und verbinde Planung, Gestaltung und hilfreiche Funktionen – damit Kunden Ihr Angebot verstehen und den passenden Kontakt finden.</p>
-            <p class="hero-promise">Ihr Angebot klarer. Ihr Alltag einfacher.</p>
+            <h1 id="hero-title">Klar im Auftritt.<br><em>Stark im Alltag.</em></h1>
+            <p class="hero-description">Ihr Unternehmen hat seinen eigenen Charakter. Ihre Website sollte ihn zeigen. Ich verbinde Gestaltung, Inhalte und hilfreiche Funktionen zu einem Auftritt, der zu Ihnen passt.</p>
+            <p class="hero-promise">Individuell gestaltet. Persönlich entwickelt.</p>
             <div class="hero-actions">
-              <a class="button button--primary" href="#projektfinder">Über Ihr Vorhaben sprechen ${arrow}</a>
-              <a class="text-link" href="#ansatz">Den Ansatz kennenlernen <span aria-hidden="true">↓</span></a>
+              <a class="button button--primary" href="#projektfinder">Ihr Projekt besprechen ${arrow}</a>
+              <a class="text-link" href="#arbeiten">Arbeiten entdecken <span aria-hidden="true">↓</span></a>
             </div>
           </div>
-          <aside class="hero-working-note" aria-label="Wie ich an ein Projekt herangehe">
-            <div class="working-note-heading"><span>VON DER AUFGABE ZUR LÖSUNG</span><span aria-hidden="true">↗</span></div>
-            <div class="working-note-row"><span>01 / Verstehen</span><h2>Was soll<br>leichter werden?</h2><p>Für Ihre Kunden. Für Sie. Für die Menschen, die damit arbeiten.</p></div>
-            <div class="working-note-row"><span>02 / Gestalten</span><h2>Klar im Auftritt.</h2><p>Inhalte, Gestaltung und Funktionen, die zusammenpassen.</p></div>
-            <div class="working-note-result"><span>03 / Umsetzen</span><strong>Nützlich im Alltag.</strong><p>Individuell entwickelt und passend zu Ihren Abläufen.</p></div>
-          </aside>
+          <div class="studio-stage" aria-label="Drei unterschiedliche Markenwelten als Konzeptstudien">
+            <span class="stage-orbit" aria-hidden="true"></span>
+            <span class="stage-caption">GESTALTUNG, DIE ZU IHNEN PASST.</span>
+            <a class="stage-piece stage-piece--wood" href="${base}demos/business/" aria-label="Eiche & Form: Business-Demo entdecken">
+              <span class="stage-piece-top">EICHE & FORM <span aria-hidden="true">↗</span></span>
+              <img src="${base}package-demos/wood-kitchen.webp" alt="Holz und klare Linien in einer hellen Küche" width="1600" height="1067" fetchpriority="high">
+              <span class="stage-piece-title">Raum für<br><em>Handwerk.</em></span><span class="stage-piece-bottom">01 — TISCHLEREI / BUSINESS</span>
+            </a>
+            <a class="stage-piece stage-piece--clear" href="${base}demos/start/" aria-label="Klarblick: Start-Demo entdecken"><span class="stage-piece-top">klarblick <span aria-hidden="true">↗</span></span><span class="clear-window" aria-hidden="true"></span><strong>Eine klare<br>Sache.</strong><span class="stage-piece-bottom">02 — FENSTERREINIGUNG / START</span></a>
+            <a class="stage-piece stage-piece--food" href="${base}demos/complete/" aria-label="Hof & Flamme: Complete-Demo entdecken"><img src="${base}package-demos/food-dish.webp" alt="Ein angerichteter Teller als Einblick in die Restaurant-Bildwelt" width="1600" height="1067"><span class="stage-piece-top">HOF & FLAMME <span aria-hidden="true">↗</span></span><span class="stage-piece-title">Ein Abend,<br>der bleibt.</span><span class="stage-piece-bottom">03 — RESTAURANT / COMPLETE</span></a>
+            <span class="stage-stamp" aria-hidden="true">Für Ihren<br><em>eigenen</em><br>Auftritt. ↗</span>
+            <p class="stage-footnote">Drei fiktive Marken. Drei eigene Welten.</p>
+          </div>
         </div>
-        <div class="hero-bottom"><p>Webbyu · Lukas Wagner · Ein direkter Ansprechpartner.</p><span>Bad Oldesloe · Stormarn · Hamburg</span></div>
+        <div class="hero-bottom"><p><span class="status-dot" aria-hidden="true"></span> Lukas Wagner · Konzept, Gestaltung & Entwicklung</p><button type="button" class="motion-control" aria-pressed="false" hidden><span aria-hidden="true">◉</span><span data-motion-label>Bewegung reduzieren</span></button><span>Bad Oldesloe · Stormarn · Hamburg <span aria-hidden="true">↘</span></span></div>
+      </section>
+
+      <section id="arbeiten" class="work-section" aria-labelledby="work-title" aria-describedby="gallery-disclaimer">
+        <div class="section-shell">
+          <div class="section-kicker"><span>01 / AUSGEWÄHLTE KONZEPTSTUDIEN</span><span>Drei Pakete. Drei vollständige Websites.</span></div>
+          <div class="section-heading gallery-heading">
+            <h2 id="work-title">So unterschiedlich wie<br><em>Ihr Unternehmen.</em></h2>
+            <p>Vom klaren Unternehmensauftritt bis zur eigenen Markenwelt: Entdecken Sie drei vollständige Beispielwebsites und finden Sie den passenden Einstieg für Ihr Vorhaben.</p>
+          </div>
+          ${packageDemoCards(base)}
+          <details class="studio-lab"><summary><span><span class="lab-label">DAS WEBBYU LABOR</span><strong>Was kann eine Website noch?</strong><span class="lab-description">Auswahlhilfen, Shops und räumliche Erlebnisse ausprobieren.</span></span><span class="lab-toggle" aria-hidden="true">+</span></summary><div class="studio-lab-content"><p>Die Reise verbindet die drei Paketbeispiele mit zwei zusätzlichen Funktionsstudien für Shops und besondere Interaktionen. Diese Erweiterungen werden gesondert angeboten.</p>
+          <div id="journey-preview" class="journey-embed" role="region" aria-label="Die Reise – interaktive Vorschau">
+            <div class="journey-embed-bar">
+              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Von der Idee zum Erlebnis.</span></div>
+              <div class="journey-embed-actions">
+                <a href="${base}reise/" data-journey-page>Reise öffnen ${arrow}</a>
+                <button type="button" data-journey-fullscreen aria-label="Die Reise im Vollbild ansehen" aria-pressed="false" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span data-fullscreen-label>Vollbild</span></button>
+              </div>
+            </div>
+            <iframe class="journey-embed-frame" src="${base}reise/?embed=1" title="Die Reise von Webbyu – acht Stationen und fünf Beispiele" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+            <p class="journey-embed-status" role="status" hidden></p>
+          </div>
+          <div class="gallery-footer">
+            <div class="gallery-shortcuts" role="group" aria-label="Konzept direkt groß öffnen">
+              <span>Direkt groß öffnen</span>
+              ${concepts.filter(c => c.goal === 'sales' || c.goal === 'raumgut').map(c => `<button type="button" data-demo="${c.goal}" aria-label="${c.name}: Konzeptdemo groß öffnen">${c.name} ${arrow}</button>`).join('')}
+            </div>
+          </div>
+          </div></details>
+          <p id="gallery-disclaimer" class="studio-disclaimer">Beispiele für fiktive Marken, keine Kundenreferenzen. Sie können die Abläufe ausprobieren; Anfragen und Käufe sind lokale Simulationen. Informationen zum verwendeten Bildmaterial finden Sie in den jeweiligen Demos.</p>
+        </div>
       </section>
 
       <section id="ansatz" class="approach-section section-shell" aria-labelledby="approach-title">
-        <div class="section-kicker"><span>01 / DER ANSATZ</span><span>Ihr Unternehmen ist der Ausgangspunkt.</span></div>
+        <div class="section-kicker"><span>02 / DER ANSATZ</span><span>Ihr Unternehmen ist der Ausgangspunkt.</span></div>
         <div class="section-heading">
-          <h2 id="approach-title">Eine Website ist ein Teil<br><em>Ihrer täglichen Arbeit.</em></h2>
-          <p>Sie erklärt Ihr Angebot, beantwortet Fragen und bereitet Entscheidungen vor. Deshalb schaue ich auch auf das, was vor und nach einem Besuch passiert.</p>
+          <h2 id="approach-title">Gute Gestaltung beginnt<br><em>mit einer guten Frage.</em></h2>
+          <p>Was soll für Ihre Kunden leichter werden? Eine Website erklärt Ihr Angebot, beantwortet Fragen und bereitet Entscheidungen vor. Deshalb beginnt meine Arbeit mit Ihrem Unternehmen.</p>
         </div>
         <div class="approach-intro"><p>Vielleicht finden Kunden nicht die passende Leistung. Vielleicht fehlen bei Anfragen immer dieselben Angaben. Oder Sie übertragen Informationen mehrmals von Hand.</p><p>Ich kläre mit Ihnen, wo es hakt. Daraus entsteht ein Auftritt mit den Funktionen, die für Ihre Aufgabe sinnvoll sind — vom verständlichen Unternehmensauftritt bis zum angebundenen Shop.</p></div>
         <div class="situation-heading"><span>KENNEN SIE DAS?</span><p>Drei typische Ausgangspunkte — und was daraus werden kann.</p></div>
@@ -66,34 +105,6 @@ export function renderPageHtml(base: string): string {
             <div class="situation-body"><div><span>Im Alltag</span><p>${situation.context}</p></div><div><span>Ein möglicher Weg</span><p>${situation.approach}</p><p class="situation-example">${situation.example}</p></div><div class="situation-result"><span>Das Ziel</span><p>${situation.result}</p></div></div>
           </details>`).join('')}</div>
         <a class="text-link approach-link" href="#arbeiten">In den Beispielen ausprobieren <span aria-hidden="true">↓</span></a>
-      </section>
-
-      <section id="arbeiten" class="work-section" aria-labelledby="work-title" aria-describedby="gallery-disclaimer">
-        <div class="section-shell">
-          <div class="section-kicker"><span>02 / BEISPIELE ZUM AUSPROBIEREN</span><span>Vier Aufgaben. Vier eigene Wege.</span></div>
-          <div class="section-heading gallery-heading">
-            <h2 id="work-title">So kann sich eine<br><em>gute Lösung anfühlen.</em></h2>
-            <p>Wünsche für einen Raum sammeln, ein technisches Anliegen einordnen oder das passende Produkt finden: Probieren Sie aus, wie die Website bei einer konkreten Aufgabe helfen kann.</p>
-          </div>
-          <div id="journey-preview" class="journey-embed" role="region" aria-label="Die Reise – interaktive Vorschau">
-            <div class="journey-embed-bar">
-              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Von der Idee zum Erlebnis.</span></div>
-              <div class="journey-embed-actions">
-                <a href="${base}reise/" data-journey-page>Reise öffnen ${arrow}</a>
-                <button type="button" data-journey-fullscreen aria-label="Die Reise im Vollbild ansehen" aria-pressed="false" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span data-fullscreen-label>Vollbild</span></button>
-              </div>
-            </div>
-            <iframe class="journey-embed-frame" src="${base}reise/?embed=1" title="Die Reise von Webbyu – sieben Stationen und vier interaktive Konzepte" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
-            <p class="journey-embed-status" role="status" hidden></p>
-          </div>
-          <div class="gallery-footer">
-            <p id="gallery-disclaimer">Beispiele für fiktive Marken, keine Kundenreferenzen. Sie können die Abläufe ausprobieren; Anfragen und Käufe sind lokale Simulationen. Bildmaterial ist KI-generiert.</p>
-            <div class="gallery-shortcuts" role="group" aria-label="Konzept direkt groß öffnen">
-              <span>Direkt groß öffnen</span>
-              ${concepts.map(c => `<button type="button" data-demo="${c.goal}" aria-label="${c.name}: Konzeptdemo groß öffnen">${c.name} ${arrow}</button>`).join('')}
-            </div>
-          </div>
-        </div>
       </section>
 
       <section id="leistungen" class="services-section section-shell" aria-labelledby="services-title">
@@ -120,7 +131,7 @@ export function renderPageHtml(base: string): string {
             <span class="package-number">${p.number}</span>
             <div class="package-intro"><h3>${p.name}</h3><p>${p.description}</p><details class="package-details"><summary>Ablauf & Umfang</summary>${p.details.map(detail => `<p>${detail}</p>`).join('')}</details></div>
             <ul>${p.features.map(f => `<li><span aria-hidden="true">↗</span>${f}</li>`).join('')}</ul>
-            <div class="package-action"><div><strong class="package-price">${p.price}</strong><span class="package-price-note">Umfang individuell vereinbart</span></div><button type="button" data-package="${p.id}" class="round-arrow" aria-label="Paket ${p.name} vormerken">${arrow}</button></div>
+            <div class="package-action"><a class="text-link" href="${base}demos/${p.id}/">Paket-Demo ansehen ↗</a><div><strong class="package-price">${p.price}</strong><span class="package-price-note">Umfang individuell vereinbart</span></div><button type="button" data-package="${p.id}" class="round-arrow" aria-label="Paket ${p.name} vormerken">${arrow}</button></div>
           </article>`).join('')}
         </div>
         <div class="package-included"><span>GEMEINSAM KLÄREN</span><ul><li>Gestaltung & Besucherführung</li><li>Darstellung auf Handy und Computer</li><li>Inhalte & benötigte Funktionen</li><li>Prüfung, Übergabe & Betrieb</li></ul></div>
@@ -179,7 +190,7 @@ export function renderPageHtml(base: string): string {
       </section>
     </main>
     <footer class="site-footer section-shell">
-      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">webbyu<span class="wordmark-dot" aria-hidden="true"></span></a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
+      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben"><img src="${base}webbyu-wortmarke-entwurf.png" alt="" width="2172" height="724" /></a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
       <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="${base}impressum/">Impressum</a><a href="${base}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav>
       <div class="legal-notes">
         <details id="impressum"><summary>Impressum</summary><p>Betreiber: Lukas Wagner · Webbyu. Anschrift und Kontakt finden Sie im <a href="${base}impressum/">Impressum</a>.</p></details>
