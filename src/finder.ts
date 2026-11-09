@@ -1,4 +1,4 @@
-import { extensions, goals, packages, offerNotice, scopeNotice, type Goal, type PackageChoice } from './data';
+import { businessNotice, extensions, goals, packages, offerNotice, scopeNotice, type Goal, type PackageChoice } from './data';
 import { recommendPackage, type BriefState, type BriefStore } from './state';
 import type { InquiryField, InquiryRequest, InquiryResponse } from './inquiry-contract';
 import { createInquiryId, INQUIRY_CONTACT, inquiryFingerprint, inquiryFits, InquiryUncertain, invalidInquiryFields, postInquiry } from './inquiry-client';
@@ -67,7 +67,8 @@ function summaryEntries(state: BriefState): [string, string][] {
   ];
 }
 
-export function mountFinder(container: HTMLElement, store: BriefStore): { openAtStart(): void; focus(): void; dispose(): void } {
+export function mountFinder(container: HTMLElement, store: BriefStore, options: { sendEnabled?: boolean } = {}): { openAtStart(): void; focus(): void; dispose(): void } {
+  const sendEnabled = options.sendEnabled === true;
   let step = 0;
   let completed = false;
   let localUpdate = false;
@@ -170,11 +171,12 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
         <div class="finder-complete-mark" aria-hidden="true">↗</div>
         <p class="finder-eyebrow">Ihr Projekt auf einen Blick</p>
         <h3 class="finder-heading" tabindex="-1">Ihre Anfrage.<br>In Ruhe prüfen.</h3>
-        <p class="finder-step-intro">Prüfen Sie die vollständige Anfrage. Sie können sie kopieren oder Ihre Angaben bearbeiten. Erst ein Klick auf „Anfrage jetzt senden“ übermittelt sie an Webbyu.</p>
+        <p class="finder-step-intro">${sendEnabled ? 'Prüfen Sie die vollständige Anfrage. Sie können sie kopieren oder Ihre Angaben bearbeiten. Erst ein Klick auf „Anfrage jetzt senden“ übermittelt sie an Webbyu.' : 'Ihre Zusammenfassung ist fertig. Kopieren Sie sie und kontaktieren Sie mich per E-Mail oder Telefon. Der Projektfinder versendet derzeit nichts.'}</p>
+        <p class="finder-privacy">${businessNotice}</p>
         ${!attempt ? '<div class="finder-notice"><strong>Vorschau erstellt. Nichts versendet.</strong> Diese Angaben bleiben bis zum Versand nur im Speicher dieser Seite. Beim Neuladen gehen Eingaben und Anfragekennungen verloren.</div>' : ''}
         <div class="finder-summary" data-summary><dl>${summaryEntries(state).map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><p>Ein Angebot entsteht nach dem Gespräch. Den endgültigen Umfang stimmen wir gemeinsam ab.</p></div>
-        <p class="finder-privacy">Beim ausdrücklichen Versand werden die oben gezeigten Projekt- und Kontaktdaten sowie eine Anfragekennung an den Webbyu-Server übertragen und über IONOS verschlüsselt per E-Mail an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> gesendet. Ihre E-Mail-Adresse dient als Antwortadresse (Reply-To). Zur Missbrauchsabwehr und gegen Doppelversand verarbeitet der Server pseudonymisierte Schutzdaten. Es gibt keine automatische Besucher-E-Mail und keine Anhänge. <a href="${import.meta.env.BASE_URL}datenschutz/#projektfinder">Datenschutz zu Versand und Schutzdaten</a></p>
-        <div class="finder-actions finder-actions-summary"><button class="finder-back" type="button" data-action="edit" data-focus="edit">← Angaben bearbeiten</button><button class="finder-back" type="button" data-action="copy" data-focus="copy">Zusammenfassung kopieren</button><button class="finder-next" type="button" data-action="send" data-focus="send" ${inFlight || (attempt?.result !== undefined && attempt.result !== 'sending' && !(attempt.result instanceof InquiryUncertain) && attempt.result.status === 'success') ? 'disabled' : ''}>${sendLabel(attempt)} <span aria-hidden="true">↗</span></button></div>
+        ${sendEnabled ? `<p class="finder-privacy">Beim ausdrücklichen Versand werden die oben gezeigten Projekt- und Kontaktdaten sowie eine Anfragekennung an den Webbyu-Server übertragen und über IONOS verschlüsselt per E-Mail an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> gesendet. Ihre E-Mail-Adresse dient als Antwortadresse (Reply-To). Zur Missbrauchsabwehr und gegen Doppelversand verarbeitet der Server pseudonymisierte Schutzdaten. Es gibt keine automatische Besucher-E-Mail und keine Anhänge. <a href="${import.meta.env.BASE_URL}datenschutz/#projektfinder">Datenschutz zu Versand und Schutzdaten</a></p>` : `<p class="finder-privacy">Die Zusammenfassung bleibt nur in dieser Seite und wird beim Neuladen gelöscht. Es wird nichts übertragen. Kontakt: <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> oder <a href="tel:+4917642090983">+49 176 42090983</a>.</p>`}
+        <div class="finder-actions finder-actions-summary"><button class="finder-back" type="button" data-action="edit" data-focus="edit">← Angaben bearbeiten</button><button class="finder-back" type="button" data-action="copy" data-focus="copy">Zusammenfassung kopieren</button>${sendEnabled ? `<button class="finder-next" type="button" data-action="send" data-focus="send" ${inFlight || (attempt?.result !== undefined && attempt.result !== 'sending' && !(attempt.result instanceof InquiryUncertain) && attempt.result.status === 'success') ? 'disabled' : ''}>${sendLabel(attempt)} <span aria-hidden="true">↗</span></button>` : `<a class="finder-next" href="mailto:${INQUIRY_CONTACT}">E-Mail schreiben <span aria-hidden="true">↗</span></a>`}</div>
         <div class="finder-copy-status" role="status" aria-live="polite">${copyMarkup()}</div>`;
     } else {
       if (step === 0) {
@@ -213,8 +215,8 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
           <label class="finder-field finder-package-field">Paketwunsch selbst wählen<select name="selectedPackage" data-focus="selectedPackage"><option value="custom" ${choice === 'custom' ? 'selected' : ''}>Individuellen Umfang klären</option>${packages.map(item => `<option value="${item.id}" ${choice === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select></label>
           <p class="finder-scope-note">${scopeNotes(state)}</p>
           <p class="finder-chosen-extras"><strong>Ihre Erweiterungen</strong><span>${escape(extensionNames(state))}</span></p>
-          <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">*</span><input type="text" name="name" data-focus="name" autocomplete="name" required maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">*</span><input type="email" name="email" data-focus="email" autocomplete="email" required maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-unternehmen.de"></label></div>
-          <p class="finder-privacy">* Erforderlich für Ihre Anfrage. Bis zum ausdrücklichen Versand bleiben Ihre Eingaben nur im Speicher dieser Seite. Als Nächstes prüfen Sie eine Vorschau; erst danach können Sie die Anfrage über IONOS per E-Mail an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> senden. Beim Neuladen gehen die Eingaben verloren. <a href="${import.meta.env.BASE_URL}datenschutz/#projektfinder">Datenschutz zu Versand und Schutzdaten</a></p>`;
+          <div class="finder-fields finder-contact"><label class="finder-field">Ihr Name <span class="finder-required">${sendEnabled ? '*' : '(optional)'}</span><input type="text" name="name" data-focus="name" autocomplete="name" ${sendEnabled ? 'required' : ''} maxlength="120" value="${escape(state.name)}" placeholder="Vor- und Nachname"></label><label class="finder-field">Ihre E-Mail <span class="finder-required">${sendEnabled ? '*' : '(optional)'}</span><input type="email" name="email" data-focus="email" autocomplete="email" ${sendEnabled ? 'required' : ''} maxlength="254" value="${escape(state.email)}" placeholder="hallo@ihr-unternehmen.de"></label></div>
+          ${sendEnabled ? `<p class="finder-privacy">* Erforderlich für Ihre Anfrage. Bis zum ausdrücklichen Versand bleiben Ihre Eingaben nur im Speicher dieser Seite. Als Nächstes prüfen Sie eine Vorschau; erst danach können Sie die Anfrage über IONOS per E-Mail an <a href="mailto:${INQUIRY_CONTACT}">${INQUIRY_CONTACT}</a> senden. Beim Neuladen gehen die Eingaben verloren. <a href="${import.meta.env.BASE_URL}datenschutz/#projektfinder">Datenschutz zu Versand und Schutzdaten</a></p>` : `<p class="finder-privacy">Name und E-Mail sind für Ihre lokale Zusammenfassung optional. Diese Seite versendet nichts. Kopieren Sie Ihre Angaben und kontaktieren Sie mich direkt. Beim Neuladen werden Ihre Eingaben verworfen.</p>`}`;
       }
 
       body += `<div class="finder-actions">${step > 0 ? '<button class="finder-back" type="button" data-action="back" data-focus="back">← Zurück</button>' : '<span class="finder-time">Schritt für Schritt. Ganz unverbindlich.</span>'}<button class="finder-next" type="submit" data-focus="next">${step === 3 ? 'Anfrage prüfen' : 'Weiter'} <span aria-hidden="true">↗</span></button></div>`;
@@ -277,7 +279,8 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
     event.preventDefault();
     if (completed) return;
     website = container.querySelector<HTMLInputElement>('[name="website"]')?.value ?? website;
-    const invalid = invalidInquiryFields(store.get()).filter(field => step === 3 || fieldSteps[field] === step);
+    const invalid = invalidInquiryFields(store.get()).filter(field =>
+      (sendEnabled || !['name', 'email'].includes(field)) && (step === 3 || fieldSteps[field] === step));
     if (invalid.length) { showInvalid(invalid); return; }
     if (step < 3) {
       step += 1;
@@ -307,7 +310,7 @@ export function mountFinder(container: HTMLElement, store: BriefStore): { openAt
   }
 
   async function send() {
-    if (!completed || inFlight || disposed) return;
+    if (!sendEnabled || !completed || inFlight || disposed) return;
     website = container.querySelector<HTMLInputElement>('[name="website"]')?.value ?? website;
     const state = store.get();
     const invalid = invalidInquiryFields(state);

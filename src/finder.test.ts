@@ -28,11 +28,29 @@ describe('project finder', () => {
     randomUUID = vi.fn().mockReturnValueOnce(id).mockReturnValue(secondId);
     vi.stubGlobal('fetch', fetchMock);
     vi.stubGlobal('crypto', { randomUUID });
-    finder = mountFinder(container, store);
+    finder = mountFinder(container, store, { sendEnabled: true });
   });
   afterEach(() => { finder.dispose(); container.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
   function next() { container.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }
+
+  it('defaults to a local summary without mandatory contact data or any sending path', async () => {
+    finder.dispose();
+    finder = mountFinder(container, store);
+    next(); next(); next();
+    expect(container.querySelector<HTMLInputElement>('[name="name"]')!.required).toBe(false);
+    expect(container.querySelector<HTMLInputElement>('[name="email"]')!.required).toBe(false);
+    next();
+    expect(container.querySelector('[data-summary]')).not.toBeNull();
+    expect(container.querySelector('[data-action="send"]')).toBeNull();
+    expect(container.textContent).toContain('Der Projektfinder versendet derzeit nichts.');
+    const injected = document.createElement('button');
+    injected.dataset.action = 'send';
+    container.append(injected);
+    injected.click();
+    await settle();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
   function choose(value: string) { container.querySelector<HTMLInputElement>(`input[value="${value}"]`)!.click(); }
   function change(name: string, value: string) {
     const input = container.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${name}"]`)!;

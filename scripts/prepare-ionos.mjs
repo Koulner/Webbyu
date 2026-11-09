@@ -2,13 +2,14 @@ import { copyFileSync, cpSync, readFileSync, writeFileSync, mkdirSync, existsSyn
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { listFiles } from './deploy-ionos.mjs';
+import { pages } from '../site.config.mjs';
 
 export function prepare(env = process.env) {
   const commit = env.GITHUB_SHA;
   if (!/^[a-f0-9]{40}$/.test(commit ?? '')) throw new Error('A valid GITHUB_SHA is required.');
-  for (const page of ['index.html', 'reise/index.html', 'impressum/index.html', 'datenschutz/index.html', '404.html']) {
-    const html = readFileSync(`dist/${page}`, 'utf8');
-    if (html.includes('/Webbyu/') || html.includes('%BASE_URL%')) throw new Error(`Incorrect production base path in ${page}. Build with SITE_BASE_PATH=/.`);
+  for (const page of pages) {
+    const html = readFileSync(`dist/${page.file}`, 'utf8');
+    if (html.includes('/Webbyu/') || html.includes('%BASE_URL%')) throw new Error(`Incorrect production base path in ${page.file}. Build with SITE_BASE_PATH=/.`);
   }
   for (const file of ['vendor/autoload.php', 'vendor/phpmailer/phpmailer/src/PHPMailer.php', 'vendor/composer/installed.json', 'composer.lock']) {
     if (!existsSync(`backend/${file}`)) throw new Error('Install locked production Composer dependencies before preparing IONOS.');
