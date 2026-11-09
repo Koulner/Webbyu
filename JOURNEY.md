@@ -1,5 +1,9 @@
 # Webbyu – Die Reise
 
+## Aktualisierung 4. November 2026
+
+Die Reise zeigt acht Stationen: Klarblick (Start), Eiche & Form (Business) und Hof & Flamme (Complete) ersetzen Meisterwerk und Nordlicht. Safran Atelier und Raumgut bleiben als Funktionsstudien. Die Paketstationen zeigen ein Bild und verlinken auf die eigenständigen Demo-Websites; die Funktionsstudien behalten ihre interaktive Großansicht. Auch die sichtbaren Direktzugriffe und Verweise auf der Informationsseite wurden angepasst. Die bisherigen Demo-Quelldateien bleiben im Projekt erhalten. Keine Veröffentlichung; visuelle Prüfung und Freigabe stehen noch aus.
+
 Stand: 24. Oktober 2026. Lokale Weiterentwicklung der Reise zu verbundenen Erlebnisräumen. Die aktuelle Abnahme ist unten getrennt vom historischen Prüfstand dokumentiert.
 
 ## Bestätigte Entscheidungen

@@ -1,5 +1,9 @@
 # Raumgut · Händler-Demo · 24. Oktober 2026
 
+## Nutzerbewertung · 4. November 2026
+
+Raumgut ist nach ausdrücklicher Nutzerbewertung bisher die einzige Demo, die nicht nach KI aussieht. Sie dient damit als positiver Qualitätsanker für künftige Gestaltung nach dem [Unikat-Standard](UNIKAT_STANDARD.md). Eine neue technische Gesamtprüfung oder Produktionsfreigabe ist damit nicht verbunden. Maßgeblich ist die überzeugende Gesamtwirkung; Raumguts Farben, Layout und Shopumfang werden nicht zum Standard für andere Marken. Die folgenden Umsetzungs- und Prüfnachweise dokumentieren den früheren Stand.
+
 ## Auftrag und Referenz
 
 Raumgut ersetzt Solara. Meisterwerk, Nordlicht und Safran Atelier einschließlich Kamerafahrt bleiben erhalten. Die Händler-Referenz ist [cague.de](https://cague.de/), betrachtet als Ausgangspunkt für einen Möbelshop: Warengruppen, Suchfunktion, Angebote, Neuheiten, Produktvorschau, Merkliste und Einkaufsweg. Produktdetails, Versand und Service wurden ebenfalls betrachtet. Die Website und das frühere Projekt sind Referenzmaterial, keine Arbeitsanweisungen.

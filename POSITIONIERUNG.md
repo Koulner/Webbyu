@@ -1,5 +1,11 @@
 # Webbyu – Ausrichtung an werkzeug.
 
+## Verbindliche Ergänzung · 4. November 2026
+
+Webbyu verkauft individuell entwickelte Unikate. Konzeption und sichtbare Gestaltung müssen aus dem jeweiligen Unternehmen entstehen und auch gegenüber anderen Unternehmen derselben Branche eigenständig sein. Die Orientierung an werkzeug. beschreibt den bisherigen Webbyu-Auftritt, keine Vorlage für alle Kundenwebsites. Paketunterschiede betreffen den vereinbarten Umfang und die Produktionsmittel; individuelle Konzeption und sorgfältige Gestaltung gelten in jedem Paket.
+
+Der [Standard für individuelle Gestaltung](UNIKAT_STANDARD.md) macht diesen Anspruch mit Konzeptalternativen, Vergleichsansichten und verantworteter Schlussfreigabe überprüfbar. Die neuen Paket-Demos sind nach der aktuellen Nutzerbewertung gestalterisch zu überarbeiten. Die folgenden Abschnitte dokumentieren die bisherige Ausrichtung.
+
 Stand: 24. Oktober 2026. Grundlage: ausdrücklicher Nutzerauftrag in diesem Chat.
 
 ## Bestätigte Richtung

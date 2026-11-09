@@ -1,5 +1,17 @@
 # Webbyu – Redesign delivery protocol
 
+## Individual design standard — 2026-11-04
+
+The user rejected the new package demos as insufficiently distinctive for Webbyu's promise of unique work. For new design work and demo revisions, read [UNIKAT_STANDARD.md](UNIKAT_STANDARD.md) and the updated [MASTER_PROMPT_WEBDESIGN.md](MASTER_PROMPT_WEBDESIGN.md). Develop distinct concept alternatives, document the selection, demonstrate the idea across desktop/mobile and the page sequence, and compare it against other Webbyu designs and a same-industry substitution. Final design acceptance requires documented review by the responsible person; automated self-ratings and passing technical checks do not establish it. Klarblick, Eiche & Form and Hof & Flamme need design revision. Earlier technical evidence remains scoped to its tested version. This update changes documentation only.
+
+## Landscape journey — 2026-10-24
+
+The user requested implementation of the approved seven-station journey plan. This adds a separate static `/reise/` entry, a deterministic Three.js landscape with shared vector fallback/teaser, native-scroll chapter navigation and cached access to the existing four demos. Current blue/ivory/lime tokens from POSITIONIERUNG.md take precedence over the historical palette below. Reduced motion uses a fixed overview; WebGL failure/context loss preserves all content and controls. Work remains local. Decisions, extension guidance and acceptance evidence are in JOURNEY.md; tracked in IDEE-06 in IDEEN_UND_ROADMAP.md. Earlier package states and the glasses concept remain preserved.
+
+## Ideas and next product concept — 2026-10-24
+
+Read [IDEEN_UND_ROADMAP.md](IDEEN_UND_ROADMAP.md) before continuing the referral, sales, load-management, media or single-product work. It tracks all five ideas, confirmed decisions, open questions and reusable continuation prompts. The user's next priority is an immersive product onepager for glasses; product content is forthcoming. Update that tracker as work proceeds. Commercial rules, animation technology and replacement of existing demos have not been decided.
+
 ## Accepted objective
 
 German agency prototype for a single founder in Hamburg / Bad Oldesloe: a light editorial page with a dark interactive 3D demo gallery. User correction on 2026-10-24: Webbyu has one founder; use first-person singular and “Über mich” navigation. This supersedes the historical two-founder/team wording below. Instrument Sans for UI/body and Instrument Serif for large headings and genuine italic accents, locally served with licenses. Palette: ivory #F5F1EA, ink #241D26, aubergine #513448, gallery #151419, champagne #C7B29A. Body text >=16px, functional labels >=12px. Use a compact typographic introduction, generous dark gallery, clear services/process/finder, restrained contours and considered lighting.
