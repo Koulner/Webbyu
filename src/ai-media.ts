@@ -7,7 +7,7 @@ export const AI_LABEL = 'KI-generiert';
 
 /** Path fragments of AI-generated files below `public/` or `src/assets/`. */
 export const aiMediaPatterns: readonly RegExp[] = [
-  /package-demos\/(?:klarblick-(?:concept|800)|eiche-concept|hof-(?:concept|800))\.webp/,
+  /package-demos\/(?:klarblick-(?:concept|800)|eiche-concept|hof-(?:concept|800|ki-[a-z]+(?:-800)?))\.webp/,
   /reference-assets\/raumgut\//,
   /reference-assets\/(?:materials|room-diptych)/,
   /assets\/demos\/saffron\//,

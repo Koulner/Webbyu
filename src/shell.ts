@@ -1,3 +1,4 @@
+import { hofPlakat } from './package-demos/hof/feuer';
 import { packageDemoCards, packageDemos } from './package-demos/catalogue';
 import { businessNotice, concepts, extensions, packages, packageQuestions, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
@@ -52,7 +53,7 @@ export function renderPageHtml(base: string): string {
               <span class="stage-piece-title">Gerade Möbel für<br><em>schiefe Häuser.</em></span><span class="stage-piece-bottom">01 — TISCHLEREI / BUSINESS</span>
             </a>
             <a class="stage-piece stage-piece--clear" href="${base}demos/start/" aria-label="Klarblick: Start-Demo entdecken"><span class="stage-piece-top">klarblick <span aria-hidden="true">↗</span></span><span class="clear-window" aria-hidden="true"></span><strong>Dieses eine<br>Fenster.</strong><span class="stage-piece-bottom">02 — FENSTERREINIGUNG / START</span></a>
-            <a class="stage-piece stage-piece--food" href="${base}demos/complete/" aria-label="Hof & Flamme: Complete-Demo entdecken"><img src="${base}package-demos/food-dish.webp" alt="Ein angerichteter Teller als Einblick in die Restaurant-Bildwelt" width="1600" height="1067"><span class="stage-piece-top">HOF & FLAMME <span aria-hidden="true">↗</span></span><span class="stage-piece-title">Ein Abend,<br>der bleibt.</span><span class="stage-piece-bottom">03 — RESTAURANT / COMPLETE</span></a>
+            <a class="stage-piece stage-piece--food" href="${base}demos/complete/" aria-label="Hof & Flamme: Complete-Demo entdecken">${hofPlakat()}<span class="stage-piece-top">HOF & FLAMME <span aria-hidden="true">↗</span></span><span class="stage-piece-title">Wir kochen,<br>bis das Feuer<br>aus ist.</span><span class="stage-piece-bottom">03 — RESTAURANT / COMPLETE</span></a>
             <span class="stage-stamp" aria-hidden="true">Für Ihren<br><em>eigenen</em><br>Auftritt. ↗</span>
             <p class="stage-footnote">Drei fiktive Marken. Drei eigene Welten.</p>
           </div>

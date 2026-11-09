@@ -69,6 +69,30 @@ describe('complete package websites', () => {
     expect((form.elements.namedItem('fensterliste') as HTMLInputElement).value).toBe('');
     dispose();
   });
+  it('derives the Hof menu from one fire and keeps the seat request local', () => {
+    vi.stubGlobal('matchMedia', () => ({matches:false,addEventListener:vi.fn()}));
+    const karte=document.createElement('div'); karte.innerHTML=renderPackageDemo('/demos/complete/speisekarte/', '/'); document.body.append(karte);
+    const disposeKarte=mountPackageDemo(karte);
+    const haken=karte.querySelector<HTMLInputElement>('[data-ohne-fleisch]')!;
+    expect(karte.querySelector('[data-schalter]')!.hasAttribute('hidden')).toBe(false);
+    haken.checked=true; haken.dispatchEvent(new Event('change'));
+    expect(karte.querySelector('[data-karte]')!.hasAttribute('data-ohne')).toBe(true);
+    expect(karte.querySelectorAll('.hf-gangband > ul > li')).toHaveLength(7);
+    disposeKarte(); karte.remove();
+    const root=document.createElement('div'); root.innerHTML=renderPackageDemo('/demos/complete/kontakt/', '/'); document.body.append(root);
+    const dispose=mountPackageDemo(root);
+    const form=root.querySelector('form')!;
+    const sonntag=root.querySelector<HTMLButtonElement>('[data-abend-wahl^="Sonntag"]')!; sonntag.click();
+    expect((form.elements.namedItem('abend') as HTMLSelectElement).value).toBe('Sonntag, 12:30 Uhr');
+    expect(sonntag.getAttribute('aria-pressed')).toBe('true');
+    const set=(name: string, value: string) => { (form.elements.namedItem(name) as HTMLInputElement).value=value; };
+    set('name','Beispiel'); set('email','demo@example.test'); set('message','Eine Person isst kein Fleisch.');
+    form.dispatchEvent(new Event('submit',{cancelable:true}));
+    const review=root.querySelector('[data-form-review] dl')!.textContent!;
+    expect(review).toContain('Personenzwei Personen'); expect(review).toContain('AbendSonntag, 12:30 Uhr'); expect(review).not.toContain('mm');
+    root.querySelector<HTMLButtonElement>('[data-confirm]')!.click();
+    dispose();
+  });
   it('draws the visitor niche from four measures and lists them in the local review', () => {
     vi.stubGlobal('matchMedia', () => ({matches:false,addEventListener:vi.fn()}));
     const root=document.createElement('div'); root.innerHTML=renderPackageDemo('/demos/business/kontakt/', '/'); document.body.append(root);

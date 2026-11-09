@@ -1,7 +1,8 @@
 import './style.css';
 import './identities.css';
-import './hof-pages.css';
 import './eiche/eiche.css';
+import './hof/hof.css';
+import { mountHof } from './hof/client';
 import { mountEiche } from './eiche/client';
 import { mountKlarblick } from './klarblick-client';
 import './klarblick.css';
@@ -63,6 +64,7 @@ export function mountPackageDemo(root: HTMLElement) {
   root.querySelectorAll('.pd-card,.pd-copy,.pd-gallery figure').forEach(el => observer?.observe(el));
   const disposeEiche = root.querySelector('.pd-business') ? mountEiche(root, abort.signal) : () => {};
   if (root.querySelector('.pd-start')) mountKlarblick(root, abort.signal);
+  if (root.querySelector('.pd-complete')) mountHof(root, abort.signal);
   return () => { abort.abort(); observer?.disconnect(); video?.pause(); disposeEiche(); };
 }
 const root = document.querySelector<HTMLElement>('#package-demo-app');
