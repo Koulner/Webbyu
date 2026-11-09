@@ -1,12 +1,13 @@
 import { stations } from './data';
 import { landscapeSvg, mapProjection } from './map';
+import { wordmarkImg } from '../wordmark';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 export function renderJourneyHtml(home: string): string {
   return `
     <a class="journey-skip" href="#reise-kapitel">Zu den Kapiteln springen</a>
     <header class="journey-header">
-      <a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite"><img src="${home}webbyu-wortmarke-entwurf.png" alt="" width="2172" height="724" /></a>
+      <a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">${wordmarkImg(home, '(max-width: 600px) 135px, 154px')}</a>
       <nav aria-label="Hauptnavigation"><a href="${home}#arbeiten">Die Arbeiten</a><a href="#landschaft" aria-current="page">Die Reise <i aria-hidden="true"></i></a><a href="${home}#ueber-uns">Über mich</a></nav>
       <a class="journey-contact" href="${home}#projektfinder" aria-label="Projekt besprechen">Projekt besprechen ${arrow}</a>
     </header>
@@ -77,7 +78,7 @@ export function renderJourneyHtml(home: string): string {
       <div class="journey-progress" aria-hidden="true"><span></span></div>
     </div>
     <p class="journey-map-hint" data-map-hint>Scrollen führt Sie durch die Erlebnisräume. Alle Stationen sind auch direkt anwählbar.</p>
-    <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite"><img src="${home}webbyu-wortmarke-entwurf.png" alt="" width="2172" height="724" /></a><p>Ein Gründer. Ein direkter Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><nav class="journey-legal" aria-label="Rechtliche Angaben"><a href="${home}impressum/">Impressum</a><a href="${home}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav><a href="${home}">Zur Startseite ${arrow}</a></footer>
+    <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">${wordmarkImg(home, '(max-width: 600px) 135px, 154px')}</a><p>Ein Gründer. Ein direkter Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><nav class="journey-legal" aria-label="Rechtliche Angaben"><a href="${home}impressum/">Impressum</a><a href="${home}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav><a href="${home}">Zur Startseite ${arrow}</a></footer>
     <div class="journey-status" role="status" aria-live="polite"></div><div data-demo-parking hidden></div>`;
 }
 
