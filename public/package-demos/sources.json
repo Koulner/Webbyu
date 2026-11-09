@@ -121,5 +121,35 @@
     "source": "Prozedural erzeugt mit pilot/eiche-form/strecke/tools/gen-oak.py, 4. November 2026",
     "type": "Erzeugte Holzstruktur; kein Foto",
     "local_bytes": 51002
+  },
+  {
+    "file": "klarblick-klinker.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 16153
+  },
+  {
+    "file": "klarblick-schiefer.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 5107
+  },
+  {
+    "file": "klarblick-hecke.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 46541
+  },
+  {
+    "file": "klarblick-gehweg.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 1932
+  },
+  {
+    "file": "klarblick-giebel.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 17174
   }
 ]

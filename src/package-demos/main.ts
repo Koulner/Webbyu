@@ -3,6 +3,7 @@ import './identities.css';
 import './hof-pages.css';
 import './eiche/eiche.css';
 import { mountEiche } from './eiche/client';
+import { mountKlarblick } from './klarblick-client';
 import './klarblick.css';
 import '../ai-badge.css';
 export function mountPackageDemo(root: HTMLElement) {
@@ -28,7 +29,7 @@ export function mountPackageDemo(root: HTMLElement) {
       const data = new FormData(form);
       const rows: [string, string][] = [['Name', String(data.get('name') ?? '')], ['E-Mail', String(data.get('email') ?? '')]];
       // Optionale Zusatzfelder einer Demo, etwa Maße, erscheinen nur mit Inhalt.
-      form.querySelectorAll<HTMLInputElement>('[data-review]').forEach(input => { if (input.value.trim()) rows.push([input.dataset.review!, `${input.value.trim()} mm`]); });
+      form.querySelectorAll<HTMLInputElement>('[data-review]').forEach(input => { if (input.value.trim()) rows.push([input.dataset.review!, `${input.value.trim()}${input.dataset.einheit ?? ' mm'}`]); });
       rows.push(['Ihr Anliegen', String(data.get('message') ?? '')]);
       for (const [title, value] of rows) {
         const dt = document.createElement('dt'); dt.textContent = title;
@@ -61,6 +62,7 @@ export function mountPackageDemo(root: HTMLElement) {
   const observer = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(entries => { entries.forEach(entry => { if(entry.isIntersecting) { if (!reduce.matches) entry.target.classList.add('pd-reveal'); observer?.unobserve(entry.target); } }); }, {threshold:.12}) : null;
   root.querySelectorAll('.pd-card,.pd-copy,.pd-gallery figure').forEach(el => observer?.observe(el));
   const disposeEiche = root.querySelector('.pd-business') ? mountEiche(root, abort.signal) : () => {};
+  if (root.querySelector('.pd-start')) mountKlarblick(root, abort.signal);
   return () => { abort.abort(); observer?.disconnect(); video?.pause(); disposeEiche(); };
 }
 const root = document.querySelector<HTMLElement>('#package-demo-app');

@@ -49,6 +49,26 @@ describe('complete package websites', () => {
     root.querySelector<HTMLButtonElement>('[data-reset]')!.click(); expect(form.hidden).toBe(false);
     dispose(); storage.mockRestore();
   });
+  it('counts windows, draws them and lists them in the local Klarblick review', () => {
+    vi.stubGlobal('matchMedia', () => ({matches:false,addEventListener:vi.fn()}));
+    const root=document.createElement('div'); root.innerHTML=renderPackageDemo('/demos/start/', '/'); document.body.append(root);
+    const dispose=mountPackageDemo(root);
+    const form=root.querySelector('form')!;
+    const plus=(art: string) => form.querySelector<HTMLButtonElement>(`[data-art=${art}] [data-mehr]`)!.click();
+    expect(root.querySelector('[data-summe]')!.textContent).toBe('Noch steht kein Fenster.');
+    plus('rund'); plus('sprossen'); plus('sprossen');
+    expect(root.querySelector('[data-summe]')!.textContent).toBe('Macht 3 Fenster.');
+    expect(root.querySelector('[data-mein-haus] svg')!.getAttribute('aria-label')).toBe('Ihr Haus mit 3 Fenstern.');
+    expect(root.querySelector('[data-wagen]')!.textContent).toContain('Eckenpinsel');
+    const set=(name: string, value: string) => { (form.elements.namedItem(name) as HTMLInputElement).value=value; };
+    set('name','Beispiel'); set('email','demo@example.test'); set('message','Reinfeld, Einfahrt schmal');
+    form.dispatchEvent(new Event('submit',{cancelable:true}));
+    expect(root.querySelector('[data-form-review] dl')!.textContent).toContain('Ihre Fenster1 × Rund im Giebel, 2 × Sprossen');
+    root.querySelector<HTMLButtonElement>('[data-confirm]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-reset]')!.click();
+    expect((form.elements.namedItem('fensterliste') as HTMLInputElement).value).toBe('');
+    dispose();
+  });
   it('draws the visitor niche from four measures and lists them in the local review', () => {
     vi.stubGlobal('matchMedia', () => ({matches:false,addEventListener:vi.fn()}));
     const root=document.createElement('div'); root.innerHTML=renderPackageDemo('/demos/business/kontakt/', '/'); document.body.append(root);
