@@ -26,7 +26,7 @@ function unlabelledAiImages(html: string): string[] {
 
 describe('AI media disclosure', () => {
   it('recognises AI files and keeps licensed or self-rendered media unlabelled', () => {
-    for (const src of ['/package-demos/klarblick-concept.webp', '/package-demos/hof-800.webp', '/reference-assets/raumgut/chair.jpg', '/reference-assets/materials-960.webp', '/src/assets/demos/saffron/flower.webp', '/webbyu-wortmarke-entwurf.png']) expect(isAiMedia(src), src).toBe(true);
+    for (const src of ['/package-demos/klarblick-concept.webp', '/package-demos/hof-800.webp', '/reference-assets/raumgut/chair.jpg', '/reference-assets/materials-960.webp', '/src/assets/demos/saffron/flower.webp', '/webbyu-wortmarke.png', '/webbyu-wortmarke-405.webp', '/webbyu-w-icon.png']) expect(isAiMedia(src), src).toBe(true);
     for (const src of ['/package-demos/wood-kitchen.webp', '/package-demos/food-dish.webp', '/package-demos/eiche-fall14.webp', '/package-demos/eiche-holz.webp', '/social/webbyu.jpg']) expect(isAiMedia(src), src).toBe(false);
     expect(aiBadge()).toContain(AI_LABEL);
   });

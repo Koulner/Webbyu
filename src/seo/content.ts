@@ -1,3 +1,5 @@
+import { wordmarkImg } from '../wordmark';
+
 type PageContext = { link: (path: string) => string };
 
 type ContentPage = {
@@ -242,7 +244,7 @@ export function renderContentPage(path: string, base: string): string {
   return `
     <a class="content-skip" href="#inhalt">Zum Inhalt</a>
     <header class="content-header">
-      <a class="content-wordmark" href="${link('/')}" aria-label="Webbyu – Startseite"><img src="${link('/webbyu-wortmarke-entwurf.png')}" alt="" width="2172" height="724" /></a>
+      <a class="content-wordmark" href="${link('/')}" aria-label="Webbyu – Startseite">${wordmarkImg(link('/'), '(max-width: 600px) 135px, 154px')}</a>
       <nav class="content-nav" aria-label="Hauptnavigation">${nav.map(([href, label]) => `<a href="${link(href)}"${href === cleanPath ? ' aria-current="page"' : ''}>${label}</a>`).join('')}<a class="content-nav-contact" href="${link('/#projektfinder')}">Vorhaben besprechen <span aria-hidden="true">↗</span></a></nav>
     </header>
     <main id="inhalt" class="content-main${page.article ? ' content-is-article' : ''}" tabindex="-1">
@@ -256,5 +258,5 @@ export function renderContentPage(path: string, base: string): string {
       ${page.body({ link })}
       <aside class="content-contact" aria-labelledby="kontakt-titel"><div><p class="content-eyebrow">Ihr nächster Schritt</p><h2 id="kontakt-titel">Was soll Ihre Website leichter machen?</h2><p>Beschreiben Sie Ihr Unternehmen und Ihre wichtigste Aufgabe. Wir klären gemeinsam, welcher Umfang sinnvoll ist. Angebot auf Anfrage.</p><p class="content-contact-small">Für Unternehmen und Selbstständige · Bad Oldesloe, Stormarn & Umgebung</p></div><div class="content-contact-actions"><a class="content-button" href="${link('/#projektfinder')}">Vorhaben besprechen <span aria-hidden="true">↗</span></a><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><a href="tel:+4917642090983">+49 176 42090983</a></div></aside>
     </main>
-    <footer class="content-footer"><div class="content-footer-top"><a class="content-wordmark" href="${link('/')}" aria-label="Webbyu – Startseite"><img src="${link('/webbyu-wortmarke-entwurf.png')}" alt="" width="2172" height="724" /></a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p></div><nav aria-label="Weitere Seiten"><a href="${link('/websites-fuer-unternehmen/')}">Websites für Unternehmen</a><a href="${link('/anfrageformulare-auswahlhilfen/')}">Anfrageformulare & Auswahlhilfen</a><a href="${link('/ueber-mich/')}">Über mich</a><a href="${link('/ratgeber/')}">Ratgeber</a><a href="${link('/reise/')}">Konzeptstudien</a><a href="${link('/impressum/')}">Impressum</a><a href="${link('/datenschutz/')}">Datenschutz</a><button class="content-privacy-open" type="button" data-privacy-open hidden>Cookie-Einstellungen</button></nav><div class="content-footer-bottom"><span>© 2026 Webbyu · Lukas Wagner</span><span>Individuelle Websites & hilfreiche Funktionen</span></div></footer>`;
+    <footer class="content-footer"><div class="content-footer-top"><a class="content-wordmark" href="${link('/')}" aria-label="Webbyu – Startseite">${wordmarkImg(link('/'), '(max-width: 600px) 135px, 154px')}</a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p></div><nav aria-label="Weitere Seiten"><a href="${link('/websites-fuer-unternehmen/')}">Websites für Unternehmen</a><a href="${link('/anfrageformulare-auswahlhilfen/')}">Anfrageformulare & Auswahlhilfen</a><a href="${link('/ueber-mich/')}">Über mich</a><a href="${link('/ratgeber/')}">Ratgeber</a><a href="${link('/reise/')}">Konzeptstudien</a><a href="${link('/impressum/')}">Impressum</a><a href="${link('/datenschutz/')}">Datenschutz</a><button class="content-privacy-open" type="button" data-privacy-open hidden>Cookie-Einstellungen</button></nav><div class="content-footer-bottom"><span>© 2026 Webbyu · Lukas Wagner</span><span>Individuelle Websites & hilfreiche Funktionen</span></div></footer>`;
 }

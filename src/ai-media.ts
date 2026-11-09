@@ -11,7 +11,7 @@ export const aiMediaPatterns: readonly RegExp[] = [
   /reference-assets\/raumgut\//,
   /reference-assets\/(?:materials|room-diptych)/,
   /assets\/demos\/saffron\//,
-  /webbyu-(?:wortmarke-entwurf|w-icon-entwurf|symbol-db-\d+)\.png/,
+  /webbyu-(?:wortmarke|w-icon|symbol-db-\d+)(?:-\d+)?\.(?:png|webp)/,
 ];
 
 export const isAiMedia = (src: string): boolean => aiMediaPatterns.some(pattern => pattern.test(src));

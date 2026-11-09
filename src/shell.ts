@@ -2,6 +2,7 @@ import { hofPlakat } from './package-demos/hof/feuer';
 import { packageDemoCards, packageDemos } from './package-demos/catalogue';
 import { businessNotice, concepts, extensions, packages, packageQuestions, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
+import { wordmarkImg } from './wordmark';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -10,7 +11,7 @@ export function renderPageHtml(base: string): string {
   return `
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <header class="site-header">
-      <a class="wordmark" href="#" aria-label="Webbyu – Startseite"><img src="${base}webbyu-wortmarke-entwurf.png" alt="" width="2172" height="724" /></a>
+      <a class="wordmark" href="#" aria-label="Webbyu – Startseite">${wordmarkImg(base, '(max-width: 600px) 128px, 145px')}</a>
       <nav aria-label="Hauptnavigation">
         <a href="#arbeiten">Beispiele <span>${String(2 + packageDemos.length).padStart(2, '0')}</span></a>
         <a href="#ansatz">Ansatz</a>
@@ -191,7 +192,7 @@ export function renderPageHtml(base: string): string {
       </section>
     </main>
     <footer class="site-footer section-shell">
-      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben"><img src="${base}webbyu-wortmarke-entwurf.png" alt="" width="2172" height="724" /></a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
+      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">${wordmarkImg(base, '(max-width: 600px) 245px, clamp(180px, 30vw, 410px)')}</a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
       <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="${base}impressum/">Impressum</a><a href="${base}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav>
       <div class="legal-notes">
         <details id="impressum"><summary>Impressum</summary><p>Betreiber: Lukas Wagner · Webbyu. Anschrift und Kontakt finden Sie im <a href="${base}impressum/">Impressum</a>.</p></details>
