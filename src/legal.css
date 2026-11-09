@@ -34,3 +34,7 @@ p { margin: 0 0 14px; }
 .legal-skip:focus { transform: translateY(0); }
 @media (max-width: 550px) { .legal-header { gap: 18px; } .legal-header > a:last-child { font-size: 14px; } main { padding-top: 40px; } .legal-footer { flex-direction: column; align-items: flex-start; } }
 @media print { .legal-skip, .legal-header, .legal-footer { display: none; } main { max-width: none; padding: 0; } :root { background: white; color: black; } section { break-inside: avoid; } }
+.legal-ai { margin-top: 48px; padding-top: 24px; border-top: 1px solid #d1d5d1; }
+.legal-ai h2 { font-size: 27px; margin: 0 0 16px; }
+.legal-ai ul { padding-left: 1.2em; }
+.legal-ai li + li { margin-top: .5em; }

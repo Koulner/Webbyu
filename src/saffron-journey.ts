@@ -1,4 +1,6 @@
 import './saffron-journey.css';
+import './ai-badge.css';
+import { aiBadge } from './ai-media';
 
 // Original rendered camera move from the user's reference project, frames 0–400.
 // The branded jar enters later and is deliberately outside this anonymous excerpt.
@@ -27,7 +29,7 @@ export function saffronJourneyMarkup(id: string) {
     <div class="demo-spice-section-heading"><p class="demo-eyebrow">Eine Reise ins Detail</p><h3>Von der Blüte<br><em>zum Gewürz.</em></h3><p>Folgen Sie der Kamera. Oder springen Sie direkt zu einem Kapitel.</p></div>
     <div class="saffron-stage">
       <div class="demo-botanical-controls" role="group" aria-label="Botanisches Kapitel">${saffronChapters.map((chapter, index) => `<button type="button" data-ingredient="${index}" aria-pressed="${index === 0}" aria-controls="${id}-botanical"><span>0${index + 1}</span>${chapter.title}</button>`).join('')}</div>
-      <figure id="${id}-botanical" class="demo-botanical-figure"><div class="saffron-picture"><img data-ingredient-image src="${saffronChapters[0].image}" alt="${saffronChapters[0].alt}" width="960" height="540" loading="lazy"><canvas data-saffron-layer aria-hidden="true"></canvas><canvas data-saffron-layer aria-hidden="true"></canvas><span class="saffron-picture-label" aria-hidden="true">SAFRAN ATELIER / BOTANISCHE STUDIE</span></div><figcaption data-ingredient-caption aria-live="polite">${saffronChapters[0].text}</figcaption></figure>
+      <figure id="${id}-botanical" class="demo-botanical-figure"><div class="saffron-picture"><img data-ingredient-image src="${saffronChapters[0].image}" alt="${saffronChapters[0].alt}" width="960" height="540" loading="lazy"><canvas data-saffron-layer aria-hidden="true"></canvas><canvas data-saffron-layer aria-hidden="true"></canvas><span class="saffron-picture-label" aria-hidden="true">SAFRAN ATELIER / BOTANISCHE STUDIE</span>${aiBadge()}</div><figcaption data-ingredient-caption aria-live="polite">${saffronChapters[0].text}</figcaption></figure>
       <div class="saffron-motion-controls" hidden><button type="button" class="demo-secondary" data-saffron-play>Abspielen</button><label for="${id}-camera">Kameraposition<input id="${id}-camera" data-saffron-progress type="range" min="0" max="1000" step="1" value="0" aria-valuetext="Anfang der Kamerafahrt"></label></div>
       <div class="saffron-stage-bottom"><p data-saffron-status role="status">Drei Kapitel zum Entdecken.</p><button class="demo-nav-link" data-product-open type="button">Zur Kollektion <span aria-hidden="true">↗</span></button></div>
     </div>

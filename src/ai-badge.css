@@ -1,0 +1,20 @@
+/* Visible label for AI-generated images. Black on white chip keeps ≥ 4.5:1 on any image. */
+.ai-badge {
+  position: absolute;
+  z-index: 3;
+  top: .6rem;
+  right: .6rem;
+  left: auto;
+  bottom: auto;
+  display: inline-block;
+  max-width: calc(100% - 1.2rem);
+  padding: .2em .55em;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .92);
+  color: #1b1b1b;
+  font: 600 11px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  letter-spacing: .02em;
+  text-transform: none;
+  white-space: nowrap;
+  pointer-events: none;
+}
