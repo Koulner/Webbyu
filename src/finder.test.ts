@@ -386,7 +386,7 @@ describe('project finder', () => {
     expect(entries['Einmalige Erstellung']).toContain('Anfahrt in Ihrer Region: enthalten');
     expect(entries['Noch zu klären']).toContain('Kurzclip beim Fototermin: offen, Richtwert 390–490 €, kein Festpreis');
     expect(entries['Noch zu klären']).toContain('Inhalte selbst pflegen: offen');
-    expect(entries['Laufende Kosten bei Ihren Anbietern']).toContain('Domain und Hosting: ca. 5–15 € pro Monat');
+    expect(entries['Laufende Kosten bei Ihren Anbietern']).toContain('Domain und Hosting: je nach Anbieter');
     expect(entries['Summe Erstellung']).toBe('2.940 € + 2 offene Positionen. Kein vollständiger Gesamtpreis.');
     expect(entries['Abgewählt']).toContain('Bestehende Website übernehmen');
     expect(entries['Preisorientierung']).toBe('Unverbindliche Orientierung. Verbindlich ist das schriftliche Angebot. Gemäß § 19 UStG wird keine Umsatzsteuer berechnet. Katalog 2026-11-a.');

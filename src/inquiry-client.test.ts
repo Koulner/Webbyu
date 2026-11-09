@@ -104,7 +104,7 @@ describe('Projektberater fields', () => {
   });
 
   it('limits the shown positions to 30 unique, known entries with whole-euro amounts', () => {
-    expect(invalidInquiryFields({ ...brief(), shownLines: [line('base_start', 'fixed', 990), line('hosting', 'external', 5, 15), line('3d', 'open')] })).toEqual([]);
+    expect(invalidInquiryFields({ ...brief(), shownLines: [line('base_start', 'fixed', 990), line('hosting', 'external'), line('3d', 'open')] })).toEqual([]);
     const ids = LINE_IDS.slice(0, 31);
     expect(invalidInquiryFields({ ...brief(), shownLines: ids.slice(0, 30).map(id => line(id, 'open')) })).toEqual([]);
     for (const shownLines of [

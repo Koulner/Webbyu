@@ -83,8 +83,8 @@ const catalogLines = {
   '3d': { label: 'Interaktives 3D' },
   unsure: { label: 'Weitere Funktionen noch offen' },
   shop: { label: 'Shop' },
-  // Außerhalb der Webbyu-Summe. Die Spanne für Hosting ist eine Annahme und vor Freigabe beim Anbieter zu prüfen.
-  hosting: { label: 'Domain und Hosting', detail: 'Laufen auf Ihren Namen, kein Vertrag mit Webbyu', range: [5, 15], unit: 'month' },
+  // Außerhalb der Webbyu-Summe, ohne Zahl: Webbyu hostet nichts, der Anbieter des Kunden bestimmt den Preis.
+  hosting: { label: 'Domain und Hosting', detail: 'Laufen auf Ihren Namen, kein Vertrag mit Webbyu' },
   legal: { label: 'Rechtstexte' },
   // Medien-Weg: weitere offene Punkte
   drone: { label: 'Drohnenaufnahmen', detail: 'Abhängig von Ort, Wetter und Vorbereitung' },

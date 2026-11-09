@@ -28,7 +28,7 @@ function payload(array $patch = []): array {
         'shownLines' => [
             line('base_start', 'fixed', 990, 990), line('concept', 'included'), line('scope_extended', 'fixed', 750, 750),
             line('photo_standard_site', 'fixed', 520, 520), line('clip_addon', 'open'), line('travel_included', 'included'),
-            line('wizard', 'fixed', 490, 490), line('cms', 'open'), line('hosting', 'external', 5, 15), line('legal', 'external'),
+            line('wizard', 'fixed', 490, 490), line('cms', 'open'), line('hosting', 'external'), line('legal', 'external'),
         ],
     ], $patch);
 }
@@ -185,7 +185,7 @@ try {
         "Funktionen:\nInhalte selbst pflegen, Auswahlhilfe", "Paketwunsch:\nautomatische Empfehlung", "Bildquelle:\nFotos von Webbyu, Standard", "Ort:\nIn der Region",
         'Preisorientierung, vom Besucher gesehen und nicht geprüft (Katalog 2026-11-a)', 'Der Server rechnet sie nicht neu, und sie binden nicht.',
         "Einmalige Erstellung:\n- Grundlage Ihrer Website: 990 €", '- Konzept: enthalten', '- Erweiterte Umsetzung: 750 €', 'Summe: 2.750 € + 2 offene Positionen. Kein vollständiger Gesamtpreis.',
-        "Noch zu klären:\n- Kurzclip beim Fototermin\n- Inhalte selbst pflegen", "Laufende Kosten bei Ihren Anbietern:\n- Domain und Hosting (monatlich, beim Anbieter des Besuchers): ca. 5–15 €", '- Rechtstexte: je nach Anbieter',
+        "Noch zu klären:\n- Kurzclip beim Fototermin\n- Inhalte selbst pflegen", "Laufende Kosten bei Ihren Anbietern:\n- Domain und Hosting (beim Anbieter des Besuchers): je nach Anbieter", '- Rechtstexte: je nach Anbieter',
         'Vom Besucher abgewählt: Texte aus Stichpunkten',
     ] as $expected) check(str_contains($body, $expected), 'Inquiry mail shows: ' . $expected);
     check(str_contains($body, "Über uns: <script>alert('x')</script> & Foto\nZweite Zeile"), 'Visitor text is carried as literal plain text');

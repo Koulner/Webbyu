@@ -51,7 +51,7 @@ describe('website route: positions, groups and sums', () => {
     ]);
     expect(o.creation.map(item => item.id)).toEqual(['base_start', 'concept', 'correction', 'golive', 'handover']);
     expect(o.open).toEqual([]);
-    expect(o.external.map(item => lineAmount(item))).toEqual(['ca. 5–15 € pro Monat', 'je nach Anbieter']);
+    expect(o.external.map(item => lineAmount(item))).toEqual(['je nach Anbieter', 'je nach Anbieter']);
     expect(sum(brief(settled))).toBe('990 €');
     expect(o.label).toBe('Webbyu Start');
   });

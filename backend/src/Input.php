@@ -53,7 +53,7 @@ final class Input
         '3d' => 'Interaktives 3D',
         'unsure' => 'Weitere Funktionen noch offen',
         'shop' => 'Shop',
-        'hosting' => 'Domain und Hosting (monatlich, beim Anbieter des Besuchers)',
+        'hosting' => 'Domain und Hosting (beim Anbieter des Besuchers)',
         'legal' => 'Rechtstexte',
         'photo_compact_solo' => 'Fotos kompakt',
         'photo_standard_solo' => 'Fotos Standard',
