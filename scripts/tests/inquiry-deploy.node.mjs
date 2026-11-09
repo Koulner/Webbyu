@@ -71,3 +71,20 @@ test('published backend probes detect PHP source delivery, missing config and ex
   await verifyInquiry(new URL('https://webbyu.de'), commit, mockFetch('ready'));
   for (const mode of ['source', 'unavailable', 'exposed']) await assert.rejects(verifyInquiry(new URL('https://webbyu.de'), commit, mockFetch(mode)));
 });
+
+test('the HTTP smoke test of the backend sends a complete, current request and the package ships the pieces the mail needs', () => {
+  const source = readFileSync('scripts/test-backend.mjs', 'utf8');
+  const literal = /const payload = (\{[\s\S]*?\n  \});/.exec(source)?.[1];
+  assert.ok(literal, 'payload literal found');
+  const payload = Function(`return (${literal});`)();
+  const input = readFileSync('backend/src/Input.php', 'utf8');
+  const quoted = text => [...text.matchAll(/'([^']+)'/g)].map(match => match[1]);
+  const keys = quoted(/const KEYS = \[([\s\S]*?)\];/.exec(input)[1]);
+  assert.deepEqual(Object.keys(payload).sort(), [...keys].sort(), 'a stale payload would be rejected before the checks below it run');
+  const known = quoted(/const LINES = \[([\s\S]*?)\n    \];/.exec(input)[1]).filter((_, index) => index % 2 === 0);
+  for (const line of payload.shownLines) assert.ok(known.includes(line.id), `known position ${line.id}`);
+  // Unknown identifiers must be refused: the test sends a retired extension and an invented position.
+  assert.match(source, /extensions: \['photos'\]/);
+  assert.match(source, /id: 'unbekannt'/);
+  assert.doesNotMatch(input, /'photos'|'videos'|'seo'|'maps'/, 'retired extension identifiers are gone from the backend');
+});
