@@ -1,6 +1,12 @@
-import { defineConfig } from 'vite';
+import { renderPackageDemo } from './src/package-demos/page';
+import { defineConfig } from 'vitest/config';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pages } from './site.config.mjs';
+import { applyMetadata, robotsTxt, sitemapXml } from './scripts/seo-html.mjs';
+import { renderPageHtml } from './src/shell';
+import { renderJourneyHtml } from './src/journey/page';
+import { renderContentPage } from './src/seo/content';
 
 // GitHub Pages serves project repositories below /<repository>/ while local
 // development and user pages are rooted at /. Keep the same build portable in
@@ -19,31 +25,47 @@ if (!/^\/(?:[A-Za-z0-9_-]+\/)*$/.test(base)) {
 
 export default defineConfig({
   base,
+  // Archived checkouts are not part of the application test suite.
+  test: { include: ['src/**/*.test.ts'] },
   plugins: [{
-    name: 'preview-noindex',
+    name: 'webbyu-static-pages',
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         response.setHeader('X-Robots-Tag', 'noindex, nofollow');
-        if (request.url?.split('?')[0] === `${base}robots.txt`) {
-          response.setHeader('Content-Type', 'text/plain; charset=utf-8');
-          response.end('User-agent: *\nDisallow: /\n');
+        const path = request.url?.split('?')[0];
+        if (path === `${base}robots.txt` || path === `${base}sitemap.xml`) {
+          response.setHeader('Content-Type', path.endsWith('.xml') ? 'application/xml; charset=utf-8' : 'text/plain; charset=utf-8');
+          response.end(path.endsWith('.xml') ? sitemapXml() : robotsTxt(true));
           return;
         }
         next();
       });
     },
-    transformIndexHtml(html) {
-      if ((process.env.NODE_ENV !== 'development' && process.env.SITE_NOINDEX !== 'true') || /<meta\s+name=["']robots["']/i.test(html)) return html;
-      return { html, tags: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' }, injectTo: 'head' }] };
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html, context) {
+        const page = pages.find(page => resolve(page.file) === resolve(context.filename));
+        if (!page) return html;
+        const noindex = process.env.NODE_ENV === 'development' || process.env.SITE_NOINDEX === 'true';
+        const renderers = { 'package-demo': () => renderPackageDemo(page.path, base), home: () => renderPageHtml(base), journey: () => renderJourneyHtml(base), content: () => renderContentPage(page.path, base) };
+        const renderer = renderers[page.kind as keyof typeof renderers];
+        if (renderer) {
+          const id = page.kind === 'package-demo' ? 'package-demo-app' : page.kind === 'home' ? 'app' : page.kind === 'journey' ? 'journey-app' : 'content-app';
+          html = html.replace(`<div id="${id}"></div>`, `<div id="${id}" data-prerendered="true">${renderer()}</div>`);
+        }
+        return applyMetadata(html, page, { noindex });
+      },
     },
     writeBundle(output) {
-      if (process.env.SITE_NOINDEX === 'true') writeFileSync(resolve(output.dir ?? 'dist', 'robots.txt'), 'User-agent: *\nDisallow: /\n');
+      const directory = output.dir ?? 'dist';
+      writeFileSync(resolve(directory, 'robots.txt'), robotsTxt(process.env.SITE_NOINDEX === 'true'));
+      writeFileSync(resolve(directory, 'sitemap.xml'), sitemapXml());
     },
   }],
   // QA screenshots and alternate builds are not application source. Watching
   // files while they are copied can terminate the Windows development server.
-  server: { watch: { ignored: ['**/artifacts/**'] } },
+  server: { watch: { ignored: ['**/artifacts/**', '**/dist*/**'] } },
   build: {
-    rollupOptions: { input: { main: 'index.html', journey: 'reise/index.html', imprint: 'impressum/index.html', privacy: 'datenschutz/index.html', notFound: '404.html' } },
+    rollupOptions: { input: Object.fromEntries(pages.map(page => [page.id, page.file])) },
   },
 });
