@@ -53,6 +53,8 @@ jobs:
           SITE_BASE_PATH: /
 
       - name: Prepare and test the production package with Apache and PHP
+        env:
+          SITE_NOINDEX: 'true'
         run: |
           node scripts/prepare-ionos.mjs
           docker build -t webbyu-inquiry-test -f backend/tests/Apache.Dockerfile dist

@@ -53,4 +53,4 @@ export function assertPublicBuild(root, commit) {
   return files;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) { await verifySeoBuild(); prepare(); }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) { await verifySeoBuild('dist', { noindex: process.env.SITE_NOINDEX === 'true' }); prepare(); }
