@@ -1,0 +1,233 @@
+@import url('zeichnung.css');
+@font-face { font-family: Besley; src: url('fonts/besley-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: optional; }
+@font-face { font-family: Besley; src: url('fonts/besley-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: Barlow; src: url('fonts/barlow-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: optional; }
+@font-face { font-family: Barlow; src: url('fonts/barlow-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: Barlow; src: url('fonts/barlow-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+
+:root {
+  --papier: #f7f6f2; --wand: #e4e3dd; --tusche: #202327; --rot: #b8341a; --grau: #565a5e;
+  --rand: clamp(22px, 3.2vw, 52px);
+  --bund: clamp(16px, 3.4vw, 56px);
+  --serif: Besley, Rockwell, Georgia, serif;
+  --sans: Barlow, 'Arial Narrow', Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--papier); color: var(--tusche); font: 400 clamp(17px, 1.25vw, 19px)/1.5 var(--sans); }
+h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(46px, 6vw, 96px); line-height: 1.01; letter-spacing: -.015em; }
+h2 { font-size: clamp(32px, 3.6vw, 56px); line-height: 1.06; letter-spacing: -.01em; }
+h3 { font-size: clamp(22px, 1.9vw, 28px); line-height: 1.15; }
+p { margin: 0 0 1em; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--rot); outline-offset: 3px; }
+.nur-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.skip { position: absolute; left: 8px; top: -60px; background: var(--tusche); color: #fff; padding: 8px 14px; z-index: 5; }
+.skip:focus { top: 8px; }
+
+/* Die Seite ist der Korpus: rechts läuft die Wand, dazwischen die Passleiste. */
+.seite { position: relative; padding-right: var(--rand); overflow: clip; }
+.wandrand { position: absolute; top: 0; right: 0; bottom: 0; width: var(--rand); pointer-events: none; }
+.wandrand i { position: absolute; inset: 0; display: block; }
+.wandrand-leiste { background: url('oak.webp') center top / 240px auto; clip-path: polygon(0 0, 8% 0, 64% 100%, 0 100%); }
+.wandrand-mauer { background: var(--wand) repeating-linear-gradient(135deg, var(--tusche) 0 1px, transparent 1px 10px); clip-path: polygon(8% 0, 100% 0, 100% 100%, 64% 100%); }
+.wandrand-mauer::before { content: none; }
+
+.demo-bar { margin: 0; padding: 5px var(--bund); font-size: 14px; background: var(--tusche); color: #fff; }
+.kopf { display: flex; align-items: center; gap: clamp(16px, 3vw, 44px); padding: 16px var(--bund); border-bottom: 2px solid var(--tusche); flex-wrap: wrap; }
+.logo { display: inline-flex; align-items: center; gap: 10px; font: 700 clamp(19px, 1.6vw, 23px)/1 var(--serif); text-decoration: none; margin-right: auto; }
+.marke { width: 20px; height: 24px; flex: none; }
+.kopf nav { display: flex; gap: clamp(14px, 2.2vw, 30px); font-weight: 500; }
+.kopf nav a { text-decoration: none; padding: 6px 0; }
+.kopf nav a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--rot); text-decoration-thickness: 2px; }
+
+.knopf { display: inline-block; background: var(--tusche); color: #fff; border: 2px solid var(--tusche); font: 600 1em/1.2 var(--sans); padding: .78em 1.25em; text-decoration: none; cursor: pointer; }
+.knopf:hover { background: var(--rot); border-color: var(--rot); }
+.knopf--klein { font-size: 16px; padding: .5em .9em; }
+.textlink, .textknopf { font: 600 1em/1.3 var(--sans); color: var(--tusche); text-decoration: underline; text-decoration-color: var(--rot); text-decoration-thickness: 2px; text-underline-offset: 5px; background: none; border: 0; padding: 4px 0; cursor: pointer; }
+.textlink:hover, .textknopf:hover { color: var(--rot); }
+.aktionen { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin: 0; }
+
+html:not(.js) [data-umschalten] { display: none; }
+
+/* Visualisierung aus den Maßen von Fall 14, Quellen in bilder/QUELLEN.md */
+.render { display: block; width: 100%; height: auto; }
+.einstieg-bild .render { max-height: calc(100svh - 280px); min-height: 380px; width: auto; max-width: 100%; margin: 0 auto; }
+.buehne .render { max-height: calc(100vh - 76px); width: auto; max-width: 100%; margin: 0 auto; }
+
+/* Einstieg */
+.einstieg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); gap: clamp(20px, 3vw, 48px); padding: clamp(24px, 3vw, 48px) var(--bund) clamp(28px, 3vw, 44px); align-items: start; }
+.schief { display: inline-block; transform: rotate(-1.6deg); transform-origin: left bottom; color: var(--rot); }
+.vorspann { font-size: clamp(19px, 1.55vw, 23px); line-height: 1.42; max-width: 33em; margin: 1.2em 0 1.6em; }
+.einstieg-bild { margin: 0; min-width: 0; }
+.einstieg-bild svg { max-height: calc(100svh - 280px); min-height: 380px; margin: 0 auto; }
+.schriftfeld { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 24px; margin: 14px 0 0; font-size: 15px; line-height: 1.3; }
+.schriftfeld dl, dl.schriftfeld { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); border: 2px solid var(--tusche); margin: 0; }
+.schriftfeld dl > div, dl.schriftfeld > div { padding: 5px 12px 6px; border: 1px solid var(--tusche); }
+.schriftfeld dt { font-size: 13px; color: var(--grau); }
+.schriftfeld dd { margin: 0; font-weight: 500; }
+
+/* Abschnitte */
+.abschnitt-kopf { padding: clamp(40px, 5vw, 84px) var(--bund) clamp(20px, 2.4vw, 36px); display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 12px 40px; align-items: end; }
+.abschnitt-kopf p { margin: 0; }
+.fall { border-top: 2px solid var(--tusche); }
+
+/* Fall: jede Stufe eine Zeichnung. Mit JavaScript liegen die Zeichnungen auf einer Bühne. */
+.fall-stufen { padding: 0 var(--bund); position: relative; }
+.stufe { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 72px); padding: 26px 0 56px; border-top: 1px solid var(--tusche); }
+.stufe-bild { margin: 0; min-width: 0; }
+.stufe-bild svg { max-height: 78svh; margin: 0 auto; }
+.stufe-bild figcaption, .detailbild figcaption, .akte-paar figcaption { font-size: 15px; color: var(--grau); margin-top: 8px; }
+.stufe-text { max-width: 33em; }
+.stufe-text h3 { font-size: clamp(26px, 2.5vw, 38px); margin-bottom: .6em; }
+.detailbild { margin: 1.4em 0 0; }
+
+.buehne { display: none; }
+@media (min-width: 1001px) and (min-height: 620px) {
+  .js .fall-stufen { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 0 clamp(24px, 4vw, 72px); }
+  .js .buehne { display: block; position: sticky; top: 16px; height: calc(100vh - 32px); grid-column: 1; grid-row: 1 / span 4; }
+  .js .buehne figure { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .3s ease; display: flex; flex-direction: column; justify-content: center; }
+  .js .buehne figure.an { opacity: 1; }
+  .js .buehne svg { max-height: calc(100vh - 76px); }
+  .js .buehne figcaption { font-size: 15px; color: var(--grau); margin-top: 8px; }
+  .js .stufe-bild { display: none; }
+  .js .stufe { display: block; grid-column: 2; padding: 22vh 0; border-top: 0; }
+  .js .stufe-text { opacity: .32; transition: opacity .3s ease; }
+  .js .stufe.an .stufe-text { opacity: 1; }
+}
+
+/* Situationen */
+.situationen { border-top: 2px solid var(--tusche); padding-bottom: clamp(30px, 4vw, 64px); }
+.situationen .abschnitt-kopf { grid-template-columns: 1fr; }
+.situationen ul { --g: clamp(28px, 3vw, 52px); list-style: none; margin: 0; padding: 0 var(--bund); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 var(--g); }
+.situationen li { position: relative; padding-bottom: 8px; }
+.situationen li + li::before { content: ''; position: absolute; left: calc(var(--g) / -2); top: 0; bottom: 0; border-left: 1px solid var(--tusche); }
+.situationen li svg { margin-bottom: 14px; }
+.situationen h3 { margin-bottom: .45em; }
+.situationen p { margin: 0; }
+
+/* Messen */
+.messen { background: var(--wand); border-top: 2px solid var(--tusche); padding: clamp(40px, 5vw, 84px) var(--bund); scroll-margin-top: 0; }
+.messen-kopf { margin-bottom: clamp(20px, 2.6vw, 36px); }
+.messen-kopf h2 { margin-bottom: .4em; font-size: clamp(38px, 4.8vw, 76px); }
+.messen-kopf p { margin: 0; max-width: 44em; }
+.messen fieldset { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px clamp(26px, 4vw, 72px); align-items: start; }
+.messfeld { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: '. top .' 'left bild right' '. bottom .'; gap: 10px; align-items: center; justify-items: center; grid-row: span 2; }
+.mass { display: block; font-weight: 500; font-size: 15px; line-height: 1.2; }
+.mass--top { grid-area: top; } .mass--bottom { grid-area: bottom; } .mass--left { grid-area: left; } .mass--right { grid-area: right; }
+.mass > span:first-child { display: block; margin-bottom: 3px; }
+.mass-feld { position: relative; display: block; width: 7.2em; }
+.messen .mass-feld input { width: 100%; padding-right: 2.4em; text-align: right; color: var(--rot); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mass-feld input::placeholder { color: #66696a; font-weight: 400; }
+.mass-feld i { position: absolute; right: .55em; top: 50%; transform: translateY(-50%); font-style: normal; color: var(--grau); font-size: .85em; pointer-events: none; }
+.messbild { grid-area: bild; width: 100%; max-width: 270px; }
+.messen input, .messen textarea { font: 400 17px/1.3 var(--sans); width: 100%; padding: .55em .6em; background: var(--papier); border: 2px solid var(--tusche); border-radius: 0; color: var(--tusche); }
+.mass-feld input.falsch, .messen input[aria-invalid='true'], .messen textarea[aria-invalid='true'] { border-color: var(--rot); box-shadow: inset 0 0 0 1px var(--rot); }
+.messen fieldset:disabled input, .messen fieldset:disabled textarea, .messen fieldset:disabled button { opacity: .55; }
+.messen-ergebnis { min-height: 7.5em; }
+.ergebnis-satz { font: 700 clamp(21px, 1.9vw, 28px)/1.22 var(--serif); margin: 0 0 .5em; }
+.ergebnis-werte { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 2px 26px; margin: 0; font-variant-numeric: tabular-nums; }
+.ergebnis-werte dt { font-size: 14px; color: var(--grau); }
+.ergebnis-werte dd { margin: 0 0 8px; font-weight: 600; color: var(--rot); }
+.ergebnis-werte div { min-width: 0; }
+.ergebnis-klein { font-size: 15.5px; color: var(--grau); margin: .3em 0 0; }
+.kontakt { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.kontakt label { font-weight: 500; }
+.kontakt-breit, .kontakt-fehler, .kontakt-fuss { grid-column: 1 / -1; }
+.kontakt-fehler { color: var(--rot); font-weight: 600; margin: 0; }
+.kontakt-fuss { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin: 0; font-size: 15px; }
+.kontakt-noscript { margin-top: 16px; font-weight: 500; }
+.messen-pruefung { background: var(--papier); border: 2px solid var(--tusche); padding: clamp(18px, 2vw, 30px); max-width: 48em; }
+.messen-pruefung h3 { margin-bottom: .6em; }
+.messen-pruefung dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; margin: 0 0 1em; }
+.messen-pruefung dt { color: var(--grau); }
+.messen-pruefung dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+
+/* Werkstatt */
+.werkstatt { background: var(--tusche); color: #fff; padding: clamp(40px, 5vw, 84px) var(--bund); }
+.werkstatt h2 { max-width: 15em; margin-bottom: .9em; font-size: clamp(32px, 4.4vw, 68px); }
+.werkstatt-spalten { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 90px); max-width: 74em; }
+.werkstatt h3 { margin-bottom: .6em; }
+.werkstatt ul { list-style: none; margin: 0; padding: 0; }
+.werkstatt li { border-top: 1px solid #72767a; padding: .55em 0 .7em; }
+.fuss { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px 40px; padding: 26px var(--bund) 34px; font-size: 15.5px; }
+.fuss > div { display: flex; gap: 12px; }
+.fuss .marke { margin-top: 3px; }
+.fuss p { margin: 0; }
+.fuss-hinweis { color: var(--grau); }
+
+/* Unterseite Fall 14 */
+.akte { padding: clamp(26px, 3.4vw, 56px) var(--bund) clamp(40px, 5vw, 84px); }
+.akte h1 { font-size: clamp(64px, 11vw, 176px); line-height: .95; }
+.akte-zurueck { margin: 0 0 18px; }
+.akte-kopf .vorspann { margin-bottom: 1.2em; }
+dl.schriftfeld { display: inline-grid; grid-template-columns: repeat(4, minmax(0, auto)); font-size: 15px; gap: 0; justify-content: start; align-items: stretch; }
+.akte section { padding-top: clamp(36px, 4.6vw, 76px); }
+.akte section h2 { margin-bottom: .55em; }
+.akte-absatz { max-width: 38em; }
+.akte-paar { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 3vw, 48px); margin-top: 1.2em; max-width: 1040px; }
+.akte-paar figure { margin: 0; min-width: 0; }
+.akte-liste table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; margin-top: 1em; }
+.akte-liste th, .akte-liste td { text-align: left; padding: .55em 1em .55em 0; border-top: 1px solid var(--tusche); font-weight: 400; vertical-align: top; }
+.akte-liste thead th { font-size: 14.5px; color: var(--grau); border-top: 2px solid var(--tusche); font-weight: 500; }
+.akte-liste tbody th { font-weight: 600; }
+.akte-liste .keil td, .akte-liste .keil th { color: var(--rot); font-weight: 600; }
+.akte-klein { font-size: 15px; color: var(--grau); margin-top: .8em; }
+.akte-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(20px, 4vw, 64px); align-items: start; }
+.akte-detail .detailbild { margin: 0; }
+.akte-weiter .akte-absatz { margin-bottom: 1.2em; }
+
+@media (max-width: 1000px) {
+  .einstieg { grid-template-columns: 1fr; }
+  .einstieg-bild svg { max-height: none; min-height: 0; max-width: 620px; }
+  .einstieg-bild .render { max-height: none; min-height: 0; width: 100%; max-width: 620px; margin: 0; }
+  .stufe { grid-template-columns: 1fr; gap: 12px; padding: 22px 0 40px; }
+  .stufe-text { order: -1; }
+  .stufe-bild svg { max-height: none; max-width: 560px; margin: 0; }
+  .abschnitt-kopf { grid-template-columns: 1fr; }
+  .situationen ul { grid-template-columns: 1fr 1fr; gap: 28px var(--g); }
+  .situationen li:nth-child(odd)::before { content: none; }
+  .messen fieldset { grid-template-columns: 1fr; }
+  .messfeld { grid-row: auto; justify-self: start; width: 100%; max-width: 560px; }
+  .werkstatt-spalten { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  body { font-size: 17px; }
+  .dim { font-size: 108px; }
+  .kopf { gap: 8px 12px; padding: 12px var(--bund); }
+  .kopf nav { order: 3; width: 100%; font-size: 16px; gap: 18px; }
+  .knopf--klein { font-size: 15px; }
+  .demo-bar { font-size: 13px; }
+  .einstieg { padding-top: 26px; }
+  .schriftfeld { font-size: 14px; }
+  .schriftfeld dl { width: 100%; grid-template-columns: 1fr 1fr; }
+  .situationen ul { grid-template-columns: 1fr; gap: 0; }
+  .situationen li { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 14px; padding: 16px 0; border-top: 1px solid var(--tusche); }
+  .situationen li::before { content: none !important; }
+  .situationen li svg { margin: 0; }
+  .messfeld { grid-template-columns: 1fr 1fr; grid-template-areas: 'top bottom' 'left right' 'bild bild'; justify-items: stretch; }
+  .mass-feld { width: 100%; }
+  .messbild { justify-self: center; max-width: 200px; margin-top: 6px; }
+  .ergebnis-werte { grid-template-columns: 1fr 1fr; }
+  .kontakt { grid-template-columns: 1fr; }
+  .fuss { grid-template-columns: 1fr; }
+  dl.schriftfeld { display: grid; grid-template-columns: 1fr 1fr; width: 100%; justify-content: stretch; }
+  .akte-paar { grid-template-columns: 1fr 1fr; }
+  .akte-liste thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .akte-liste tr { display: grid; grid-template-columns: 2.3em repeat(3, minmax(0, 1fr)); gap: 3px 8px; padding: .65em 0; border-top: 1px solid var(--tusche); }
+  .akte-liste th, .akte-liste td { display: block; border: 0; padding: 0; }
+  .akte-liste tbody th { grid-column: 2 / 4; }
+  .akte-liste td[data-t='Pos.'] { grid-column: 1; grid-row: 1; }
+  .akte-liste td[data-t='Stück'] { grid-column: 4; grid-row: 1; text-align: right; }
+  .akte-liste td[data-t='Stück']::after { content: ' Stk.'; }
+  .akte-liste td[data-t='Länge'] { grid-column: 2; }
+  .akte-liste td[data-t='Material'] { grid-column: 2 / -1; font-size: 15.5px; }
+  .akte-liste td[data-t='Länge']::before, .akte-liste td[data-t='Breite']::before, .akte-liste td[data-t='Stärke']::before { content: attr(data-t); display: block; font-size: 13.5px; font-weight: 400; color: var(--grau); }
+  .akte-detail { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .buehne figure, .js .stufe-text { transition: none !important; }
+}
+@media print { .wandrand { display: none; } .seite { padding-right: 0; } }

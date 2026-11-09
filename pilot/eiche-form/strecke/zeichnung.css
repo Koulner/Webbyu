@@ -1,0 +1,40 @@
+/* Strichsprache aller Zeichnungen. Maße in Rot wie mit dem Zimmermannsbleistift. */
+.zeichnung { display: block; width: 100%; height: auto; overflow: visible; }
+.zeichnung text { font-family: Barlow, 'Arial Narrow', sans-serif; font-variant-numeric: tabular-nums; }
+.nische { fill: var(--papier); }
+.wand { fill: none; stroke: var(--tusche); stroke-width: 11; stroke-linejoin: miter; }
+.l-ink { stroke: var(--tusche); stroke-width: 5; }
+.l-lot { stroke: var(--rot); stroke-width: 3.5; stroke-dasharray: 26 18; }
+.l-dim { stroke: var(--rot); stroke-width: 4; }
+.l-dim-ink { stroke: var(--tusche); stroke-width: 4; }
+.l-hilf { stroke: var(--tusche); stroke-width: 2.5; opacity: .45; }
+.l-fuge { stroke: #2c2117; stroke-width: 4.5; }
+.dim { font-size: 74px; font-weight: 500; fill: var(--tusche); paint-order: stroke; stroke: var(--papier); stroke-width: 20px; stroke-linejoin: round; }
+.dim--rot { fill: var(--rot); font-weight: 600; }
+.schiefe { fill: var(--rot); opacity: .24; }
+.luft { fill: var(--rot); opacity: .34; }
+.leiste { stroke: var(--tusche); stroke-width: 3; }
+.korpus { fill: var(--papier); stroke: var(--tusche); stroke-width: 9; }
+.rohr { fill: var(--wand); stroke: var(--tusche); stroke-width: 4; stroke-dasharray: 16 12; }
+.ruecken { fill: #2c2117; opacity: .22; }
+.haken { fill: #1f2226; }
+.griff { fill: #231a11; }
+.sockel { fill: #2c2117; }
+.kontur { fill: none; stroke: #2c2117; stroke-width: 5; }
+.schnitt { stroke: var(--tusche); stroke-width: 1.4; }
+.front { stroke: var(--tusche); stroke-width: .8; }
+.l-fuge-fine { stroke: var(--tusche); stroke-width: .7; }
+.l-dim-fine { stroke: var(--rot); stroke-width: 1; }
+.dim-klein { font-size: 13px; fill: var(--tusche); }
+.dim-klein--stark { font-weight: 600; }
+.dim-klein--rot { fill: var(--rot); font-weight: 600; font-size: 14px; }
+.zeichnung--detail .wand { stroke-width: 1.8; }
+.zeichnung--detail .leiste { stroke-width: 1; }
+.wand-klein { fill: none; stroke: var(--tusche); stroke-width: 3.5; }
+.kontur-klein { stroke: var(--tusche); stroke-width: 1.8; fill-opacity: 1; }
+.l-klein { fill: none; stroke: var(--tusche); stroke-width: 1.4; }
+.l-rot { fill: none; stroke: var(--rot); stroke-width: 2; }
+.schlitz { fill: #2c2117; }
+.tuer { fill: var(--papier); stroke: var(--tusche); stroke-width: 2; }
+.dim-s { font-size: 17px; font-weight: 600; fill: var(--tusche); }
+.dim-s--rot { fill: var(--rot); }

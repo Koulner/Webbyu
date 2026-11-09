@@ -1,0 +1,86 @@
+@import url('../strecke/zeichnung.css');
+@font-face { font-family: Besley; src: url('../strecke/fonts/besley-latin-700-normal.woff2') format('woff2'); font-weight: 700; }
+@font-face { font-family: Barlow; src: url('../strecke/fonts/barlow-latin-400-normal.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: Barlow; src: url('../strecke/fonts/barlow-latin-600-normal.woff2') format('woff2'); font-weight: 600; }
+:root { --wand: #e4e3dd; --tusche: #202327; --rot: #c4391d; --papier: #f7f6f2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #d9d8d2; color: #202327; font: 16px/1.45 Barlow, sans-serif; }
+main { max-width: 1320px; margin: 0 auto; padding: 32px 16px 80px; }
+.top h1 { font: 700 34px/1.1 Besley, serif; margin: 0 0 8px; }
+.top p { margin: 0 0 32px; max-width: 62ch; }
+.dir { background: #f7f6f2; padding: 24px; margin-bottom: 24px; }
+.dir header { max-width: 78ch; margin-bottom: 20px; }
+.tag { margin: 0; font-weight: 600; color: #c4391d; }
+.dir h2 { font: 700 26px/1.15 Besley, serif; margin: 2px 0 8px; }
+.idea, .weak { margin: 0 0 6px; }
+.frames { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.f { margin: 0; }
+.f figcaption { font-size: 14px; margin-top: 6px; font-weight: 600; }
+.f-box { position: relative; overflow: hidden; border: 1px solid #202327; background: #fff; }
+.f-in { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform: scale(.5); }
+.f--d .f-box { width: 480px; height: 300px; }
+.f--d .f-in { width: 960px; height: 600px; }
+.f--m .f-box { width: 170px; height: 300px; }
+.f--m .f-in { width: 340px; height: 600px; }
+.f-in > div { width: 100%; height: 100%; position: relative; overflow: hidden; }
+.f-in h1, .f-in h2 { margin: 0; }
+.f-in svg.zeichnung { width: 100%; height: 100%; display: block; }
+
+/* A: Akte, manilafarbene Mappe mit Reitern */
+.a { background: #c9b48a; padding: 28px 34px 0; }
+.a-tabs { display: flex; gap: 4px; font-size: 18px; }
+.a-tabs > * { background: #b39c70; padding: 8px 18px; border-radius: 6px 6px 0 0; font-weight: 400; }
+.a-tabs b { background: #fbfaf5; font-weight: 600; }
+.a-sheet { background: #fbfaf5; padding: 44px 50px; height: calc(100% - 39px); position: relative; }
+.a-date { font: 400 20px/1 'Courier New', monospace; margin: 0 0 22px; color: #6a5d43; }
+.a h1 { font: 400 58px/1.1 Georgia, serif; }
+.a h2 { font: 400 42px/1.1 Georgia, serif; margin-bottom: 18px; }
+.a-body { font-size: 24px; margin-top: 20px; max-width: 34ch; }
+.a-stamp { position: absolute; right: 44px; bottom: 40px; border: 3px solid #a33; color: #a33; padding: 6px 14px; transform: rotate(-5deg); font-size: 20px; font-weight: 600; }
+.a-sheet--row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; }
+.a ul { font: 400 20px/1.7 'Courier New', monospace; padding: 0; list-style: none; }
+.a-mini { height: 470px; }
+.a--m { padding: 16px 12px 0; }
+.a--m .a-sheet { height: auto; padding: 26px 22px; }
+.a--m h1 { font-size: 36px; }
+.a--m h2 { font-size: 32px; margin: 0; }
+.a-sheet--2 { margin-top: 12px; }
+
+/* B: Passleiste, Wand am rechten Rand */
+.b { background: #f7f6f2; display: grid; grid-template-columns: 1fr 1fr; padding-right: 40px; }
+.b-wall { position: absolute; top: 0; right: 0; bottom: 0; width: 54px; clip-path: polygon(70% 0, 100% 0, 100% 100%, 22% 100%); background: repeating-linear-gradient(135deg, #202327 0 2px, #e4e3dd 2px 12px); }
+.b-wall::before { content: ''; position: absolute; inset: 0; background: url('../strecke/oak.webp'); clip-path: polygon(70% 0, 76% 0, 46% 100%, 22% 100%); }
+.b-copy { padding: 54px 20px 0 44px; }
+.b h1 { font: 700 68px/1.03 Besley, serif; letter-spacing: -.01em; }
+.b h2 { font: 700 44px/1.08 Besley, serif; }
+.b-copy p { font-size: 23px; margin: 22px 0 26px; }
+.b-btn { display: inline-block; background: #202327; color: #fff; padding: 14px 22px; font-size: 21px; font-weight: 600; }
+.b-draw { height: 600px; }
+.b-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-style: normal; }
+.b-form i { border-bottom: 2px solid #202327; padding: 8px 0; font-style: normal; font-size: 20px; color: #c4391d; }
+.b--m { grid-template-columns: 1fr; padding-right: 26px; }
+.b--m .b-wall { width: 26px; }
+.b--m .b-copy { padding: 26px 8px 0 20px; }
+.b--m h1 { font-size: 42px; }
+.b--m .b-btn { margin-top: 16px; font-size: 18px; }
+.b--m .b-draw { height: 330px; }
+
+/* C: Stückliste, nur Typografie */
+.c { background: #fff; padding: 36px 44px; font-size: 22px; }
+.c-top { margin: 0 0 16px; font-weight: 600; }
+.c h1 { font: 700 96px/.98 Besley, serif; margin-bottom: 24px; }
+.c h2 { font: 700 72px/1 Besley, serif; margin-bottom: 16px; }
+.c-long { max-width: 44ch; font-size: 26px; margin: 0 0 18px; }
+.c table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.c td { border-top: 2px solid #202327; padding: 7px 12px 7px 0; }
+.c .hot td { color: #c4391d; font-weight: 600; }
+.c .you td { background: #f1efe6; font-weight: 600; }
+.c--m { padding: 22px 18px; font-size: 16px; }
+.c--m h1 { font-size: 50px; }
+.c--m td:last-child { display: none; }
+
+@media (max-width: 560px) {
+  .dir { padding: 16px; }
+  .f--d .f-box { width: 320px; height: 200px; }
+  .f--d .f-in { transform: scale(.3333); }
+}
