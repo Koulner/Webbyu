@@ -55,7 +55,8 @@ export function mountPrivacy() {
     const restoreFocus = panel.contains(document.activeElement);
     panel.hidden = true;
     panel.querySelector('details')!.open = false;
-    if (restoreFocus) (opener?.isConnected ? opener : document.querySelector<HTMLElement>('[data-privacy-open]'))?.focus();
+    // A notice that opened by itself has no opener; never send the reader to the footer button.
+    if (restoreFocus) (opener?.isConnected ? opener : document.querySelector<HTMLElement>('main[tabindex="-1"]'))?.focus({ preventScroll: true });
   }
 
   panel.querySelector('.privacy-reject')!.addEventListener('click', reject, { signal: events.signal });
