@@ -4,6 +4,7 @@ export type PackageId = 'start' | 'business' | 'complete';
 export type PackageChoice = PackageId | 'custom';
 
 export const offerNotice = 'Angebot auf Anfrage';
+export const businessNotice = 'Unser Angebot richtet sich ausschließlich an Unternehmen und Selbstständige, die für ihre geschäftliche Tätigkeit handeln.';
 export const scopeNotice = 'Shops, komplexe Buchungen und individuelle Integrationen benötigen einen gesonderten Umfang und ein eigenes Angebot.';
 
 export const goals: { id: Goal; label: string; description: string }[] = [

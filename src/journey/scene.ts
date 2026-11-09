@@ -244,7 +244,7 @@ export function initLandscape(container: HTMLElement): LandscapeController {
         }
         for(let i=0;i<4;i++)box(-1.45+i*.95,.09,.85,.65,.025,.05,sage);
       }
-      if(station.demoId)group.scale.setScalar(.7);
+      if(station.demoId || station.packageId)group.scale.setScalar(.7);
       return {group,surfaces,moves,index};
     });
 
@@ -313,7 +313,7 @@ export function initLandscape(container: HTMLElement): LandscapeController {
         group.visible=reveal>.005;
         const station=stations[index];
         // Live website surfaces occupy the centre. Their physical studies sit below and beside them.
-        group.position.set(station.position[0]+(station.demoId?1.6:0),station.demoId?-2:-.12*(1-reveal),station.position[1]+(station.demoId?1.2:0));
+        group.position.set(station.position[0]+((station.demoId || station.packageId)?1.6:0),(station.demoId || station.packageId)?-2:-.12*(1-reveal),station.position[1]+((station.demoId || station.packageId)?1.2:0));
         surfaces.forEach(value => {value.opacity=reveal;value.depthWrite=reveal>.55;});
         moves.forEach(({object,origin,offset}) => object.position.copy(origin).addScaledVector(offset,1-reveal));
       });

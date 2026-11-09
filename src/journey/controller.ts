@@ -1,4 +1,5 @@
 import { stations, stationIndex } from './data';
+import { aiBadge, isAiMedia } from '../ai-media';
 import type { DemoId } from '../data';
 import { renderJourney } from './page';
 import { mapProjection } from './map';
@@ -8,7 +9,7 @@ export interface LandscapeController {
   setEnabled(enabled: boolean): void;
   dispose(): void;
 }
-type DemoModule = Pick<typeof import('../demos'), 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
+type DemoModule = Pick<typeof import('../demos'), 'prepareDemo' | 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
 interface JourneyOptions {
   embedded?: boolean;
   loadScene?: () => Promise<{ initLandscape(container: HTMLElement): LandscapeController }>;
@@ -21,6 +22,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   const events = new AbortController();
   const listen = { signal: events.signal };
   const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; addEventListener?: (type: string, listener: () => void) => void; removeEventListener?: (type: string, listener: () => void) => void } }).connection;
   const compact = window.matchMedia('(max-width: 760px)');
   const sections = [...root.querySelectorAll<HTMLElement>('[data-chapter]')];
   const map = root.querySelector<HTMLElement>('[data-map]')!;
@@ -34,9 +36,10 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   const preview = root.querySelector<HTMLElement>('[data-scene-preview]')!;
   const previewSlot = root.querySelector<HTMLElement>('[data-preview-slot]')!;
   const previewOpen = root.querySelector<HTMLButtonElement>('[data-preview-open]')!;
+  const previewLink = root.querySelector<HTMLAnchorElement>('[data-preview-link]')!;
   const previewLoading = root.querySelector<HTMLElement>('[data-preview-loading]')!;
   const parking = root.querySelector<HTMLElement>('[data-demo-parking]')!;
-  const questions: Record<number,string> = {0:'Die Aufgabe verstehen.',3:'Gestaltung und Funktion verbinden.',6:'Das nächste Vorhaben klären.'};
+  const questions: Record<number,string> = {0:'Die Aufgabe verstehen.',3:'Gestaltung und Funktion verbinden.',7:'Das nächste Vorhaben klären.'};
   let disposed = false;
   let active = -2;
   let progress = -1;
@@ -49,6 +52,11 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   let request = 0;
   let previewRequest = 0;
   let viewportWidth = window.innerWidth;
+  let stageVisible = false;
+  let sceneLoading: Promise<void> | undefined;
+  let sceneFailed = false;
+  let settleScene!: () => void;
+  const sceneReady = new Promise<void>(resolve => { settleScene = resolve; });
   const sessions = new Map<DemoId, HTMLElement>();
 
   function loadDemoModule() {
@@ -77,20 +85,44 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     const station=stations[index];
     const id=station?.demoId;
     for(const demo of previewSlot.querySelectorAll<HTMLElement>(':scope > .demo')) parking.append(demo);
-    preview.hidden=!id;
+    preview.hidden=!(id || station?.packageId);
+    previewOpen.hidden=Boolean(station?.packageId);
+    previewLink.hidden=!station?.packageId;
+    previewSlot.querySelector('.journey-package-image')?.remove();
+    previewSlot.querySelector(':scope > .ai-badge')?.remove();
     delete previewOpen.dataset.previewDemo;
+    if(station?.packageId) {
+      previewLink.href=`${import.meta.env.BASE_URL}demos/${station.packageId}/`;
+      previewLink.setAttribute('aria-label',`${station.label}: Beispielwebsite ansehen`);
+      root.querySelector('[data-preview-name]')!.textContent=station.label;
+      previewLoading.hidden=true;
+      preview.removeAttribute('aria-busy');
+      const image=document.createElement('img');
+      image.className='journey-package-image';
+      image.src=`${import.meta.env.BASE_URL}package-demos/${station.image}`;
+      image.alt='';
+      previewSlot.append(image);
+      if(isAiMedia(image.src)) previewSlot.insertAdjacentHTML('beforeend',aiBadge());
+      return;
+    }
     if(!id) return;
     previewOpen.dataset.previewDemo=id;
     previewOpen.setAttribute('aria-label',`${station.label}: sichtbare Website in Großansicht ausprobieren`);
     root.querySelector('[data-preview-name]')!.textContent=station.label;
     previewLoading.hidden=false;
     previewLoading.textContent='Website-Vorschau wird geladen …';
+    if(connection?.saveData && !sessions.has(id)) {
+      previewLoading.textContent='Datensparmodus aktiv. Zum Laden der Website-Vorschau öffnen.';
+      return;
+    }
     preview.setAttribute('aria-busy','true');
     sizePreview();
     try {
       const module=await loadDemoModule();
       if(disposed||ticket!==previewRequest) return;
       demoModule=module;
+      if(!sessions.has(id)) await module.prepareDemo(id);
+      if(disposed||ticket!==previewRequest) return;
       const demo=getSession(module,id);
       if(!demo.closest('dialog')) previewSlot.append(demo);
       sizePreview();
@@ -121,7 +153,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     active = index;
     void showPreview(index);
     map.dataset.view=index<0?'overview':'travel';
-    map.dataset.project=String(Boolean(stations[index]?.demoId));
+    map.dataset.project=String(Boolean(stations[index]?.demoId || stations[index]?.packageId));
     sections.forEach((section,i)=>section.classList.toggle('is-current',i===index+1));
     root.querySelector('[data-scene-caption]')!.textContent=index<0?'Jede Idee eröffnet einen neuen Zusammenhang.':stations[index].visual.caption;
     root.querySelector('[data-scene-index]')!.textContent=index<0?'WEBBYU / VERBUNDENE ERLEBNISRÄUME':`${String(index+1).padStart(2,'0')} / ${stations[index].label.toUpperCase()}`;
@@ -170,6 +202,11 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     preview.style.setProperty('--preview-reveal',String(media.matches?1:Math.max(0,1-Math.abs(progress-active)*2)));
     sizePreview();
     positionFallbackPins();
+    if(typeof IntersectionObserver === 'undefined') {
+      const rect = map.getBoundingClientRect();
+      stageVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+      void ensureScene();
+    }
   }
 
   function schedule() { if(!frame&&!disposed) frame=requestAnimationFrame(update); }
@@ -189,6 +226,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       heading.focus({preventScroll:true});
     }
     activate(index);
+    if(push) void ensureScene(true);
     schedule();
   }
 
@@ -201,7 +239,9 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       const module=await loadDemoModule();
       if(disposed||ticket!==request) return;
       demoModule=module;
-      dialog ??= module.mountDemoDialog({onRestore(){ if(!disposed) { scene?.setEnabled(true);root.classList.remove('has-open-demo');void showPreview(active); } }});
+      if(!sessions.has(id)) await module.prepareDemo(id);
+      if(disposed||ticket!==request) return;
+      dialog ??= module.mountDemoDialog({onRestore(){ if(!disposed) { scene?.setEnabled(!media.matches && !connection?.saveData);root.classList.remove('has-open-demo');void showPreview(active); } }});
       const demo=getSession(module,id);
       trigger.disabled=false;
       trigger.focus({preventScroll:true});
@@ -266,22 +306,52 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
   const fromHistory=()=>go(stationIndex(location.hash),false,false);
   window.addEventListener('popstate',fromHistory,listen);
   window.addEventListener('hashchange',fromHistory,listen);
-  media.addEventListener('change',schedule);
+  const preferenceChanged = () => {
+    scene?.setEnabled(!media.matches && !connection?.saveData && !root.classList.contains('has-open-demo'));
+    void ensureScene();
+    schedule();
+  };
+  media.addEventListener('change',preferenceChanged);
+  connection?.addEventListener?.('change',preferenceChanged);
   const resize=new ResizeObserver(schedule);
   resize.observe(root);
   resize.observe(previewSlot);
 
-  const sceneReady=(options.loadScene??(()=>import('./scene')))().then(module=>{
-    if(disposed) return;
-    scene=module.initLandscape(map);
-    scene.setProgress(progress,true);
-    if(dialog) scene.setEnabled(!document.querySelector('.concept-dialog[open]'));
-  }).catch(()=>{
-    if(disposed) return;
-    map.dataset.render='static';
-    root.querySelector('[data-map-hint]')!.textContent='Die Erlebnisräume werden als Illustration gezeigt. Alle Stationen und Demos sind erreichbar.';
-    positionFallbackPins();
-  });
+  function ensureScene(requested = false): Promise<void> | undefined {
+    if(disposed || scene || sceneLoading || (sceneFailed && !requested)) return sceneLoading;
+    if(media.matches || connection?.saveData) {
+      map.dataset.render='static';
+      settleScene();
+      return;
+    }
+    if(!stageVisible && !requested) return;
+    sceneLoading=(options.loadScene??(()=>import('./scene')))().then(module=>{
+      if(disposed || media.matches || connection?.saveData) return;
+      scene=module.initLandscape(map);
+      sceneFailed=false;
+      scene.setProgress(progress,true);
+      scene.setEnabled(!root.classList.contains('has-open-demo'));
+    }).catch(()=>{
+      if(disposed) return;
+      sceneFailed=true;
+      map.dataset.render='static';
+      root.querySelector('[data-map-hint]')!.textContent='Die Erlebnisräume werden als Illustration gezeigt. Alle Stationen und Demos sind erreichbar.';
+      positionFallbackPins();
+    }).finally(()=>{sceneLoading=undefined;settleScene();});
+    return sceneLoading;
+  }
+  let sceneObserver: IntersectionObserver | undefined;
+  if(typeof IntersectionObserver !== 'undefined') {
+    sceneObserver=new IntersectionObserver(entries=>{
+      stageVisible=entries.some(entry=>entry.isIntersecting);
+      void ensureScene();
+    });
+    sceneObserver.observe(map);
+  } else {
+    const rect=map.getBoundingClientRect();
+    stageVisible=rect.bottom>0 && rect.top<window.innerHeight;
+  }
+  void ensureScene();
   if(location.hash&&stationIndex(location.hash)>=0) requestAnimationFrame(()=>{ if(!disposed) go(stationIndex(location.hash),false,false); });
   schedule();
 
@@ -292,7 +362,10 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       if(disposed) return;
       disposed=true;
       events.abort();
-      media.removeEventListener('change',schedule);
+      media.removeEventListener('change',preferenceChanged);
+      connection?.removeEventListener?.('change',preferenceChanged);
+      sceneObserver?.disconnect();
+      settleScene();
       resize.disconnect();
       if(frame) cancelAnimationFrame(frame);
       dialog?.dispose();

@@ -1,28 +1,38 @@
+import { packageFromSearch } from './package-demos/catalogue';
 import './fonts.css';
 import './tokens.css';
 import './styles.css';
 import './content.css';
+import './home.css';
+import './home-motion.css';
+import './ai-badge.css';
 import { extensions, packages, type DemoId, type PackageId } from './data';
 import { briefStore, type BriefStore } from './state';
-import { createDemo, disposeDemo, mountDemoDialog } from './demos';
 import { mountJourneyPreview } from './journey-preview';
 import { mountFinder } from './finder';
 import { renderPage } from './shell';
 import { mountPrivacy } from './privacy';
+import { mountHomeMotion } from './home-motion';
 
 const arrow = '<span aria-hidden="true">↗</span>';
+type DemoModule = Pick<typeof import('./demos'), 'prepareDemo' | 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
 interface AppOptions {
   store?: BriefStore;
+  loadDemos?: () => Promise<DemoModule>;
+  sendEnabled?: boolean;
 }
 
 /** Main owns cross-feature wiring; feature modules only consume their contracts. */
 export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   const store = options.store ?? briefStore;
+  const requestedPackage = packageFromSearch(location.search);
+  if (requestedPackage) store.update({ selectedPackage: requestedPackage });
   const mounts = renderPage(root);
+  const motion = mountHomeMotion(root);
   const privacy = mountPrivacy();
   const events = new AbortController();
   const listenerOptions = { signal: events.signal };
-  const finder = mountFinder(mounts.finder, store);
+  const finder = mountFinder(mounts.finder, store, { sendEnabled: options.sendEnabled ?? import.meta.env.VITE_INQUIRY_ENABLED === 'true' });
   let disposed = false;
   let toastTimer = 0;
 
@@ -31,7 +41,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
     if (restart) finder.openAtStart();
     else finder.focus();
     mounts.finder.closest('section')?.scrollIntoView({
-      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches || root.dataset.motion === 'quiet' ? 'instant' : 'smooth',
     });
   }
 
@@ -40,17 +50,53 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   const demoParking = document.createElement('div');
   demoParking.hidden = true;
   root.append(demoParking);
-  const demoDialog = mountDemoDialog();
-  root.querySelectorAll<HTMLButtonElement>('button[data-demo]').forEach(button => {
-    button.addEventListener('click', () => {
-      const id = button.dataset.demo as DemoId;
+  let demoModule: DemoModule | undefined;
+  let demosLoading: Promise<DemoModule> | undefined;
+  let demoDialog: ReturnType<DemoModule['mountDemoDialog']> | undefined;
+  let demoRequest = 0;
+  const demoStatus = document.createElement('p');
+  demoStatus.className = 'gallery-demo-status';
+  demoStatus.setAttribute('role', 'status');
+  mounts.journeyPreview.parentElement!.append(demoStatus);
+
+  async function openDemo(id: DemoId, button: HTMLButtonElement) {
+    const ticket = ++demoRequest;
+    button.setAttribute('aria-busy', 'true');
+    button.setAttribute('aria-disabled', 'true');
+    demoStatus.textContent = 'Die Konzeptdemo wird geladen …';
+    try {
+      demosLoading ??= (options.loadDemos ?? (() => import('./demos')))().catch(error => {
+        demosLoading = undefined;
+        throw error;
+      });
+      const module = await demosLoading;
+      if (disposed || ticket !== demoRequest) return;
+      demoModule = module;
+      if (!demoSessions.has(id)) await module.prepareDemo(id);
+      if (disposed || ticket !== demoRequest) return;
       let demo = demoSessions.get(id);
       if (!demo) {
-        demo = createDemo(id);
+        demo = module.createDemo(id);
         demoParking.append(demo);
         demoSessions.set(id, demo);
       }
+      demoDialog ??= module.mountDemoDialog();
+      button.focus({ preventScroll: true });
       demoDialog.open(id, demo);
+      demoStatus.textContent = '';
+    } catch {
+      if (!disposed && ticket === demoRequest) {
+        demoStatus.textContent = 'Die Demo konnte nicht geladen werden. Wählen Sie das Konzept erneut, um es noch einmal zu versuchen.';
+      }
+    } finally {
+      button.removeAttribute('aria-busy');
+      button.removeAttribute('aria-disabled');
+    }
+  }
+  root.querySelectorAll<HTMLButtonElement>('button[data-demo]').forEach(button => {
+    button.addEventListener('click', () => {
+      if (button.getAttribute('aria-busy') === 'true') return;
+      void openDemo(button.dataset.demo as DemoId, button);
     }, listenerOptions);
   });
   root.querySelectorAll<HTMLAnchorElement>('a[href="#projektfinder"]').forEach(link => {
@@ -136,12 +182,14 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
       if (disposed) return;
       disposed = true;
       events.abort();
+      motion.dispose();
       privacy.dispose();
       journeyPreview.dispose();
-      demoDialog.dispose();
-      demoSessions.forEach(disposeDemo);
+      demoDialog?.dispose();
+      demoSessions.forEach(demo => demoModule?.disposeDemo(demo));
       demoSessions.clear();
       demoParking.remove();
+      demoStatus.remove();
       finder.dispose();
       unsubscribeExtensions();
       clearTimeout(toastTimer);

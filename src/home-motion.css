@@ -1,0 +1,76 @@
+/* Motion enhances fully visible content. No loops or scroll interception. */
+#app .studio-stage { animation: none; --stage-x: 0; --stage-y: 0; }
+.motion-control { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 30px; background: transparent; font-size: 10px; color: var(--color-muted); }
+.motion-control > span:first-child { font-size: 14px; color: var(--color-ink); }
+.motion-control:hover:not(:disabled) { border-color: var(--color-ink); color: var(--color-ink); }
+.motion-control[aria-pressed=true] > span:first-child { opacity: .4; }
+#app .hero-bottom { flex-wrap: wrap; gap: 12px 20px; }
+#app .site-header nav a { position: relative; }
+#app .site-header nav a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 5px; height: 2px; background: #5b795a; transform: scaleX(0); transform-origin: left; transition: transform 250ms ease; }
+#app .site-header nav a[aria-current=location]::after { transform: scaleX(1); }
+#app .site-header nav a[aria-current=location] { color: var(--color-ink); }
+
+/* Samples have different depths. Movement follows input and then settles. */
+#app[data-motion=full] .studio-stage::before { content: ''; position: absolute; inset: -5%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at var(--light-x, 50%) var(--light-y, 50%), #d3ed9a65, transparent 62%); opacity: 0; transition: opacity 450ms ease; }
+#app[data-motion=full] .studio-stage.is-pointer-active::before { opacity: 1; }
+#app[data-motion=full] .stage-piece { --card-angle: -7deg; --card-depth: 7px; transform: perspective(1000px) rotateX(calc(var(--stage-y) * -3deg)) rotateY(calc(var(--stage-x) * 4deg)) rotate(var(--card-angle)); translate: calc(var(--stage-x) * var(--card-depth)) calc(var(--stage-y) * var(--card-depth)); transition: box-shadow 350ms ease, transform 350ms ease; }
+#app[data-motion=full] .stage-piece--clear { --card-angle: 8deg; --card-depth: 17px; }
+#app[data-motion=full] .stage-piece--food { --card-angle: 6deg; --card-depth: 24px; }
+#app[data-motion=full] .stage-piece::before { content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: linear-gradient(120deg, transparent 22%, #ffffff70 48%, transparent 72%); background-size: 240% 100%; background-position: calc(50% + var(--stage-x) * 50%) 0; opacity: 0; transition: opacity 350ms ease; }
+#app[data-motion=full] .studio-stage.is-pointer-active .stage-piece::before { opacity: .28; }
+#app[data-motion=full] .stage-piece:hover, #app[data-motion=full] .stage-piece:focus-visible { transform: perspective(1000px) rotateX(calc(var(--stage-y) * -3deg)) rotateY(calc(var(--stage-x) * 4deg)) rotate(0deg) translateY(-9px); }
+#app[data-motion=full] .stage-orbit { translate: calc(var(--stage-x) * -6px) calc(var(--stage-y) * -6px); }
+#app[data-motion=full] .stage-stamp { translate: calc(var(--stage-x) * -10px) calc(var(--stage-y) * -10px); }
+
+/* The cover itself remains a normal, keyboard-accessible link. */
+#app .package-demo-preview { position: relative; }
+#app .package-demo-preview::after { content: 'Website entdecken ↗'; position: absolute; right: 22px; bottom: 20px; padding: 13px 18px; border-radius: 30px; font-size: 12px; line-height: 1.3; background: var(--color-ivory); color: var(--color-ink); box-shadow: 0 4px 24px #10272b1a; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  #app[data-motion=full] .package-demo-preview::after { opacity: 0; translate: 0 8px; transition: opacity 200ms ease, translate 300ms ease; }
+  #app[data-motion=full] .package-demo-preview:is(:hover, :focus-visible)::after { opacity: 1; translate: 0 0; }
+  #app[data-motion=full] .package-demo-preview img { transition: transform 850ms cubic-bezier(.2,.7,.2,1), box-shadow 600ms ease; }
+  #app[data-motion=full] .package-demo-preview:is(:hover, :focus-visible) img { transform: scale(1.035) translateY(-3px); box-shadow: 0 20px 35px #14272540; }
+  #app[data-motion=full] .package-row { transition: border-color 250ms ease, box-shadow 350ms ease; }
+  #app[data-motion=full] .package-row:focus-within, #app[data-motion=full] .package-row:hover { border-color: #7f956a; box-shadow: 0 12px 36px #172f3108; }
+}
+
+/* The four collaboration steps share a progress line. Text stays at full contrast. */
+#app .process-list { position: relative; isolation: isolate; --process-progress: 0; }
+#app .process-list::before, #app .process-list::after { content: ''; position: absolute; left: 17px; top: 17px; bottom: 25px; width: 1px; z-index: -1; background: #b9c5ad; }
+#app .process-list::after { background: #3b5d4e; transform: scaleY(var(--process-progress)); transform-origin: top; }
+#app .process-list li { padding-left: 0; gap: 22px; }
+#app .process-list li > span { display: grid; place-items: center; flex-shrink: 0; width: 35px; height: 35px; padding: 0; border: 1px solid #b9c5ad; border-radius: 50%; background: #e8ecdf; color: #526267; font-size: 10px; transition: background 250ms ease, color 250ms ease, border-color 250ms ease; }
+#app .process-list li.is-reached > span { background: #152b31; color: #e5fb77; border-color: #152b31; }
+#app .process-list li.is-current > span { box-shadow: 0 0 0 5px #cbd8ba; }
+
+#app[data-motion=full] .button, #app[data-motion=full] .header-cta { transition: background 250ms ease, box-shadow 250ms ease; }
+#app[data-motion=full] .button:hover { box-shadow: 0 5px 18px #152b311c; }
+#app[data-motion=full] .button > span, #app[data-motion=full] .header-cta > span, #app[data-motion=full] .text-link > span, #app[data-motion=full] .round-arrow > span { display: inline-block; transition: translate 230ms cubic-bezier(.2,.7,.2,1); }
+#app[data-motion=full] :is(.button, .header-cta, .text-link, .round-arrow):is(:hover, :focus-visible) > span { translate: 3px -3px; }
+#app[data-motion=full] .hero-actions .text-link:is(:hover, :focus-visible) > span { translate: 0 3px; }
+#app[data-motion=full] .lab-toggle { transition: transform 300ms ease, background 250ms ease; }
+#app[data-motion=full] .studio-lab > summary:hover .lab-toggle { background: #e5fb771c; }
+#app[data-motion=full] .studio-lab[open] .studio-lab-content { animation: lab-open 400ms ease-out; }
+@keyframes lab-open { from { opacity: .3; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+
+#app[data-motion=quiet] *, #app[data-motion=quiet] *::before, #app[data-motion=quiet] *::after { animation: none !important; transition: none !important; scroll-behavior: auto; }
+#app[data-motion=quiet] .stage-piece:hover, #app[data-motion=quiet] .stage-piece:focus-visible { transform: rotate(-7deg); }
+#app[data-motion=quiet] .stage-piece--clear:is(:hover, :focus-visible) { transform: rotate(8deg); }
+#app[data-motion=quiet] .stage-piece--food:is(:hover, :focus-visible) { transform: rotate(6deg); }
+#app[data-motion=quiet] .package-demo-preview:hover img { transform: none; }
+html:has(#app[data-motion=quiet]) { scroll-behavior: auto; }
+@media (prefers-reduced-motion: reduce) {
+  #app .stage-piece:is(:hover, :focus-visible) { transform: rotate(-7deg); }
+  #app .stage-piece--clear:is(:hover, :focus-visible) { transform: rotate(8deg); }
+  #app .stage-piece--food:is(:hover, :focus-visible) { transform: rotate(6deg); }
+}
+@media (max-width: 900px) {
+  #app .hero-bottom > p { flex: 1 1 60%; }
+  #app .hero-bottom > span { flex-basis: 100%; }
+}
+@media (max-width: 600px) {
+  #app .hero-bottom { align-items: start; }
+  .motion-control { min-height: 44px; padding-inline: 0; border: 0; }
+  #app .package-demo-preview::after { right: 14px; bottom: 14px; padding: 11px 14px; font-size: 11px; }
+  #app .process-list li { gap: 18px; }
+}

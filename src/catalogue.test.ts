@@ -1,13 +1,15 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountCatalogue } from './catalogue';
+import { prepareDemo } from './demos';
 import type { CatalogueController } from './contracts';
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal');
 const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close');
 let controllers: CatalogueController[];
 
-beforeEach(() => {
+beforeEach(async () => {
+  await Promise.all((['meisterwerk', 'nordlicht', 'sales', 'raumgut'] as const).map(prepareDemo));
   controllers = [];
   document.body.innerHTML = '<div id="controls"></div><div id="slot"></div>';
   Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {

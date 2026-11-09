@@ -36,7 +36,7 @@ export function mountMediaFallback(scope: HTMLElement | ShadowRoot, signal: Abor
       if (explanation) explanation.textContent = 'Der Bildvergleich ist gerade nicht verfügbar. Die Raumidee ist im Text beschrieben.';
       update();
     }, { signal });
-    probe.src = `${import.meta.env.BASE_URL}reference-assets/room-diptych.png`;
+    probe.src = `${import.meta.env.BASE_URL}reference-assets/room-diptych.webp`;
   }
   return status;
 }

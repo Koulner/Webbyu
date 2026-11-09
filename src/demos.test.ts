@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createDemo, disposeDemo, mountDemoDialog } from './demos';
+import { prepareDemo, createDemo, disposeDemo, mountDemoDialog } from './demos';
 import type { DemoId } from './data';
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal');
@@ -9,7 +9,8 @@ const originalScrollIntoView = Object.getOwnPropertyDescriptor(HTMLElement.proto
 let scrollIntoView: ReturnType<typeof vi.fn>;
 let dialogs: ReturnType<typeof mountDemoDialog>[];
 
-beforeEach(() => {
+beforeEach(async () => {
+  await Promise.all(["meisterwerk", "nordlicht", "sales", "raumgut"].map(id => prepareDemo(id as Parameters<typeof prepareDemo>[0])));
   dialogs = [];
   scrollIntoView = vi.fn();
   Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { configurable: true, value: scrollIntoView });

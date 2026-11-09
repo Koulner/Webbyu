@@ -117,11 +117,11 @@ describe('journey visual lifecycle',()=>{
     controller.setProgress(2.5,true);flush();
     const mist=scene.getObjectByName('transition-mist-1') as THREE.Mesh<THREE.PlaneGeometry,THREE.ShaderMaterial>;
     expect(mist.visible).toBe(true);expect(mist.material.uniforms.uOpacity.value).toBeGreaterThan(0);
-    controller.setProgress(6,true);flush();
+    controller.setProgress(stations.length-1,true);flush();
     expect(drawn()).toBeGreaterThan(earlyDrawn);
     traced.forEach(mesh=>expect(mesh.geometry.drawRange.count).toBe(mesh.geometry.index!.count));
     expect(mist.visible).toBe(false);expect(frames.size).toBe(0);
-    expect(worlds[6].visible).toBe(true);
+    expect(worlds[stations.length-1].visible).toBe(true);
   });
 
   it('stops work when disabled, offscreen or hidden, and reduced motion preserves the overview',()=>{
