@@ -41,7 +41,7 @@ Der Anfragevertrag ist strikt: Neue Felder müssen in Vertrag, Backend-Prüfung,
 
 ## Branches
 
-`prod` ist live, `dev` ist die Entwicklung. Beide sind auseinandergelaufen, ein Merge ergab am 9.11.2026 41 Konflikte. `dev` nicht ungeklärt nach `prod` mergen.
+`prod` ist live und enthält seit 9.11.2026 den Stand von `dev` (Merge f479962). Neue Arbeit von `prod` abzweigen. Der Anfrageversand ist live seit 9.11.2026 abgeschaltet (a156e01); wieder einschalten nur mit dem neuen Projektberater und ausdrücklicher Freigabe.
 
 ## Lokale Dokumente
 
