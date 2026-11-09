@@ -1,4 +1,5 @@
-export type Goal = 'presence' | 'inquiries' | 'bookings' | 'sales';
+/** `media` gehört dem Medien-Weg und wird dort ohne Zielauswahl gesetzt. */
+export type Goal = 'presence' | 'inquiries' | 'bookings' | 'sales' | 'media';
 export type DemoId = 'meisterwerk' | 'nordlicht' | 'sales' | 'raumgut';
 export type PackageId = 'start' | 'business' | 'complete';
 export type PackageChoice = PackageId | 'custom';
@@ -41,13 +42,12 @@ export const packageQuestions = [
 ];
 
 export const extensions = [
-  { id: 'photos', name: 'Eigene Fotos produzieren', short: 'Fotografie', description: 'Eigene Aufnahmen passend zu Ihrem Unternehmen. Motive, Aufnahmeumfang und Nutzungsrechte stimmen wir individuell ab.' },
-  { id: 'videos', name: 'Foto, Video & Text verbinden', short: 'Texte & Videos', description: 'Bilder, Videos und Texte gemeinsam für Ihren Auftritt planen. Produktion, Formate und Nutzungsrechte werden individuell vereinbart.' },
   { id: 'cms', name: 'Inhalte selbst pflegen', short: 'Inhalte bearbeiten', description: 'Texte, Bilder und neue Inhalte bei Bedarf selbst bearbeiten. Die passende Möglichkeit zur Pflege wird für Ihr Projekt ausgewählt.' },
-  { id: 'booking', name: 'Termine einfacher buchen', short: 'Buchung', description: 'Leistungen und verfügbare Zeiten in einen passenden Buchungsablauf einbinden.' },
-  { id: 'seo', name: 'Besser gefunden werden', short: 'Suchmaschinen', description: 'Seiten und Inhalte auf die Fragen ausrichten, mit denen Kunden nach Ihrem Angebot suchen. Zusätzliche Maßnahmen stimmen wir gesondert ab.' },
-  { id: 'maps', name: 'Den Weg zu Ihnen zeigen', short: 'Standort & Anfahrt', description: 'Standort, Anfahrt und Ihre lokale Präsenz verständlich zusammenbringen.' },
-  { id: 'wizard', name: 'Zur richtigen Wahl führen', short: 'Projektfinder', description: 'Mit wenigen Fragen zum passenden Produkt, Paket oder Angebot führen.' },
+  { id: 'booking_embed', name: 'Vorhandenen Buchungsdienst einbinden', short: 'Buchung einbinden', description: 'Ein Dienst für Termine, den Sie bereits nutzen, wird in Ihre Website eingebunden, mit Einwilligungslösung.' },
+  { id: 'booking_custom', name: 'Buchung nach Ihrem Ablauf', short: 'Eigene Buchung', description: 'Leistungen und verfügbare Zeiten in einen eigenen Buchungsablauf bringen. Umfang und Kosten klären wir gemeinsam.' },
+  { id: 'language', name: 'Eine weitere Sprache', short: 'Weitere Sprache', description: 'Ihre Website in einer zweiten Sprache. Sie prüfen die Übersetzung vor dem Livegang.' },
+  { id: 'wizard', name: 'Zur richtigen Wahl führen', short: 'Auswahlhilfe', description: 'Mit wenigen Fragen zum passenden Produkt, Paket oder Angebot führen. Das Ergebnis erreicht Sie als geordnete Anfrage.' },
+  { id: 'integration', name: 'Dienste und Systeme verbinden', short: 'Anbindung', description: 'Vorhandene Dienste oder Systeme mit Ihrer Website zusammenbringen. Was möglich ist, klären wir gemeinsam.' },
   { id: '3d', name: 'Etwas Besonderes erleben', short: 'Interaktives 3D', description: 'Produkte und Geschichten mit räumlicher Gestaltung und gezielter Bewegung erlebbar machen.' },
 ];
 

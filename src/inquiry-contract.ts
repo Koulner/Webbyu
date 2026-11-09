@@ -1,6 +1,10 @@
 import type { BriefState } from './state';
 
-/** POST /api/inquiry.php, application/json, same origin; see backend/README.md. */
+/**
+ * POST /api/inquiry.php, application/json, same origin; see backend/README.md.
+ * Alle Schlüssel von `BriefState` sind Pflicht. Preisangaben (`shownLines`, `catalogVersion`)
+ * sind „vom Besucher gesehen“ und werden serverseitig nicht neu berechnet.
+ */
 export interface InquiryRequest extends BriefState {
   /** crypto.randomUUID(); keep unchanged for this submission and manual retries. */
   requestId: string;

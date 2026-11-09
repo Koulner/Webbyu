@@ -176,18 +176,17 @@ describe('homepage integration', () => {
 
   it('keeps the brief goal on package selection and preserves the Finder step through navigation', () => {
     mount();
-    store.update({ goal: 'sales', description: 'Ein kleiner Shop', name: 'Ada', extensions: ['photos'] });
+    store.update({ goal: 'sales', description: 'Ein kleiner Shop', name: 'Ada', extensions: ['cms'] });
     button('[data-package="complete"]').click();
-    expect(store.get()).toMatchObject({ goal: 'sales', selectedPackage: 'complete', description: 'Ein kleiner Shop', extensions: ['photos'] });
-    button('.finder-next').click();
-    button('.finder-next').click();
+    expect(store.get()).toMatchObject({ goal: 'sales', selectedPackage: 'complete', description: 'Ein kleiner Shop', extensions: ['cms'] });
+    for (let i = 0; i < 4; i++) button('.finder-next').click();
     const field = document.querySelector<HTMLTextAreaElement>('[name="description"]')!;
     field.value = 'Ein kleiner Shop mit Fotoproduktion';
     field.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelector<HTMLAnchorElement>('.site-header a[href="#leistungen"]')!.click();
     document.querySelector<HTMLAnchorElement>('.header-cta')!.click();
     expect(document.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toBe(field.value);
-    expect(document.querySelector('.finder-progress [aria-current="step"]')!.textContent).toContain('Ihr Projekt');
+    expect(document.querySelector('.finder-progress [aria-current="step"]')!.textContent).toContain('Orientierung');
     expect(document.activeElement).toBe(document.querySelector('.finder-heading'));
     expect(store.get().goal).toBe('sales');
   });
@@ -200,7 +199,7 @@ describe('homepage integration', () => {
     vi.stubGlobal('crypto', { randomUUID: vi.fn().mockReturnValue(id) });
     mount({ sendEnabled: true });
     store.update({ name: 'Ada', email: 'ada@example.com', description: 'Bleibt über Navigation erhalten' });
-    for (let i = 0; i < 4; i++) root.querySelector('form.finder-form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    for (let i = 0; i < 5; i++) root.querySelector('form.finder-form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     const preview = root.querySelector('[data-summary]')!.textContent;
     button('[data-action="send"]').click();
     const launch = button('[data-demo="sales"]');
@@ -250,27 +249,28 @@ describe('homepage integration', () => {
   it('keeps extension buttons synchronized with Finder selection, removal, and unsure', () => {
     mount();
     const cms = button('[data-extension="cms"]');
-    const seo = button('[data-extension="seo"]');
+    const wizard = button('[data-extension="wizard"]');
     const expectSelected = (element: HTMLButtonElement, selected: boolean) => {
       expect(element.getAttribute('aria-pressed')).toBe(String(selected));
       expect(element.textContent).toContain(selected ? 'Für Ihr Projekt vorgemerkt' : 'Für mein Projekt vormerken');
     };
     const checkbox = (id: string) => document.querySelector<HTMLInputElement>(`input[name="finder-extension"][value="${id}"]`)!;
     expectSelected(cms, false);
-    expectSelected(seo, false);
+    expectSelected(wizard, false);
     cms.click();
     expectSelected(cms, true);
+    button('.finder-next').click();
     button('.finder-next').click();
     expect(checkbox('cms').checked).toBe(true);
     checkbox('cms').click();
     expectSelected(cms, false);
-    checkbox('seo').click();
-    expectSelected(seo, true);
+    checkbox('wizard').click();
+    expectSelected(wizard, true);
     checkbox('cms').click();
     expectSelected(cms, true);
     checkbox('unsure').click();
     expectSelected(cms, false);
-    expectSelected(seo, false);
+    expectSelected(wizard, false);
     cms.click();
     expectSelected(cms, true);
     expect(checkbox('cms').checked).toBe(true);
