@@ -1,0 +1,10 @@
+{"event": "CREATED", "artifactId": "brief-eiche-form", "revision": 1, "actor": "claude-pilot", "at": "2026-11-04T09:12:32.457422+00:00"}
+{"event": "REVIEWED", "artifactId": "brief-eiche-form", "revision": 1, "actor": "review-controller", "at": "2026-11-04T09:12:32.498536+00:00"}
+{"event": "CREATED", "artifactId": "brand-eiche-form", "revision": 1, "actor": "claude-pilot", "at": "2026-11-04T09:12:32.528067+00:00"}
+{"event": "REVIEWED", "artifactId": "brand-eiche-form", "revision": 1, "actor": "review-controller", "at": "2026-11-04T09:12:32.551917+00:00"}
+{"event": "CREATED", "artifactId": "thesis-a-werkakte", "revision": 1, "actor": "claude-pilot", "at": "2026-11-04T09:12:32.571436+00:00"}
+{"event": "REVIEWED", "artifactId": "thesis-a-werkakte", "revision": 1, "actor": "review-controller", "at": "2026-11-04T09:12:32.591349+00:00"}
+{"event": "CREATED", "artifactId": "thesis-b-passleiste", "revision": 1, "actor": "claude-pilot", "at": "2026-11-04T09:12:32.612276+00:00"}
+{"event": "REVIEWED", "artifactId": "thesis-b-passleiste", "revision": 1, "actor": "review-controller", "at": "2026-11-04T09:12:32.633276+00:00"}
+{"event": "CREATED", "artifactId": "thesis-c-stueckliste", "revision": 1, "actor": "claude-pilot", "at": "2026-11-04T09:12:32.652291+00:00"}
+{"event": "REVIEWED", "artifactId": "thesis-c-stueckliste", "revision": 1, "actor": "review-controller", "at": "2026-11-04T09:12:32.673902+00:00"}

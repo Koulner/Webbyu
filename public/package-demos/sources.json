@@ -103,5 +103,133 @@
     "type": "KI-generierte Illustration; mobile WebP-Variante, kein reales Kundenprojekt",
     "processing": "Auf 800 × 533 Pixel verkleinert, WebP Qualität 78",
     "local_bytes": 50394
+  },
+  {
+    "file": "eiche-fall14.webp",
+    "source": "Lokal berechnet mit pilot/eiche-form/strecke/tools/render.py aus den Maßen von Fall 14, 4. November 2026",
+    "type": "Entwurfsvisualisierung eines erfundenen Möbels; kein Foto, keine KI-Bilderzeugung",
+    "local_bytes": 167394
+  },
+  {
+    "file": "eiche-fall14-breit.webp",
+    "source": "Lokal berechnet mit pilot/eiche-form/strecke/tools/render.py aus den Maßen von Fall 14, 5. November 2026",
+    "type": "Entwurfsvisualisierung eines erfundenen Möbels; kein Foto, keine KI-Bilderzeugung; mit Medianfilter entrauscht",
+    "local_bytes": 86200
+  },
+  {
+    "file": "eiche-holz.webp",
+    "source": "Prozedural erzeugt mit pilot/eiche-form/strecke/tools/gen-oak.py, 4. November 2026",
+    "type": "Erzeugte Holzstruktur; kein Foto",
+    "local_bytes": 51002
+  },
+  {
+    "file": "klarblick-klinker.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 16153
+  },
+  {
+    "file": "klarblick-schiefer.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 5107
+  },
+  {
+    "file": "klarblick-hecke.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 46541
+  },
+  {
+    "file": "klarblick-gehweg.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 1932
+  },
+  {
+    "file": "klarblick-giebel.svg",
+    "source": "Programmatisch erzeugt mit pilot/klarblick/tools/texturen.mjs für diese fiktive Designstudie",
+    "type": "Eigene Zeichnung; kein Foto, kein KI-Bild",
+    "local_bytes": 17174
+  },
+  {
+    "file": "hof-ki-tafel.webp",
+    "source": "Einfarbiger Rasterdruck aus hof-concept.webp (OpenAI ImageGen, 3. November 2026) mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "KI-generierte Illustration, bearbeitet; kein Foto, kein reales Kundenprojekt; auf der Seite als KI-generiert gekennzeichnet",
+    "local_bytes": 264976
+  },
+  {
+    "file": "hof-ki-tafel-800.webp",
+    "source": "Einfarbiger Rasterdruck aus hof-concept.webp (OpenAI ImageGen, 3. November 2026) mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "KI-generierte Illustration, bearbeitet; kein Foto, kein reales Kundenprojekt; auf der Seite als KI-generiert gekennzeichnet",
+    "local_bytes": 97378
+  },
+  {
+    "file": "hof-ki-wurzeln.webp",
+    "source": "Einfarbiger Rasterdruck aus hof-concept.webp (OpenAI ImageGen, 3. November 2026) mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "KI-generierte Illustration, bearbeitet; kein Foto, kein reales Kundenprojekt; auf der Seite als KI-generiert gekennzeichnet",
+    "local_bytes": 197400
+  },
+  {
+    "file": "hof-ki-wurzeln-800.webp",
+    "source": "Einfarbiger Rasterdruck aus hof-concept.webp (OpenAI ImageGen, 3. November 2026) mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "KI-generierte Illustration, bearbeitet; kein Foto, kein reales Kundenprojekt; auf der Seite als KI-generiert gekennzeichnet",
+    "local_bytes": 90222
+  },
+  {
+    "file": "hof-ki-brot.webp",
+    "source": "Einfarbiger Rasterdruck aus hof-concept.webp (OpenAI ImageGen, 3. November 2026) mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "KI-generierte Illustration, bearbeitet; kein Foto, kein reales Kundenprojekt; auf der Seite als KI-generiert gekennzeichnet",
+    "local_bytes": 111836
+  },
+  {
+    "file": "hof-ki-kerze.webp",
+    "source": "Einfarbiger Rasterdruck aus hof-concept.webp (OpenAI ImageGen, 3. November 2026) mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "KI-generierte Illustration, bearbeitet; kein Foto, kein reales Kundenprojekt; auf der Seite als KI-generiert gekennzeichnet",
+    "local_bytes": 86280
+  },
+  {
+    "file": "hof-foto-rost.webp",
+    "source": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1",
+    "derived_from": "food-dish.webp",
+    "license": "https://unsplash.com/license",
+    "processing": "Einfarbiger Rasterdruck mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "Bearbeitetes Stockfoto; zeigt keinen realen Betrieb von Hof & Flamme",
+    "local_bytes": 241030
+  },
+  {
+    "file": "hof-foto-reichen.webp",
+    "source": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
+    "derived_from": "food-table.webp",
+    "license": "https://unsplash.com/license",
+    "processing": "Einfarbiger Rasterdruck mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "Bearbeitetes Stockfoto; zeigt keinen realen Betrieb von Hof & Flamme",
+    "local_bytes": 182892
+  },
+  {
+    "file": "hof-foto-reichen-800.webp",
+    "source": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
+    "derived_from": "food-table.webp",
+    "license": "https://unsplash.com/license",
+    "processing": "Einfarbiger Rasterdruck mit pilot/hof-flamme/tools/druck.py, 9. November 2026",
+    "type": "Bearbeitetes Stockfoto; zeigt keinen realen Betrieb von Hof & Flamme",
+    "local_bytes": 67136
+  },
+  {
+    "file": "hof-film.mp4",
+    "source": "https://www.pexels.com/video/chef-cooking-in-front-of-customer-1858094/",
+    "creator": "Rene Terp",
+    "derived_from": "restaurant.mp4",
+    "license": "https://www.pexels.com/license/",
+    "processing": "Ausschnitt 406 x 500 Pixel, einfarbig mit ffmpeg, H.264, ohne Ton, 8 Sekunden; 9. November 2026",
+    "type": "Bearbeiteter Beispielfilm; zeigt keinen realen Betrieb von Hof & Flamme",
+    "local_bytes": 302311
+  },
+  {
+    "file": "hof-film.webp",
+    "source": "Standbild aus hof-film.mp4",
+    "creator": "Rene Terp",
+    "license": "https://www.pexels.com/license/",
+    "local_bytes": 10276
   }
 ]

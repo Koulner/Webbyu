@@ -5,6 +5,7 @@ import './styles.css';
 import './content.css';
 import './home.css';
 import './home-motion.css';
+import './ai-badge.css';
 import { extensions, packages, type DemoId, type PackageId } from './data';
 import { briefStore, type BriefStore } from './state';
 import { mountJourneyPreview } from './journey-preview';

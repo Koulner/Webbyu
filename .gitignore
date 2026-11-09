@@ -5,3 +5,10 @@ artifacts/
 .npm-cache/
 .sites-runtime/
 *.log
+Webbyu_Quell*
+projektpruefung
+_vorschau*
+output/
+outputs/
+dist-webbyu/
+.claude/worktrees/

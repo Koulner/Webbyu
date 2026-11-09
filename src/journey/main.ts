@@ -2,6 +2,7 @@ import '../fonts.css';
 import '../tokens.css';
 import '../demos.css';
 import './style.css';
+import '../ai-badge.css';
 import { mountJourney } from './controller';
 import { mountPrivacy } from '../privacy';
 

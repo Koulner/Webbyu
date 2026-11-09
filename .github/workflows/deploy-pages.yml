@@ -30,12 +30,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: openssl
+          tools: composer:v2
+          coverage: none
+
+      - name: Install locked backend dependencies without secrets
+        run: |
+          composer validate --strict --working-dir=backend
+          composer install --working-dir=backend --no-dev --prefer-dist --no-scripts --no-plugins --no-interaction --classmap-authoritative
+          composer audit --working-dir=backend --locked --no-dev
+
       - name: Verify
-        run: npm run typecheck && npm test && npm run test:deploy
+        run: npm run typecheck && npm test && npm run test:deploy && npm run test:backend
 
       - name: Build
         run: npm run build
         env:
           SITE_NOINDEX: 'true'
+          SITE_BASE_PATH: /
+
+      - name: Prepare and test the production package with Apache and PHP
+        run: |
+          node scripts/prepare-ionos.mjs
+          docker build -t webbyu-inquiry-test -f backend/tests/Apache.Dockerfile dist
+          docker run -d --name webbyu-inquiry-test -p 127.0.0.1:8088:80 webbyu-inquiry-test
+          for attempt in {1..30}; do curl --silent --output /dev/null http://127.0.0.1:8088/api/health.php && break || sleep 1; done
+          node scripts/test-apache.mjs
+
+      - name: Remove test container
+        if: always()
+        run: docker rm -f webbyu-inquiry-test 2>/dev/null || true
 
       # QA runs checks and a build only. No Pages deployment or build upload.

@@ -63,6 +63,28 @@ describe('privacy choice', () => {
     expect(document.activeElement).toBe(reopen());
   });
 
+  it('keeps the reading position when rejecting the notice that opened by itself', () => {
+    document.querySelector('main')!.tabIndex = -1;
+    notice = mountPrivacy();
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+    reject().focus();
+    focus.mockClear();
+    reject().click();
+    expect(document.activeElement).toBe(document.querySelector('main'));
+    expect(document.activeElement).not.toBe(reopen());
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
+  it('does not scroll when focus returns to the footer button that reopened the notice', () => {
+    notice = mountPrivacy();
+    reopen().click();
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+    reject().click();
+    expect(document.activeElement).toBe(reopen());
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
   it('treats closing and Escape as rejection without granting permission', () => {
     notice = mountPrivacy();
     document.querySelector<HTMLButtonElement>('.privacy-close')!.click();
@@ -95,6 +117,20 @@ describe('privacy choice', () => {
     expect(panel().hidden).toBe(true);
     reopen().click();
     expect(panel().hidden).toBe(false);
+  });
+
+  it('sets no cookie before or after the reaction', () => {
+    notice = mountPrivacy();
+    expect(document.cookie).toBe('');
+    reject().click();
+    expect(document.cookie).toBe('');
+  });
+
+  it('keeps cookies, browser storage and third-party embeds out of the code that runs before the reaction', () => {
+    const sources = import.meta.glob<string>(['./**/*.{ts,html}', '!./**/*.test.ts', '!./privacy.ts'], { query: '?raw', import: 'default', eager: true });
+    const unguarded = /document\.cookie|cookieStore\.|(?:local|session)Storage\.setItem|<(?:iframe|script)\b[^>]*\bsrc=["']https?:/i;
+    expect(Object.keys(sources).length).toBeGreaterThan(20);
+    expect(Object.keys(sources).filter(path => unguarded.test(sources[path]!))).toEqual([]);
   });
 
   it('removes its elements and listeners on dispose', () => {

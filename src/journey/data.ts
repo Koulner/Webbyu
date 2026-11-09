@@ -52,12 +52,12 @@ export const stations: readonly JourneyStation[] = [
   },
   {
     id: 'eiche-und-form', label: 'Eiche & Form', eyebrow: 'Paketbeispiel / Webbyu Business',
-    title: 'Mehr Raum für Handwerk und Projekte.',
-    description: 'Ein mehrseitiger Auftritt für eine fiktive Tischlerei.',
-    detail: 'Leistungen und Projektbeispiele zeigen die Arbeit der Tischlerei.',
-    position: [-2.5, -3.6], landmark: 'furniture', packageId: 'business', image: 'eiche-concept.webp',
-    visual: { color: '#bdc8ac', caption: 'Material und Arbeit werden sichtbar.' },
-    story: { task: 'Eine Tischlerei möchte ihre Leistungen und Arbeitsweise anschaulich erklären.', approach: 'Eigene Seiten für Leistungen und Projekte verbinden Bilder, Details und Kontakt.', benefit: 'Interessierte können sich ein Bild von der Arbeit machen und ihr Vorhaben beschreiben.' },
+    title: 'Gerade Möbel für schiefe Häuser.',
+    description: 'Ein mehrseitiger Auftritt für eine fiktive Tischlerei in Altbauten.',
+    detail: 'Drei Fälle mit Werkzeichnung zeigen, wie die Tischlerei schiefe Wände ausgleicht.',
+    position: [-2.5, -3.6], landmark: 'furniture', packageId: 'business', image: 'eiche-fall14-breit.webp',
+    visual: { color: '#d9d8d2', caption: 'Aufmaß, Zeichnung und Einbau aus denselben Maßen.' },
+    story: { task: 'Eine Tischlerei möchte zeigen, dass sie Möbel für Räume baut, in denen kein Winkel stimmt.', approach: 'Ein durchgehender Fall, Werkzeichnungen und ein Formular, das die eigene Nische zeichnet.', benefit: 'Interessierte sehen, ob ihr Raum in Frage kommt, und schicken gleich vier Maße mit.' },
   },
   {
     id: 'hof-und-flamme', label: 'Hof & Flamme', eyebrow: 'Paketbeispiel / Webbyu Complete',

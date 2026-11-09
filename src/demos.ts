@@ -1,5 +1,6 @@
 import { concepts, type DemoId } from './data';
 import './demos.css';
+import './ai-badge.css';
 
 type DemoMount = (root: HTMLElement, id: string, signal: AbortSignal) => void;
 const mounts = new Map<DemoId, DemoMount>();

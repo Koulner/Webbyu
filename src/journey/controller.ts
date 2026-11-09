@@ -1,4 +1,5 @@
 import { stations, stationIndex } from './data';
+import { aiBadge, isAiMedia } from '../ai-media';
 import type { DemoId } from '../data';
 import { renderJourney } from './page';
 import { mapProjection } from './map';
@@ -88,6 +89,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     previewOpen.hidden=Boolean(station?.packageId);
     previewLink.hidden=!station?.packageId;
     previewSlot.querySelector('.journey-package-image')?.remove();
+    previewSlot.querySelector(':scope > .ai-badge')?.remove();
     delete previewOpen.dataset.previewDemo;
     if(station?.packageId) {
       previewLink.href=`${import.meta.env.BASE_URL}demos/${station.packageId}/`;
@@ -100,6 +102,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       image.src=`${import.meta.env.BASE_URL}package-demos/${station.image}`;
       image.alt='';
       previewSlot.append(image);
+      if(isAiMedia(image.src)) previewSlot.insertAdjacentHTML('beforeend',aiBadge());
       return;
     }
     if(!id) return;

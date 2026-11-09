@@ -1,5 +1,7 @@
 # Safran Atelier camera sequence
 
+**KI-Kennzeichnung:** Kamerafahrt und Kapitelbilder (`bloom`, `flower`, `detail`, `threads`) sind KI-generiert (vom Nutzer am 6. November 2026 bestätigt). Sie tragen auf der Website das Label „KI-generiert“ und stehen in der Übersicht im Impressum (`#ki-kennzeichnung`).
+
 Imported on 2026-10-23 from the user's supplied `royal-spices` reference project:
 `public/hero/5/d-960/0000.webp` through `0400.webp`, every second frame.
 

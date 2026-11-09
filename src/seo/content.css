@@ -168,3 +168,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
   .content-main h2, .content-main h3 { break-after: avoid; }
   .content-main a { text-decoration: underline; }
 }
+
+.content-wordmark { display: inline-flex; align-items: center; min-height: 44px; }
+.content-wordmark img { display: block; width: 154px; height: auto; }
+@media (max-width: 600px) { .content-wordmark img { width: 135px; } }

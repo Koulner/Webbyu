@@ -1,208 +1,280 @@
-.pd-start {
-  --bg: #f7f8f2;
-  --ink: #122b36;
-  --accent: #183e50;
-  --muted: #465d66;
-  --line: #adbec1;
-  --kb-sky: #dfedf4;
-  --kb-lime: #e4f195;
-  --kb-gutter: clamp(20px, 6vw, 100px);
-}
+/* Klarblick, Webbyu Start. Die Seite ist eine Hausfront, vom Giebel bis zum Gehweg.
+   Alles ist auf .pd-start beschränkt. Materialien: pilot/klarblick/tools/texturen.mjs. */
+@font-face { font-family: 'Barlow'; src: url('/fonts/barlow-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Barlow'; src: url('/fonts/barlow-latin-800-normal.woff2') format('woff2'); font-weight: 800; font-display: swap; }
 
-.pd-start .pd-header { background: var(--bg); padding-inline: var(--kb-gutter); }
-.pd-start .pd-brand { position: relative; padding-left: 38px; font-weight: 700; }
-.pd-start .pd-brand .kb-mark {
-  position: absolute;
-  inset: 0 auto auto 0;
-  width: 25px;
-  height: 25px;
-  margin: 0;
-  border: 2px solid currentColor;
-  background: linear-gradient(90deg, transparent 46%, currentColor 46% 54%, transparent 54%);
+.pd-site.pd-start {
+  --himmel: #dbe3e2; --klinker: #7b3629; --laibung: #47201a; --schiefer: #3b464f; --rahmen: #f7f2e7;
+  --glas: #e7efed; --tinte: #1d2930; --gelb: #f2c230; --tuer: #173f35; --messing: #d3a64a; --stein: #c5bdae; --putz: #dcd4c2;
+  --bg: var(--himmel); --ink: var(--tinte); --accent: var(--tinte); --muted: #3f4d55; --line: #1d2930;
+  --rand: clamp(16px, 5.6vw, 96px);
+  background: var(--himmel); color: var(--tinte);
+  font: 500 clamp(17px, 1.2vw, 19px)/1.45 Barlow, 'Arial Narrow', Arial, sans-serif;
 }
-.pd-start .pd-brand .kb-mark::after {
-  content: "";
-  position: absolute;
-  inset: 45% 0 auto;
-  border-top: 2px solid;
-}
-.pd-start .pd-button { font-size: .92rem; gap: 20px; }
-.pd-start :focus-visible { outline-color: #995400; outline-offset: 3px; }
-.pd-start .pd-footer :focus-visible,
-.pd-start .pd-demo-bar :focus-visible { outline-color: var(--kb-lime); }
+.pd-start h1, .pd-start h2, .pd-start h3 { font-family: Barlow, Arial, sans-serif; font-style: normal; letter-spacing: 0; margin: 0; text-wrap: balance; }
+.pd-start h1 { font-size: clamp(50px, 7.5vw, 124px); font-weight: 800; line-height: .98; }
+.pd-start h2 { font-size: clamp(36px, 4.6vw, 74px); font-weight: 800; line-height: 1; }
+.pd-start h3 { font-size: clamp(25px, 2.15vw, 34px); font-weight: 700; line-height: 1.08; }
+.pd-start p { margin: 0 0 .8em; max-width: 40em; }
+.pd-start :focus-visible { outline: 3px solid var(--tinte); outline-offset: 3px; }
+.pd-start .pd-demo-bar { font-family: 'Instrument Sans', sans-serif; font-weight: 400; }
+.pd-start .pd-demo-bar :focus-visible, .pd-start .kb-tuer :focus-visible, .pd-start .kb-dach :focus-visible, .pd-start .pd-footer :focus-visible { outline-color: var(--gelb); }
 
-.kb-wrap { padding-inline: var(--kb-gutter); max-width: 1680px; margin-inline: auto; }
-.pd-start .kb-tag {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  font: 600 .74rem/1.3 'Instrument Sans', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .115em;
-}
-.kb-tag span {
-  display: inline-grid;
-  place-items: center;
-  min-width: 25px;
-  height: 25px;
-  border: 1px solid currentColor;
-  letter-spacing: 0;
-}
-.kb-tag span:empty { min-width: 12px; height: 12px; background: var(--kb-lime); }
-.pd-start h2 {
-  font-size: clamp(2.4rem, 5.1vw, 5.2rem);
-  line-height: .99;
-  letter-spacing: -.066em;
-  margin-bottom: 24px;
-}
+/* Kopf steht im Himmel */
+.pd-start .pd-header { background: var(--himmel); border: 0; padding: 18px var(--rand) 6px; }
+.pd-start .pd-brand { display: grid; grid-template-columns: 30px auto; column-gap: 11px; font: 800 26px/1 Barlow, sans-serif; letter-spacing: 0; }
+.pd-start .pd-brand .kb-mark { grid-row: 1 / span 2; width: 30px; height: 34px; }
+.pd-start .pd-brand span { font: 600 12px/1.2 Barlow, sans-serif; letter-spacing: .02em; margin: 3px 0 0; }
+.pd-start .pd-header nav a { font: 600 16px/1.3 Barlow, sans-serif; border-bottom-width: 2px; }
+.pd-start .pd-menu-toggle { border: 2px solid var(--tinte); font: 700 16px/1 Barlow, sans-serif; }
+.pd-start .pd-menu-toggle span { display: none; }
 
-.kb-opening {
-  display: grid;
-  grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
-  background: var(--kb-sky);
-}
-.kb-opening-copy {
-  align-self: center;
-  padding: clamp(44px, 7vw, 108px) clamp(20px, 4vw, 70px) clamp(44px, 6vw, 90px) var(--kb-gutter);
-}
-.pd-start .kb-opening h1 {
-  font-size: clamp(3.5rem, 7.5vw, 8.5rem);
-  line-height: .85;
-  letter-spacing: -.078em;
-}
-.kb-opening h1 em {
-  font-size: 1.15em;
-  letter-spacing: -.05em;
-  color: #255269;
-}
-.kb-opening-copy > p:not(.kb-tag) { max-width: 34ch; margin-bottom: 28px; }
-.kb-opening figure, .kb-visit figure {
-  position: relative;
-  margin: 0;
-  min-width: 0;
-  background: #c5dce6;
-}
-.kb-opening-photo { min-height: clamp(450px, 42vw, 700px); border-left: 6px solid var(--ink); }
-.kb-opening-photo img, .kb-visit figure img { position: absolute; inset: 0; }
-.kb-opening-photo img { object-position: 82% center; }
-.kb-opening figcaption, .kb-visit figcaption {
-  position: absolute;
-  inset: auto 12px 12px auto;
-  background: var(--bg);
-  padding: 4px 9px;
-  font-size: .72rem;
-}
-.kb-opening-index {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 10px var(--kb-gutter);
-  background: var(--kb-lime);
-  font-size: .86rem;
-  font-weight: 600;
-}
-.kb-opening-index a { padding-block: 5px; text-underline-offset: .25em; }
-.kb-opening-index a span { display: inline-block; margin-left: 5px; }
-@media (prefers-reduced-motion: no-preference) {
-  .kb-opening-index a span { transition: transform .18s ease-out; }
-  .kb-opening-index a:is(:hover, :focus-visible) span { transform: translateY(3px); }
-}
+/* Knöpfe */
+.pd-start .kb-knopf { display: inline-block; background: var(--tinte); color: #fff; font-weight: 700; padding: .72em 1.15em; text-decoration: none; border-bottom: 5px solid var(--gelb); }
+.pd-start .kb-knopf:hover { background: var(--klinker); }
+.pd-start .kb-textlink { font-weight: 600; text-underline-offset: 4px; text-decoration-thickness: 2px; padding: 5px 0; }
+.pd-start .kb-aktionen { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 0; max-width: none; }
 
-.kb-services-section, .kb-questions {
-  display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1fr);
-  gap: clamp(26px, 6vw, 100px);
-  padding-block: clamp(65px, 9vw, 140px);
-}
-.kb-services-section p:not(.kb-tag) { max-width: 36ch; color: var(--muted); }
-.kb-service-table { margin: 0; border-top: 2px solid var(--ink); }
-.kb-service-table > div {
-  display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.15fr);
-  gap: 8px 20px;
-  padding-block: 22px;
-  border-bottom: 1px solid var(--line);
-}
-.kb-service-table dt { font-size: clamp(1.15rem, 2vw, 1.55rem); font-weight: 600; line-height: 1.2; }
-.kb-service-table dd { margin: 0; color: var(--muted); }
+/* Oben: Himmel, Giebel, Dachfläche */
+.pd-start .kb-oben { position: relative; display: grid; grid-template-columns: minmax(0, 58fr) minmax(0, 42fr); grid-template-rows: auto auto; background: var(--himmel); }
+.pd-start .kb-himmel { grid-area: 1 / 1; padding: clamp(24px, 3.4vw, 54px) clamp(16px, 2vw, 32px) clamp(44px, 5vw, 80px) var(--rand); align-self: center; }
+.pd-start .kb-ort { font-weight: 700; margin-bottom: .55em; }
+.pd-start .kb-vorspann { font-size: clamp(19px, 1.6vw, 25px); line-height: 1.34; max-width: 31em; margin: .8em 0 1.05em; }
+.pd-start .kb-giebel { grid-area: 1 / 2; align-self: end; position: relative; aspect-ratio: 1.22; }
+.pd-start .kb-giebel i { position: absolute; display: block; }
+.pd-start .kb-ortgang { inset: 0; background: var(--rahmen); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.pd-start .kb-giebelwand { inset: 20px 0 0; background: url('/package-demos/klarblick-klinker.svg') center bottom / 792px; clip-path: polygon(50% 0, 96.2% 100%, 3.8% 100%); }
+.pd-start .kb-rund { position: absolute; left: 50%; bottom: 13%; width: 38%; height: auto; transform: translateX(-50%); }
+.pd-start .kb-schornstein { grid-area: 1 / 1; justify-self: end; align-self: end; width: clamp(44px, 5vw, 76px); height: clamp(70px, 9vw, 130px); margin-right: clamp(10px, 5vw, 90px); background: url('/package-demos/klarblick-klinker.svg') 0 0 / 300px; position: relative; }
+.pd-start .kb-schornstein::before { content: ''; position: absolute; left: -7px; right: -7px; top: -9px; height: 10px; background: var(--stein); }
 
-.kb-visit { display: grid; grid-template-columns: minmax(0, 47fr) minmax(0, 53fr); background: var(--kb-sky); }
-.kb-visit figure { border-right: 6px solid var(--ink); }
-.kb-visit figure img { object-position: 49% center; }
-.kb-visit-copy { padding: clamp(44px, 6vw, 100px) var(--kb-gutter); }
-.kb-visit ol { list-style: none; counter-reset: visit; margin: 30px 0; padding: 0; max-width: 42ch; }
-.kb-visit li {
-  counter-increment: visit;
-  position: relative;
-  padding: 13px 0 13px 42px;
-  border-top: 1px solid var(--line);
-}
-.kb-visit li::before { content: counter(visit, decimal-leading-zero); position: absolute; left: 0; font-size: .84rem; }
-.kb-visit a { text-underline-offset: .25em; font-weight: 600; }
+.pd-start .kb-dach { grid-area: 2 / 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(24px, 3vw, 54px); align-items: center; padding: clamp(46px, 5vw, 84px) clamp(20px, 3vw, 48px) clamp(50px, 5vw, 84px) var(--rand); background: var(--schiefer) url('/package-demos/klarblick-schiefer.svg') 0 0 / 300px; color: var(--rahmen); border-top: 9px solid #2a333a; position: relative; }
+.pd-start .kb-dach h2 { margin-bottom: .36em; }
+.pd-start .kb-dach-text p { margin-bottom: 0; padding-bottom: 6px; }
+.pd-start .kb-rund-text { grid-area: 2 / 2; background: url('/package-demos/klarblick-klinker.svg') center top / 792px; padding: clamp(30px, 3.4vw, 52px) var(--rand) clamp(40px, 4vw, 64px) clamp(26px, 4vw, 66px); align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+.pd-start .kb-tafel { background: #fbf8f0; color: var(--tinte); padding: clamp(18px, 2vw, 30px); box-shadow: 0 6px 0 #0003; }
+.pd-start .kb-tafel h3 { margin-bottom: .3em; }
+.pd-start .kb-schild { display: inline-block; width: fit-content; background: #17408f; color: #fff; font-weight: 700; padding: .12em .62em; border: 2px solid #fff; border-radius: 5px; box-shadow: 0 0 0 2px #17408f; margin: 2px 0 14px; }
+.pd-start .kb-rinne { height: 15px; background: linear-gradient(#b9bdb8 0 5px, #898f8b 5px 11px, #62686a 11px); position: relative; z-index: 1; }
 
-.kb-region { background: var(--ink); color: var(--bg); }
-.kb-region > div {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: clamp(26px, 6vw, 100px);
-  padding-block: clamp(55px, 8vw, 110px);
-}
-.kb-region .kb-tag { grid-column: 1 / -1; color: var(--kb-lime); }
-.kb-region ul { list-style: none; margin: 0; padding: 0; grid-column: 2; grid-row: 2 / span 2; }
-.kb-region li { border-top: 1px solid #80949c; padding: 11px 0; font-size: clamp(1.25rem, 3vw, 2.2rem); letter-spacing: -.04em; }
-.kb-region li::before { content: ""; display: inline-block; width: .32em; height: .32em; margin: 0 .6em .12em 0; background: var(--kb-lime); }
-.kb-region p:last-child { max-width: 36ch; margin-bottom: 0; }
-.kb-questions details { border-top: 1px solid var(--line); }
-.kb-questions details:last-child { border-bottom: 1px solid var(--line); }
-.kb-questions summary { font-size: 1.09rem; font-weight: 600; padding: 16px 0; }
-.kb-questions details p { color: var(--muted); }
+/* Das Fenstermodul */
+.pd-start .kb-f { position: relative; min-width: 0; }
+.pd-start .kb-f-rahmen { position: relative; display: grid; gap: clamp(6px, .75vw, 11px); padding: clamp(8px, .9vw, 13px); background: var(--rahmen); box-shadow: -7px -7px 0 var(--laibung), 7px -7px 0 var(--laibung), -7px 0 0 var(--laibung), 7px 0 0 var(--laibung); }
+.pd-start .kb-f-rahmen-dunkel { background: #20282e; box-shadow: none; }
+.pd-start .kb-f:not(.kb-f-dach):not(.kb-f-laden)::before { content: ''; position: absolute; left: -22px; right: -22px; top: -35px; height: 28px; background: repeating-linear-gradient(90deg, #8a4533 0 15px, #4e2a20 15px 17px, #70352a 17px 32px, #4e2a20 32px 34px, #7b3629 34px 49px, #4e2a20 49px 51px); }
+.pd-start .kb-f:not(.kb-f-dach):not(.kb-f-laden)::after { content: ''; position: absolute; left: -16px; right: -16px; bottom: -15px; height: 15px; background: var(--stein); box-shadow: 0 5px 0 #0003; }
+.pd-start .kb-sch { position: relative; background: var(--glas); padding: clamp(16px, 1.7vw, 26px); min-width: 0; box-shadow: inset 0 7px 0 #1d29300f, inset 6px 0 0 #1d29300a; }
+.pd-start .kb-sch p:last-child { margin-bottom: 0; }
+.pd-start .kb-leer { background: linear-gradient(116deg, #cfdedc 0 58%, #e6efed 58% 67%, #cfdedc 67% 76%, #e6efed 76% 79%, #cfdedc 79%); overflow: hidden; }
+.pd-start .kb-katze { position: absolute; right: 16%; bottom: 0; width: clamp(62px, 6.4vw, 96px); height: auto; fill: #27323a; }
+.pd-start .kb-angaben { margin: .85em 0 0; display: flex; flex-wrap: wrap; gap: 6px clamp(18px, 2vw, 36px); }
+.pd-start .kb-angaben dt { font-size: .8em; font-weight: 700; }
+.pd-start .kb-angaben dd { margin: 0; font-weight: 600; line-height: 1.25; }
+.pd-start .kb-sch > .kb-angaben:first-child { margin-top: 0; }
 
-.pd-start .pd-contact {
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1fr);
-  gap: clamp(26px, 6vw, 100px);
-  padding: clamp(55px, 8vw, 110px) var(--kb-gutter);
-  background: var(--kb-lime);
-}
-.pd-start .pd-contact > div:first-child p { max-width: 38ch; }
-.pd-start .pd-contact > div:last-child { background: var(--bg); border: 2px solid var(--ink); padding: clamp(17px, 4vw, 45px); min-width: 0; }
-.pd-start .pd-contact :is(input, textarea) { background: white; border-color: #748b93; font-size: 1rem; }
-.pd-start .pd-note { color: var(--ink); }
-.pd-start .pd-footer { padding-inline: var(--kb-gutter); }
+.pd-start .kb-f-dach .kb-sch { background: #e3ebe9; color: var(--tinte); }
+.pd-start .kb-f-dach { transform: none; }
 
-.kb-notes { padding-block: clamp(55px, 8vw, 115px); }
-.kb-notes-lead { font-size: clamp(1.12rem, 2.2vw, 1.55rem); }
-.kb-notes-grid { border-top: 2px solid var(--ink); margin: 40px 0 28px; max-width: 1050px; }
-.kb-notes-grid > section { padding: 24px 0; border-bottom: 1px solid var(--line); }
-.kb-notes-grid h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); letter-spacing: -.04em; margin-bottom: 12px; }
-.kb-notes-grid p:last-child { margin-bottom: 0; }
+/* Die Wand */
+.pd-start .kb-wand { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(14px, 2.2vw, 34px); padding: clamp(72px, 8vw, 128px) var(--rand) 0; background: url('/package-demos/klarblick-klinker.svg') 0 0 / 792px; }
+.pd-start .kb-f-sprossen { grid-column: 1 / span 5; grid-row: 1; align-self: start; }
+.pd-start .kb-f-sprossen .kb-f-rahmen { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(clamp(140px, 14.6vw, 216px), auto); }
+.pd-start .kb-sch-titel { display: flex; align-items: flex-end; }
+.pd-start .kb-f-sprossen h3 { font-size: clamp(30px, 2.9vw, 44px); font-weight: 800; }
+.pd-start .kb-sch-angabe { display: flex; align-items: flex-end; }
 
-@media (min-width: 721px) and (max-width: 900px) {
-  .kb-opening-photo img { object-position: right center; }
-}
-@media (max-width: 900px) {
-  .kb-service-table > div { grid-template-columns: 1fr; }
-}
-@media (max-width: 720px) {
-  .kb-opening, .kb-services-section, .kb-visit, .kb-region > div, .kb-questions,
-  .pd-start .pd-contact { grid-template-columns: 1fr; }
-  .kb-opening-copy { padding-inline: var(--kb-gutter); }
-  .pd-start .kb-opening h1 { font-size: clamp(3.6rem, 13vw, 5.8rem); }
-  .kb-opening-photo { border-left: 0; border-top: 5px solid var(--ink); min-height: 0; aspect-ratio: 1.4; }
-  .kb-visit figure { grid-row: 2; border-right: 0; border-top: 5px solid var(--ink); aspect-ratio: 1.65; }
-  .kb-region ul { grid-column: 1; grid-row: auto; margin-bottom: 18px; }
-  .kb-opening-index { font-size: .74rem; }
-  .kb-questions h2 { margin-bottom: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .pd-start .pd-button { transition: none; }
-  .pd-start .pd-button:hover { transform: none; }
-}
+.pd-start .kb-f-treppe { grid-column: 10 / span 3; grid-row: 1; margin-top: clamp(50px, 7.5vw, 120px); align-self: start; }
+.pd-start .kb-f-treppe .kb-f-rahmen { grid-template-columns: minmax(0, 1fr); border-radius: 999px 999px 0 0; box-shadow: 0 -7px 0 7px var(--laibung); }
+.pd-start .kb-f-treppe .kb-sch-bogen { aspect-ratio: 2; padding: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: linear-gradient(116deg, #cfdedc 0 58%, #e6efed 58% 67%, #cfdedc 67%); box-shadow: none; }
+.pd-start .kb-f-treppe::before { display: none; }
+.pd-start .kb-f-treppe h3 { font-size: clamp(25px, 2.3vw, 36px); }
 
-/* The mobile menu starts closed before the module loads. Without scripting,
-   the noscript marker restores the full set of links. */
+.pd-start .kb-f-kasten { grid-column: 6 / span 4; grid-row: 1; align-self: start; margin-inline: 12px 36px; }
+.pd-start .kb-f-hinten { position: absolute; inset: -22px -24px 22px 24px; background: var(--rahmen); box-shadow: -7px -7px 0 var(--laibung), 7px -7px 0 var(--laibung), 7px 0 0 var(--laibung); }
+.pd-start .kb-f-hinten::after { content: ''; position: absolute; inset: 10px; background: #cfdcda; }
+.pd-start .kb-f-kasten .kb-f-rahmen { grid-template-columns: minmax(0, 1fr); }
+.pd-start .kb-f-kasten .kb-sch:first-child { min-height: clamp(280px, 28vw, 410px); }
+.pd-start .kb-f-kasten::before { top: -57px; }
+
+.pd-start .kb-f-hecke { grid-column: 2 / span 6; grid-row: 2; margin-top: clamp(100px, 10vw, 150px); z-index: 1; }
+.pd-start .kb-f-hecke .kb-f-rahmen { grid-template-columns: minmax(0, 1fr); padding-bottom: clamp(120px, 13vw, 190px); }
+.pd-start .kb-f-hecke::after { display: none; }
+.pd-start .kb-hausnummer { grid-column: 10 / span 3; grid-row: 2; align-self: start; justify-self: center; margin-top: clamp(130px, 13vw, 200px); background: #17408f; color: #fff; font: 800 clamp(44px, 5vw, 76px)/1 Barlow, sans-serif; padding: .08em .42em .12em; border: 3px solid #fff; border-radius: 9px; box-shadow: 0 0 0 3px #17408f, 0 7px 0 3px #0003; }
+.pd-start .kb-heckenband { grid-column: 1 / -1; grid-row: 3; height: 210px; margin: calc(-1 * clamp(96px, 10vw, 150px)) calc(-1 * var(--rand)) 0; background: url('/package-demos/klarblick-hecke.svg') 0 0 / 520px repeat-x; z-index: 2; position: relative; }
+
+.pd-start .kb-sockel { background: #6d675d linear-gradient(90deg, #0000 0 calc(100% - 1px), #5a554c 0) 0 0 / 150px 100%; padding: clamp(66px, 7vw, 96px) var(--rand) clamp(44px, 5vw, 66px); border-top: 10px solid var(--stein); }
+.pd-start .kb-f-keller { max-width: 1080px; margin-inline: auto; }
+.pd-start .kb-f-keller::before { display: none; }
+.pd-start .kb-f-keller::after { display: none; }
+.pd-start .kb-f-keller .kb-f-rahmen { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) minmax(0, 1.2fr); box-shadow: -7px -7px 0 #38332c, 7px -7px 0 #38332c, -7px 0 0 #38332c, 7px 0 0 #38332c, -7px 7px 0 #38332c, 7px 7px 0 #38332c; }
+.pd-start .kb-f-keller .kb-sch { display: flex; flex-direction: column; justify-content: center; padding-block: clamp(12px, 1.2vw, 18px); }
+
+/* Die Liste: Papier auf dem Weg zur Tür */
+.pd-start .kb-liste-band { background: url('/package-demos/klarblick-klinker.svg') 0 0 / 792px; padding: clamp(56px, 7vw, 110px) var(--rand); border-top: 8px solid var(--stein); }
+.pd-start .kb-blatt { background: #fbf8f0; color: var(--tinte); max-width: 1140px; margin-inline: auto; padding: clamp(20px, 3.4vw, 52px); box-shadow: 0 8px 0 #0002; }
+.pd-start .kb-blatt header { margin-bottom: clamp(16px, 2vw, 26px); }
+.pd-start .kb-blatt h2 { margin-bottom: .2em; }
+.pd-start .kb-blatt table { width: 100%; border-collapse: collapse; }
+.pd-start .kb-blatt thead th { text-align: left; font-size: .84em; font-weight: 700; padding: 0 12px 6px 0; border-bottom: 3px solid var(--tinte); }
+.pd-start .kb-blatt tbody td, .pd-start .kb-blatt tbody th { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid #1d293055; font-weight: 500; line-height: 1.22; vertical-align: middle; }
+.pd-start .kb-blatt tbody th { font-weight: 700; }
+.pd-start .kb-blatt td:nth-child(2) { font-weight: 800; font-size: 1.3em; font-variant-numeric: tabular-nums; }
+.pd-start .kb-z { width: 30px; height: 39px; display: block; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: square; }
+.pd-start .kb-z .kb-z-voll { fill: currentColor; stroke: none; }
+.pd-start .kb-blatt footer { margin-top: clamp(14px, 2vw, 24px); }
+.pd-start .kb-blatt footer p { margin: 0; }
+
+/* Nebenan */
+.pd-start .kb-nebenan { background: var(--putz); padding: clamp(36px, 4vw, 60px) var(--rand) clamp(46px, 6vw, 88px); border-top: 2px solid #cfc8b8; }
+.pd-start .kb-markise { position: relative; max-width: 1280px; height: clamp(54px, 6vw, 88px); margin: 0 auto 26px; background: repeating-linear-gradient(90deg, var(--tuer) 0 56px, #f4efe3 56px 112px); }
+.pd-start .kb-markise::after { content: ''; position: absolute; inset: 100% 0 auto; height: 22px; background-image: radial-gradient(circle at 28px 0, var(--tuer) 27px, transparent 28px), radial-gradient(circle at 28px 0, #f4efe3 27px, transparent 28px); background-size: 112px 22px; background-position: 0 0, 56px 0; background-repeat: repeat-x; }
+.pd-start .kb-f-laden { max-width: 1240px; margin-inline: auto; }
+.pd-start .kb-f-laden .kb-f-rahmen { grid-template-columns: minmax(0, 1fr) clamp(120px, 15vw, 210px); }
+.pd-start .kb-ladentuer { position: relative; background: linear-gradient(116deg, #27333b 0 62%, #303d46 62% 72%, #27333b 72%); }
+.pd-start .kb-ladentuer span { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); width: 76%; background: #fbf8f0; color: var(--tinte); font-weight: 700; font-size: .84em; line-height: 1.08; text-align: center; padding: 8px 4px; }
+.pd-start .kb-ladentuer::after { content: ''; position: absolute; left: 12%; top: 54%; width: 10px; height: 64px; background: var(--messing); }
+.pd-start .kb-f-laden .kb-sch { background: #1d2930; color: #f4efe3; padding: clamp(24px, 3.4vw, 54px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); column-gap: clamp(20px, 3vw, 50px); align-items: end; }
+.pd-start .kb-f-laden h2 { color: var(--messing); font-size: clamp(54px, 8.8vw, 148px); line-height: .92; grid-row: 1 / span 2; align-self: center; }
+.pd-start .kb-f-laden .kb-angaben { margin-top: .5em; }
+
+/* Eingang: Tür mit Oberlicht */
+.pd-start .kb-eingang { background: url('/package-demos/klarblick-klinker.svg') 0 0 / 792px; padding: clamp(50px, 7vw, 100px) var(--rand) 0; border-top: 10px solid var(--stein); }
+.pd-start .kb-eingang > h2 { color: #fff; max-width: 15em; margin: 0 auto clamp(48px, 5.4vw, 74px); text-align: center; font-size: clamp(38px, 5.4vw, 86px); }
+.pd-start .kb-tuer-rahmen { position: relative; max-width: 1240px; margin-inline: auto; padding: clamp(8px, .9vw, 13px); padding-bottom: 0; background: var(--rahmen); box-shadow: -7px -7px 0 var(--laibung), 7px -7px 0 var(--laibung), -7px 0 0 var(--laibung), 7px 0 0 var(--laibung); }
+.pd-start .kb-tuer-rahmen::before { content: ''; position: absolute; left: -24px; right: -24px; top: -36px; height: 29px; background: repeating-linear-gradient(90deg, #8a4533 0 15px, #4e2a20 15px 17px, #70352a 17px 32px, #4e2a20 32px 34px, #7b3629 34px 49px, #4e2a20 49px 51px); }
+.pd-start .kb-oberlicht { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, .75vw, 11px); margin-bottom: clamp(8px, .9vw, 13px); }
+.pd-start .kb-oberlicht h3 { margin-bottom: .22em; }
+.pd-start .kb-tuer { position: relative; background: var(--tuer); color: #f4efe3; }
+.pd-start .kb-tuerknauf { position: absolute; left: 50%; top: 104px; width: 34px; height: 34px; margin-left: -17px; border-radius: 50%; background: var(--messing); box-shadow: inset -4px -4px 0 #a97f2e, 0 0 0 5px #0e2b24; z-index: 1; }
+.pd-start .kb-tuer fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.pd-start .kb-fluegel { padding: clamp(22px, 3.2vw, 50px); min-width: 0; outline: 2px solid #245a4c; outline-offset: -14px; }
+.pd-start .kb-fluegel-links { border-right: 3px solid #0e2b24; }
+.pd-start .kb-fluegel-rechts { border-left: 3px solid #245a4c; }
+.pd-start .kb-fluegel-links h2 { font-size: clamp(34px, 3.6vw, 58px); margin-bottom: .22em; }
+.pd-start .kb-zaehler-liste { list-style: none; margin: 18px 0 0; padding: 0; }
+.pd-start .kb-zaehler { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid #ffffff38; }
+.pd-start .kb-zaehler:last-child { border-bottom: 1px solid #ffffff38; }
+.pd-start .kb-zaehler .kb-z { width: 26px; height: 34px; margin-inline: auto; }
+.pd-start .kb-zaehler.kb-aktiv .kb-z { color: var(--gelb); }
+.pd-start .kb-zaehler-text { min-width: 0; line-height: 1.15; }
+.pd-start .kb-zaehler-text b { display: block; font-weight: 700; }
+.pd-start .kb-zaehler-text small { font-size: .84em; color: #d3dcd5; }
+.pd-start .kb-stepper { display: inline-grid; grid-template-columns: 42px 34px 42px; align-items: center; text-align: center; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pd-start .kb-stepper button { height: 42px; background: #f4efe3; color: var(--tinte); border: 0; font: 800 23px/1 Barlow, sans-serif; padding: 0; }
+.pd-start .kb-stepper button:hover:not(:disabled) { background: var(--gelb); }
+.pd-start .kb-stepper button:disabled { background: #2d5a4e; color: #8ea89f; cursor: default; }
+.pd-start .kb-mein-haus { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(14px, 2vw, 30px); align-items: start; margin-bottom: clamp(16px, 2vw, 24px); }
+.pd-start .kb-mein-haus figure { margin: 0; }
+.pd-start .kb-mein-haus svg[role=img] { display: block; width: 100%; height: auto; }
+.pd-start .kb-mein-haus figcaption { font-weight: 700; margin-top: 7px; line-height: 1.2; }
+.pd-start .kb-haus-wand { fill: #f4efe3; }
+.pd-start .kb-haus-rund { fill: var(--gelb); stroke: var(--tinte); stroke-width: 3; }
+.pd-start .kb-haus-kreuz { stroke: var(--tinte); stroke-width: 3; fill: none; }
+.pd-start .kb-haus-tuer { fill: var(--tuer); }
+.pd-start .kb-z-haus { color: var(--tinte); }
+.pd-start .kb-wagen h3 { font-size: 1.12em; margin-bottom: .4em; }
+.pd-start .kb-wagen ul { list-style: none; margin: 0; padding: 0; line-height: 1.22; }
+.pd-start .kb-wagen li { padding: 3px 0 3px 18px; position: relative; }
+.pd-start .kb-wagen li::before { content: ''; position: absolute; left: 0; top: .55em; width: 9px; height: 9px; background: var(--gelb); }
+.pd-start .kb-fluegel label { display: block; margin-bottom: 14px; font-weight: 600; }
+.pd-start .kb-fluegel :is(input:not([type=hidden]), textarea) { display: block; width: 100%; margin-top: 5px; padding: 10px 12px; background: #f4efe3; color: var(--tinte); border: 0; border-radius: 0; font: 500 18px/1.3 Barlow, sans-serif; resize: vertical; }
+.pd-start .kb-fluegel ::placeholder { color: #566067; }
+.pd-start .kb-zwei { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.pd-start .kb-klingel { background: var(--messing); color: var(--tinte); border: 0; font: 800 clamp(18px, 1.3vw, 21px)/1 Barlow, sans-serif; padding: .85em 1.25em; cursor: pointer; }
+.pd-start .kb-klingel:hover { background: var(--gelb); }
+.pd-start .kb-demo-hinweis { font-size: .86em; margin: 14px 0 0; }
+.pd-start .kb-noscript { padding: 22px; margin: 0; }
+.pd-start .kb-zustand { padding: clamp(24px, 4vw, 60px); max-width: 780px; margin-inline: auto; }
+.pd-start .kb-zustand:focus { outline: none; }
+.pd-start .kb-zustand h3 { margin-bottom: .6em; }
+.pd-start .kb-zustand dl { margin: 0 0 18px; overflow-wrap: anywhere; }
+.pd-start .kb-zustand dt { font-size: .84em; font-weight: 700; margin-top: 12px; color: #d3dcd5; }
+.pd-start .kb-zustand dd { margin: 0; white-space: pre-wrap; font-weight: 600; }
+.pd-start .pd-link { color: inherit; font-weight: 600; }
+
+/* Gehweg */
+.pd-start .kb-gehweg { background: url('/package-demos/klarblick-gehweg.svg') 0 0 / 480px; padding: clamp(40px, 5vw, 76px) var(--rand) 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: clamp(24px, 4vw, 66px); align-items: center; border-top: 14px solid #6d675d; }
+.pd-start .kb-gehweg-text { background: #fbf8f0; padding: clamp(18px, 2.2vw, 32px); margin-bottom: clamp(40px, 5vw, 76px); align-self: center; }
+.pd-start .kb-gehweg-text h2 { font-size: clamp(34px, 3.4vw, 54px); margin-bottom: .3em; }
+.pd-start .kb-gehweg-text p { margin: 0; }
+.pd-start .kb-orte { list-style: none; margin: 0 0 clamp(56px, 6vw, 100px); padding: 0; display: grid; align-self: end; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 22px); }
+.pd-start .kb-orte li { position: relative; background: #f6c800; color: #111; border: 4px solid #111; border-radius: 9px; box-shadow: 0 0 0 4px #f6c800; padding: clamp(16px, 2vw, 30px) 8px; text-align: center; line-height: 1.1; }
+.pd-start .kb-orte li::after { content: ''; position: absolute; left: 50%; top: calc(100% + 8px); width: 9px; height: clamp(48px, 6vw, 92px); margin-left: -4px; background: #55595a; }
+.pd-start .kb-orte b { display: block; font-size: clamp(22px, 2.2vw, 34px); font-weight: 800; }
+.pd-start .kb-orte small { font-size: .82em; font-weight: 600; }
+
+.pd-start .pd-footer { background: #2b2f31; color: #f3efe4; padding: 40px var(--rand) 26px; }
+.pd-start .pd-footer .pd-brand { display: inline-grid; color: #f3efe4; }
+.pd-start .pd-footer nav { font: 600 15px/1.4 Barlow, sans-serif; }
+.pd-start .pd-footer .pd-small { font-size: 14px; }
+
+/* Hinweise */
+.pd-start .kb-hinweise-kopf { padding: clamp(36px, 6vw, 92px) var(--rand) clamp(40px, 5vw, 76px); }
+.pd-start .kb-hinweise-kopf h1 { max-width: 12em; margin-bottom: .32em; font-size: clamp(46px, 6.4vw, 104px); }
+.pd-start .kb-hinweise-kopf p { font-size: clamp(19px, 1.6vw, 25px); margin: 0; max-width: 30em; }
+.pd-start .kb-hinweise-wand { background: url('/package-demos/klarblick-klinker.svg') 0 0 / 792px; padding: clamp(40px, 6vw, 90px) var(--rand); border-top: 15px solid #898f8b; }
+.pd-start .kb-hinweise-wand section { padding: 20px 0; border-bottom: 1px solid #1d293055; }
+.pd-start .kb-hinweise-wand section:first-child { padding-top: 0; }
+.pd-start .kb-hinweise-wand section p:last-child { margin-bottom: 0; }
+.pd-start .kb-hinweise-wand h2 { font-size: clamp(27px, 2.6vw, 40px); margin-bottom: .3em; }
+.pd-start .kb-hinweise-wand .kb-blatt > p { margin: 26px 0 0; }
+
+@media (max-width: 1100px) {
+  .pd-start .kb-dach { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-mein-haus { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-mein-haus figure { max-width: 270px; }
+}
+@media (max-width: 860px) {
+  .pd-start .kb-oben { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .pd-start .kb-himmel { grid-area: auto; padding: 20px var(--rand) 28px; }
+  .pd-start .kb-schornstein { display: none; }
+  .pd-start .kb-giebel { grid-area: auto; aspect-ratio: 1.45; }
+  .pd-start .kb-rund { bottom: 8%; width: 36%; }
+  .pd-start .kb-rund-text { grid-area: auto; padding-inline: var(--rand); }
+  .pd-start .kb-dach { grid-area: auto; order: 5; padding-inline: var(--rand); }
+  .pd-start .kb-wand { display: flex; flex-direction: column; }
+  .pd-start .kb-wand .kb-f { margin-top: clamp(82px, 13vw, 120px); }
+  .pd-start .kb-wand .kb-f:first-child { margin-top: 0; }
+  .pd-start .kb-hausnummer { display: none; }
+  .pd-start .kb-f-kasten { margin-inline: 2px 24px; }
+  .pd-start .kb-f-kasten .kb-sch:first-child { min-height: 0; }
+  .pd-start .kb-f-treppe { width: min(100%, 340px); align-self: center; }
+  .pd-start .kb-heckenband { margin-inline: calc(-1 * var(--rand)); }
+  .pd-start .kb-f-keller .kb-f-rahmen { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-gehweg { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-tuerknauf { display: none; }
+  .pd-start .kb-oberlicht { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-tuer fieldset { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-fluegel-links { border-right: 0; border-bottom: 3px solid #0e2b24; }
+  .pd-start .kb-fluegel-rechts { border-left: 0; }
+  .pd-start .kb-mein-haus { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+}
+@media (max-width: 650px) {
+  .pd-start .pd-header { padding-top: 14px; }
+  .pd-start .pd-header nav { font-size: 18px; }
+  .pd-start .kb-f-sprossen .kb-f-rahmen { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
+  .pd-start .kb-f-sprossen .kb-sch-titel, .pd-start .kb-f-sprossen .kb-sch-text { grid-column: 1 / -1; }
+  .pd-start .kb-f-sprossen .kb-sch-titel { padding-bottom: 0; }
+  .pd-start .kb-f-sprossen .kb-leer { min-height: 96px; }
+  .pd-start .kb-f-sprossen .kb-sch-text p { margin: 0; }
+  .pd-start .kb-f-laden .kb-f-rahmen { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-ladentuer { min-height: 118px; }
+  .pd-start .kb-ladentuer span { top: 24px; width: 48%; }
+  .pd-start .kb-f-laden .kb-sch { grid-template-columns: minmax(0, 1fr); }
+  .pd-start .kb-f-laden h2 { grid-row: auto; margin-bottom: .2em; }
+  .pd-start .kb-orte { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .pd-start .kb-blatt thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .pd-start .kb-blatt tbody tr { display: grid; grid-template-columns: 34px 30px minmax(0, 1fr); column-gap: 8px; padding: 10px 0; border-bottom: 1px solid #1d293055; }
+  .pd-start .kb-blatt tbody td, .pd-start .kb-blatt tbody th { padding: 0; border: 0; }
+  .pd-start .kb-blatt tbody td:first-child { grid-row: 1 / span 3; }
+  .pd-start .kb-blatt tbody td:nth-child(2) { grid-row: 1 / span 3; }
+  .pd-start .kb-blatt tbody th, .pd-start .kb-blatt tbody td:nth-child(4), .pd-start .kb-blatt tbody td:nth-child(5) { grid-column: 3; }
+  .pd-start .kb-zwei { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .pd-start .kb-zaehler { grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; }
+  .pd-start .kb-stepper { grid-template-columns: 40px 28px 40px; }
+  .pd-start .kb-stepper button { height: 40px; }
+}
+/* Ohne JavaScript bleibt das mobile Menü sichtbar. */
 @media (max-width: 650px) {
   .pd-start .kb-no-script:has(span) + nav.pd-nav-closed { display: flex; }
 }

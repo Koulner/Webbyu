@@ -1,5 +1,11 @@
 # Webbyu
 
+**Reise-Update vom 4. November 2026:** Acht Stationen verbinden die drei Paketbeispiele Klarblick, Eiche & Form und Hof & Flamme mit den Funktionsstudien Safran Atelier und Raumgut. Meisterwerk und Nordlicht werden in Reise und sichtbarem Labor nicht mehr angeboten. Die älteren Angaben zum Reiseumfang unten dokumentieren frühere Stände. Änderungen sind lokal und warten auf Sichtprüfung.
+
+Verbindlich für neue Websites und gestalterische Überarbeitungen: [Standard für individuelle Gestaltung](UNIKAT_STANDARD.md). Individuelles Konzept, unterscheidbare Entwurfsrichtungen, Vergleich mit dem Portfolio und dokumentierte gestalterische Schlussfreigabe gelten in jedem Paket. Klarblick, Eiche & Form und Hof & Flamme sind nach der Nutzerkorrektur vom 4. November 2026 gestalterisch zu überarbeiten; technische Prüfungen ersetzen diese Freigabe nicht.
+
+Wiederverwendbare Arbeitsgrundlage für Kundenprojekte: [Master-Prompt Webdesign](MASTER_PROMPT_WEBDESIGN.md). Die drei Paketstudien und ihre Prüfstände sind in [PACKAGE_DEMOS.md](PACKAGE_DEMOS.md) dokumentiert.
+
 Ideen, Entscheidungen und nächste Schritte: [Ideen- und Arbeitsdokument](IDEEN_UND_ROADMAP.md). Aktueller Schwerpunkt ist der immersive Produkt-Onepager für eine Brille; das Dokument enthält den Tracker und wiederverwendbare Prompts für die Weiterarbeit.
 
 Lokaler, deutschsprachiger Website-Prototyp für die von einem einzelnen Gründer aufgebaute Digitalagentur Webbyu in Hamburg / Bad Oldesloe. Der Auftritt spricht aus der Ich-Perspektive mit einem direkten Ansprechpartner. Vite, TypeScript, Three.js und GSAP; ohne Backend oder externe Laufzeit-APIs.

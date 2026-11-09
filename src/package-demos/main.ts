@@ -1,8 +1,12 @@
 import './style.css';
 import './identities.css';
-import './hof-pages.css';
-import './business-pages.css';
+import './eiche/eiche.css';
+import './hof/hof.css';
+import { mountHof } from './hof/client';
+import { mountEiche } from './eiche/client';
+import { mountKlarblick } from './klarblick-client';
 import './klarblick.css';
+import '../ai-badge.css';
 export function mountPackageDemo(root: HTMLElement) {
   const abort = new AbortController();
   const options = { signal: abort.signal };
@@ -24,9 +28,13 @@ export function mountPackageDemo(root: HTMLElement) {
       event.preventDefault(); if (!form.reportValidity()) return;
       const dl = review.querySelector('dl')!; dl.replaceChildren();
       const data = new FormData(form);
-      for (const [key, title] of [['name','Name'],['email','E-Mail'],['message','Ihr Anliegen']]) {
+      const rows: [string, string][] = [['Name', String(data.get('name') ?? '')], ['E-Mail', String(data.get('email') ?? '')]];
+      // Optionale Zusatzfelder einer Demo, etwa Maße, erscheinen nur mit Inhalt.
+      form.querySelectorAll<HTMLInputElement>('[data-review]').forEach(input => { if (input.value.trim()) rows.push([input.dataset.review!, `${input.value.trim()}${input.dataset.einheit ?? ' mm'}`]); });
+      rows.push(['Ihr Anliegen', String(data.get('message') ?? '')]);
+      for (const [title, value] of rows) {
         const dt = document.createElement('dt'); dt.textContent = title;
-        const dd = document.createElement('dd'); dd.textContent = String(data.get(key) ?? '');
+        const dd = document.createElement('dd'); dd.textContent = value;
         dl.append(dt, dd);
       }
       form.hidden = true; review.hidden = false; review.focus();
@@ -54,7 +62,11 @@ export function mountPackageDemo(root: HTMLElement) {
   });
   const observer = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(entries => { entries.forEach(entry => { if(entry.isIntersecting) { if (!reduce.matches) entry.target.classList.add('pd-reveal'); observer?.unobserve(entry.target); } }); }, {threshold:.12}) : null;
   root.querySelectorAll('.pd-card,.pd-copy,.pd-gallery figure').forEach(el => observer?.observe(el));
-  return () => { abort.abort(); observer?.disconnect(); video?.pause(); };
+  const disposeEiche = root.querySelector('.pd-business') ? mountEiche(root, abort.signal) : () => {};
+  if (root.querySelector('.pd-start')) mountKlarblick(root, abort.signal);
+  if (root.querySelector('.pd-complete')) mountHof(root, abort.signal);
+  return () => { abort.abort(); observer?.disconnect(); video?.pause(); disposeEiche(); };
 }
 const root = document.querySelector<HTMLElement>('#package-demo-app');
 if (root) mountPackageDemo(root);
+

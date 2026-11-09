@@ -1,6 +1,34 @@
 # Webbyu – Vorbereitung der Rechtstexte
 
-Stand: 25.10.2026. Rechtsform vom Betreiber bestätigt: Einzelunternehmen.
+Stand: 26.10.2026. Rechtsform vom Betreiber bestätigt: Einzelunternehmen.
+
+## Abschluss anhand vorhandener Anbieterangaben · 26.10.2026
+
+Dieser Abschnitt ersetzt die früheren Freigabevorbehalte unten. Der Betreiber hat entschieden, die Datenschutzerklärung mit den vorhandenen Konto-, Vertrags- und Anbieterangaben fertigzustellen und zu veröffentlichen. Keine individuelle IONOS-Auskunft als Voraussetzung, kein GMX-Zugriff und kein Versand der vorbereiteten Anfrage.
+
+Der Datenschutztext beschreibt die tatsächlich verfügbaren IONOS-Berichte und nennt den fehlenden Analyse-Pixel bzw. das fehlende zusätzliche Tracking-Skript im Anwendungscode. Eine exklusiv logbasierte Konfiguration wird nicht als individuell bestätigt behauptet. Die Speicherangaben werden mit Quellenbezug wiedergegeben: höchstens sieben Tage für Hosting-Logfiles nach AVV-Leistungsbeschreibung, abweichend acht Wochen für Besuchsdaten nach allgemeiner Hosting-Information, zwölf Monate verfügbarer WebAnalytics-Auswertungszeitraum. Aus der Anzeigegrenze wird keine vollständige Löschfrist abgeleitet; unterschiedliche technische Datenbestände werden nicht erfunden.
+
+Die Interessenabwägung für die Verwendung der vorhandenen Hostingstatistiken ist im lokalen [IONOS-Prüfblatt](rechtliches/IONOS-PRUEFUNG.md) dokumentiert. Der öffentliche Text erläutert Zwecke, Rechtsgrundlage, Anbieterangaben zur Anonymisierung, AVV, Empfänger und Rechte. Entwurfshinweis und eigenes `noindex` der Datenschutzerklärung entfernt; die technische `dev`-Vorschau bleibt durch den vorhandenen Workflow von Suchmaschinen ausgeschlossen. Der Cookie-Hinweis beschreibt die jetzt bereitgestellte Statistik statt einer erst geplanten Logauswertung. Die Browserauswahl bleibt unverändert auf bis zu 180 Tage begrenzt.
+
+Die private Archivierung der individuellen Bestellbestätigung bleibt eine Aufgabe der eigenen Vertragsablage und wird nicht als bereits erledigt dargestellt. Der Impressumshinweis zur steuerlichen Erfassung und die fremden Änderungen einschließlich `site/` bleiben erhalten. Ältere Kontobefunde und blockierte Kontaktversuche unten sind historische Dokumentation.
+
+**Veröffentlicht und geprüft:** Commit `e5d2cec51b5f79c175a5a28e54c794658c527ca1`, ausschließlich `datenschutz/index.html` und `src/privacy.ts`, auf `dev` und `prod` übernommen. [Dev-Prüfung](https://github.com/Koulner/Webbyu/actions/runs/40247801437) und [IONOS-Veröffentlichung](https://github.com/Koulner/Webbyu/actions/runs/40247890659) erfolgreich. Alle 124 Website-Tests, fünf Deployment-Tests, TypeScript-Prüfung und Produktionsbuild bestanden. Vier öffentliche Seiten und zwölf Anwendungsassets geprüft; veröffentlichte Rechtstexte stimmen mit den Quellen überein. Datenschutzerklärung ohne Entwurfsstatus oder `noindex`, aktualisierter Cookie-Hinweis und erhaltener Steuerhinweis live bestätigt. Bestehende Build-Warnungen zu Schriftpfaden und Chunkgröße bleiben. Lokale Prüf- und Übergabeunterlagen wurden nicht mit veröffentlicht.
+
+## Umsetzung nach verfügbarer WebAnalytics-Anzeige · 25.10.2026
+
+Dieser Abschnitt aktualisiert die älteren Befunde unten: **webbyu.de und ihre Berichte sind inzwischen in WebAnalytics verfügbar.** Die fehlende Domainanzeige und die dafür vorgesehene Nachkontrolle nach 48 Stunden sind erledigt. Aus den Berichten wird keine ausschließlich logbasierte Datenquelle abgeleitet.
+
+Die Anfrage zur tatsächlichen Datenquelle, den Fristen und Verarbeitungsorten wurde ohne das behobene Domainproblem aktualisiert. Direkter Datenschutzkontakt laut aktueller IONOS-Datenschutzerklärung: `datenschutz@ionos.de`. Automatische Freigabeprüfung blockierte die Eingabe im IONOS-KI-Assistenten wegen zusätzlicher OpenAI-Übermittlung und den GMX-Zugriff wegen fehlender ausdrücklicher Postfachfreigabe. Keine Nachricht versendet und kein Postfachinhalt gelesen.
+
+Öffentliche AGB/AVV samt drei Anlagen wurden mit Quellen und Prüfsummen außerhalb des Repositorys in der privaten Vertragsablage gesichert. Bestellbestätigung und individuell einbezogene Fassungen sind damit noch nicht nachgewiesen; der Ablagestatus benennt diese Lücke. `datenschutz/index.html` beschreibt die jetzt vorhandenen Berichte, behält aber die offenen Datenquellen-/Fristenangaben, Entwurfsstatus und `noindex`. Vollständige Interessenabwägung und Veröffentlichung bleiben bis zur belastbaren IONOS-Auskunft offen.
+
+## Frühere IONOS-Prüfung am Abend des 25.10.2026
+
+Maßgeblicher Prüfstand: [rechtliches/IONOS-PRUEFUNG.md](rechtliches/IONOS-PRUEFUNG.md). WebAnalytics zeigt auch über den Statistiklink des richtigen Hosting-Vertrags weiterhin keine Domain; webbyu.de ist im Hosting verbunden. Zusätzlich meldet das Konto eine laufende Bestellprüfung mit bis zu 24 Stunden in seltenen Fällen. Die allgemeine 48-Stunden-Frist seit der Beantragung am 25.10.2026 ist zum aktuellen Sitzungsdatum noch nicht abgelaufen; Kontrolle nach dem Wartezeitraum frühestens am 27.10.2026 ungefähr zur Beantragungsuhrzeit.
+
+Die im Neuvertrag über AGB einbezogene AVV und das erneut als „Nicht genutzt“ gelesene enthaltene CDN-Paket sind im lokalen Datenschutzentwurf ergänzt. Die bisherigen pauschalen Prüfhinweise zu diesen beiden Punkten sind präzisiert. Datenquelle und Hintergrundaktivität von WebAnalytics sowie die Speicher-/Löschregeln bleiben unbestätigt: öffentlich weiterhin maximal sieben Tage für Hosting-Logfiles in AVV-Anhang 1, acht Wochen für Besuchsdaten in der Hosting-Hilfe und zwölf Monate verfügbare Statistikdaten. Diese Angaben werden nicht eigenmächtig unterschiedlichen Beständen zugeordnet. [Aktualisierte IONOS-Anfrage](rechtliches/IONOS-SUPPORTANFRAGE.md) vorbereitet, nicht versendet.
+
+`datenschutz/index.html` bleibt ein Entwurf mit `noindex`; keine Veröffentlichung vorgenommen. Der Impressumshinweis zur steuerlichen Erfassung, die Browserauswahl für bis zu 180 Tage und bestehende Änderungen einschließlich `site/` bleiben erhalten. Die älteren Bearbeitungsstände unten dokumentieren frühere Prüfungen und werden durch diesen Abschnitt ergänzt.
 
 ## Aktueller Ergänzungsstand · Betreiberangaben und Cookie-Hinweis
 

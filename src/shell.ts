@@ -1,3 +1,4 @@
+import { hofPlakat } from './package-demos/hof/feuer';
 import { packageDemoCards, packageDemos } from './package-demos/catalogue';
 import { businessNotice, concepts, extensions, packages, packageQuestions, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
@@ -48,11 +49,11 @@ export function renderPageHtml(base: string): string {
             <span class="stage-caption">GESTALTUNG, DIE ZU IHNEN PASST.</span>
             <a class="stage-piece stage-piece--wood" href="${base}demos/business/" aria-label="Eiche & Form: Business-Demo entdecken">
               <span class="stage-piece-top">EICHE & FORM <span aria-hidden="true">↗</span></span>
-              <img src="${base}package-demos/wood-kitchen.webp" alt="Holz und klare Linien in einer hellen Küche" width="1600" height="1067" fetchpriority="high">
-              <span class="stage-piece-title">Raum für<br><em>Handwerk.</em></span><span class="stage-piece-bottom">01 — TISCHLEREI / BUSINESS</span>
+              <img src="${base}package-demos/eiche-fall14-breit.webp" alt="Entwurfsvisualisierung einer Garderobe aus Eiche in einer Altbaunische" width="1600" height="1000" fetchpriority="high">
+              <span class="stage-piece-title">Gerade Möbel für<br><em>schiefe Häuser.</em></span><span class="stage-piece-bottom">01 — TISCHLEREI / BUSINESS</span>
             </a>
-            <a class="stage-piece stage-piece--clear" href="${base}demos/start/" aria-label="Klarblick: Start-Demo entdecken"><span class="stage-piece-top">klarblick <span aria-hidden="true">↗</span></span><span class="clear-window" aria-hidden="true"></span><strong>Eine klare<br>Sache.</strong><span class="stage-piece-bottom">02 — FENSTERREINIGUNG / START</span></a>
-            <a class="stage-piece stage-piece--food" href="${base}demos/complete/" aria-label="Hof & Flamme: Complete-Demo entdecken"><img src="${base}package-demos/food-dish.webp" alt="Ein angerichteter Teller als Einblick in die Restaurant-Bildwelt" width="1600" height="1067"><span class="stage-piece-top">HOF & FLAMME <span aria-hidden="true">↗</span></span><span class="stage-piece-title">Ein Abend,<br>der bleibt.</span><span class="stage-piece-bottom">03 — RESTAURANT / COMPLETE</span></a>
+            <a class="stage-piece stage-piece--clear" href="${base}demos/start/" aria-label="Klarblick: Start-Demo entdecken"><span class="stage-piece-top">klarblick <span aria-hidden="true">↗</span></span><span class="clear-window" aria-hidden="true"></span><strong>Dieses eine<br>Fenster.</strong><span class="stage-piece-bottom">02 — FENSTERREINIGUNG / START</span></a>
+            <a class="stage-piece stage-piece--food" href="${base}demos/complete/" aria-label="Hof & Flamme: Complete-Demo entdecken">${hofPlakat()}<span class="stage-piece-top">HOF & FLAMME <span aria-hidden="true">↗</span></span><span class="stage-piece-title">Wir kochen,<br>bis das Feuer<br>aus ist.</span><span class="stage-piece-bottom">03 — RESTAURANT / COMPLETE</span></a>
             <span class="stage-stamp" aria-hidden="true">Für Ihren<br><em>eigenen</em><br>Auftritt. ↗</span>
             <p class="stage-footnote">Drei fiktive Marken. Drei eigene Welten.</p>
           </div>
@@ -87,7 +88,7 @@ export function renderPageHtml(base: string): string {
             </div>
           </div>
           </div></details>
-          <p id="gallery-disclaimer" class="studio-disclaimer">Beispiele für fiktive Marken, keine Kundenreferenzen. Sie können die Abläufe ausprobieren; Anfragen und Käufe sind lokale Simulationen. Informationen zum verwendeten Bildmaterial finden Sie in den jeweiligen Demos.</p>
+          <p id="gallery-disclaimer" class="studio-disclaimer">Beispiele für fiktive Marken, keine Kundenreferenzen. Sie können die Abläufe ausprobieren; Anfragen und Käufe sind lokale Simulationen. KI-generierte Bilder sind direkt am Bild gekennzeichnet; eine Übersicht steht im <a href="${base}impressum/#ki-kennzeichnung">Impressum</a>.</p>
         </div>
       </section>
 

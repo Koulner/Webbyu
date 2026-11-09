@@ -52,14 +52,13 @@
 .stage-piece--clear { width: 41%; height: 45%; top: 6%; right: 0; padding: 17px; background: #d8edf0; transform: rotate(8deg); color: #183f50; }
 .stage-piece--clear:hover, .stage-piece--clear:focus-visible { transform: rotate(4deg) translateY(-6px); }
 .stage-piece--clear .stage-piece-top { font-size: 15px; letter-spacing: -.05em; }
-.clear-window { display: block; height: 36%; width: 65%; margin: 15px auto 10px; border: 5px solid #f8fcf9; background: linear-gradient(130deg, #91bdc5, #f2f9e2 58%, #c6e1dc); box-shadow: 7px 7px 0 #173c4b0e; }
+.clear-window { display: block; height: 36%; aspect-ratio: 1; margin: 15px auto 10px; border-radius: 50%; border: 5px solid #f8fcf9; background: linear-gradient(#f8fcf9 0 0) center / 5px 100% no-repeat, linear-gradient(#f8fcf9 0 0) center / 100% 5px no-repeat, #f2c230; box-shadow: 0 0 0 7px #7b3629; }
 .stage-piece--clear strong { display: block; font-size: clamp(24px, 2.4vw, 36px); line-height: .95; letter-spacing: -.055em; font-weight: 500; }
 .stage-piece--clear .stage-piece-bottom { font-size: 6px; }
-.stage-piece--food { width: 46%; height: 43%; bottom: 8%; right: 0; padding: 16px; color: #f5eddc; background: #2d3025; transform: rotate(6deg); }
+.stage-piece--food { width: 46%; height: 43%; bottom: 8%; right: 0; padding: 16px; color: #16100b; background: #f6b417; transform: rotate(6deg); }
 .stage-piece--food:hover, .stage-piece--food:focus-visible { transform: rotate(2deg) translateY(-6px); }
-.stage-piece--food img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .48; }
-.stage-piece--food::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 30%, #14201ade); }
-.stage-piece--food .stage-piece-title { position: absolute; z-index: 1; bottom: 44px; font: 400 clamp(26px, 2.6vw, 40px)/1 var(--font-serif); }
+.stage-piece--food .hf-plakat { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stage-piece--food .stage-piece-title { position: absolute; z-index: 1; bottom: 38px; font: 700 clamp(22px, 2.3vw, 34px)/.98 'Instrument Sans', Arial, sans-serif; letter-spacing: -.035em; }
 .stage-stamp { position: absolute; z-index: 3; width: 105px; height: 105px; bottom: 5%; left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: var(--color-highlight); font-size: 13px; line-height: 1.1; transform: rotate(-12deg); }
 .stage-stamp em { font: italic 29px/1 var(--font-serif); }
 .stage-footnote { position: absolute; bottom: 0; right: 0; font-size: 10px; color: var(--color-muted); }
@@ -283,27 +282,40 @@
 }
 
 #app .package-demo-preview.package-preview-start {
-  background: #dfedf4;
-  color: #122b36;
+  background: #dbe3e2;
+  color: #1d2930;
   padding: 0;
-  aspect-ratio: 1.65;
+  aspect-ratio: 1.6;
 }
 #app .package-preview-start::after { content: none; }
 #app .package-preview-start img {
   position: absolute;
   inset: 0 0 0 auto;
-  width: 52%;
+  width: 100%;
   height: 100%;
-  object-position: 82% center;
-  border-left: 3px solid #122b36;
+  object-position: right bottom;
   box-shadow: none;
   transform: none;
 }
 #app .package-preview-start span { left: 5%; }
-#app .package-preview-start .package-preview-headline { bottom: 27%; font-size: clamp(1.4rem, 4vw, 4.5rem); }
+#app .package-preview-start .package-preview-headline { top: 15%; bottom: auto; font-weight: 800; letter-spacing: 0; line-height: 1; font-size: clamp(1.15rem, 3vw, 3.2rem); }
 #app .package-preview-start .package-preview-action {
   bottom: 9%;
-  background: #e4f195;
-  color: #122b36;
+  background: #1d2930;
+  color: #fff;
   padding: 5px 7px;
 }
+
+#app .package-demo-preview.package-preview-complete {
+  background: #f6b417;
+  color: #16100b;
+  padding: 0;
+  aspect-ratio: 1.6;
+}
+#app .package-preview-complete::after { content: none; }
+#app .package-preview-complete .hf-plakat { position: absolute; inset: 0; width: 100%; height: 100%; }
+#app .package-preview-complete span { left: 5%; }
+#app .package-preview-complete .package-preview-brand { top: 7%; }
+#app .package-preview-complete .package-preview-moments { top: 8%; left: auto; right: 5%; max-width: 44%; text-align: right; font-size: 9px; font-weight: 600; letter-spacing: .04em; }
+#app .package-preview-complete .package-preview-headline { top: 16%; bottom: auto; font-family: 'Instrument Sans', Arial, sans-serif; font-weight: 700; letter-spacing: -.035em; line-height: .98; font-size: clamp(1.25rem, 3vw, 3.1rem); }
+#app .package-preview-complete .package-preview-action { bottom: 8%; background: #16100b; color: #f6b417; padding: 5px 7px; letter-spacing: .08em; }
