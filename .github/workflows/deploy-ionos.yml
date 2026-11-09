@@ -42,7 +42,7 @@ jobs:
         run: npm run build
         env:
           SITE_BASE_PATH: /
-          VITE_INQUIRY_ENABLED: 'false'
+          VITE_INQUIRY_ENABLED: 'true'
       - name: Prepare production files
         run: node scripts/prepare-ionos.mjs
       - name: Test actual Apache and PHP production package

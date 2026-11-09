@@ -1,10 +1,16 @@
 import { INQUIRY_ENDPOINT, INQUIRY_MAX_BYTES, type InquiryField, type InquiryRequest, type InquiryResponse } from './inquiry-contract';
-import type { BriefState } from './state';
+import { LINE_IDS, LINE_STATUSES, REMOVABLE_LINE_IDS } from './pricing-catalog';
+import { EXTENSION_IDS, GOAL_IDS, IMAGE_SOURCES, IMAGE_STATES, MEDIA_CHOICES, MEDIA_SITES, MEDIA_USES, PACKAGE_CHOICES, PROJECT_TYPES, SCOPES, TEXT_STATES, VIDEO_STATES, ZONES, type BriefState } from './state';
 
 export const INQUIRY_TIMEOUT_MS = 90_000;
 export const INQUIRY_CONTACT = 'lukas.wagner@webbyu.de';
 const uuidV4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-const fields: InquiryField[] = ['requestId', 'website', 'goal', 'extensions', 'projectType', 'timing', 'description', 'name', 'email', 'selectedPackage'];
+const fields: InquiryField[] = [
+  'requestId', 'website', 'goal', 'extensions', 'projectType', 'timing', 'description', 'name', 'email', 'selectedPackage',
+  'scope', 'texts', 'images', 'imageSource', 'video', 'zone', 'mediaChoice', 'mediaUse', 'sites', 'drone', 'removedLines', 'catalogVersion', 'shownLines',
+];
+const SHOWN_LINES_MAX = 30;
+const AMOUNT_MAX = 100_000;
 const positiveSeconds = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) > 0;
 
 /** Fail closed on an unexpected schema, HTTP status, or uncorrelated success. */
@@ -48,19 +54,42 @@ export function inquiryFingerprint(state: BriefState, website: string): string {
     goal: state.goal, extensions: [...state.extensions].sort(), projectType: state.projectType,
     timing: state.timing, description: normalized(state.description), name: normalized(state.name),
     email: normalized(state.email).toLowerCase(), selectedPackage: state.selectedPackage, website,
+    scope: state.scope, texts: state.texts, images: state.images, imageSource: state.imageSource, video: state.video, zone: state.zone,
+    mediaChoice: state.mediaChoice, mediaUse: [...state.mediaUse].sort(), sites: state.sites, drone: state.drone,
+    removedLines: [...state.removedLines].sort(), catalogVersion: state.catalogVersion,
+    shownLines: state.shownLines.map(line => [line.id, line.status, line.min, line.max]),
   });
 }
+
+const oneOf = (choices: readonly string[], value: unknown) => typeof value === 'string' && choices.includes(value);
+const uniqueList = (value: unknown, choices: readonly string[], max: number) =>
+  Array.isArray(value) && value.length <= max && value.every(item => oneOf(choices, item)) && new Set(value).size === value.length;
+const amount = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= AMOUNT_MAX;
 
 /** Browser checks supplement server validation; limits apply before trimming. */
 export function invalidInquiryFields(state: BriefState): InquiryField[] {
   const invalid: InquiryField[] = [];
-  if (!['presence', 'inquiries', 'bookings', 'sales'].includes(state.goal)) invalid.push('goal');
-  const extensions = ['photos', 'videos', 'cms', 'booking', 'seo', 'maps', 'wizard', '3d', 'unsure'];
-  if (state.extensions.some(id => !extensions.includes(id)) || new Set(state.extensions).size !== state.extensions.length
-    || (state.extensions.includes('unsure') && state.extensions.length > 1)) invalid.push('extensions');
-  if (!['new', 'existing'].includes(state.projectType)) invalid.push('projectType');
+  if (!oneOf(GOAL_IDS, state.goal)) invalid.push('goal');
+  if (!uniqueList(state.extensions, EXTENSION_IDS, EXTENSION_IDS.length) || (state.extensions.includes('unsure') && state.extensions.length > 1)) invalid.push('extensions');
+  if (!oneOf(PROJECT_TYPES, state.projectType)) invalid.push('projectType');
   if (!['flexible', 'soon', 'later'].includes(state.timing)) invalid.push('timing');
-  if (![null, 'start', 'business', 'complete', 'custom'].includes(state.selectedPackage)) invalid.push('selectedPackage');
+  if (state.selectedPackage !== null && !oneOf(PACKAGE_CHOICES, state.selectedPackage)) invalid.push('selectedPackage');
+  if (!oneOf(SCOPES, state.scope)) invalid.push('scope');
+  if (!oneOf(TEXT_STATES, state.texts)) invalid.push('texts');
+  if (!oneOf(IMAGE_STATES, state.images)) invalid.push('images');
+  if (state.imageSource !== null && !oneOf(IMAGE_SOURCES, state.imageSource)) invalid.push('imageSource');
+  if (!oneOf(VIDEO_STATES, state.video)) invalid.push('video');
+  if (!oneOf(ZONES, state.zone)) invalid.push('zone');
+  if (state.mediaChoice !== null && !oneOf(MEDIA_CHOICES, state.mediaChoice)) invalid.push('mediaChoice');
+  if (!uniqueList(state.mediaUse, MEDIA_USES, MEDIA_USES.length)) invalid.push('mediaUse');
+  if (!oneOf(MEDIA_SITES, state.sites)) invalid.push('sites');
+  if (typeof state.drone !== 'boolean') invalid.push('drone');
+  if (!uniqueList(state.removedLines, REMOVABLE_LINE_IDS, REMOVABLE_LINE_IDS.length)) invalid.push('removedLines');
+  if (typeof state.catalogVersion !== 'string' || !/^\d{4}-\d{2}-[a-z]$/.test(state.catalogVersion)) invalid.push('catalogVersion');
+  const ids = Array.isArray(state.shownLines) ? state.shownLines.map(line => line?.id) : [];
+  if (!Array.isArray(state.shownLines) || state.shownLines.length > SHOWN_LINES_MAX || new Set(ids).size !== ids.length
+    || !state.shownLines.every(line => typeof line === 'object' && line !== null && oneOf(LINE_IDS, line.id) && oneOf(LINE_STATUSES, line.status)
+      && amount(line.min) && amount(line.max) && line.min <= line.max)) invalid.push('shownLines');
   if ([...state.description].length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/u.test(state.description)) invalid.push('description');
   if (!state.name.trim() || [...state.name].length > 120 || /[\x00-\x1f\x7f\u2028\u2029]/u.test(state.name)) invalid.push('name');
   const email = state.email.trim();

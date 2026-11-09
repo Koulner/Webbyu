@@ -22,20 +22,35 @@ const response = await fetch(INQUIRY_ENDPOINT, {
 
 `Origin` setzt der Browser selbst. Produktions-Origins: `https://webbyu.de` und `https://www.webbyu.de`, jeweils nur zum identischen Host. Keine CORS-Freigabe, kein Empfang aus Pages-Vorschauen. Lokale Frontendtests verwenden einen Mock; keine localhost-Freigabe im Produktivcode ergänzen.
 
-Alle zehn Schlüssel müssen vorhanden sein; zusätzliche Schlüssel sind ungültig:
+Alle 23 Schlüssel müssen vorhanden sein; zusätzliche Schlüssel sind ungültig. Die ersten zehn gehören zum Vertrag von AP02, die weiteren stammen aus dem Projektberater (Katalogversion `2026-11-a`):
 
 | Feld | Gültiger Inhalt |
 | --- | --- |
 | `requestId` | kleingeschriebene UUID v4 aus `crypto.randomUUID()` |
 | `website` | leerer String, Honeypot; für Menschen verborgen, nicht erforderlich/ausfüllbar machen |
-| `goal` | `presence`, `inquiries`, `bookings`, `sales` |
-| `extensions` | eindeutige Liste aus `photos`, `videos`, `cms`, `booking`, `seo`, `maps`, `wizard`, `3d`, `unsure`; `unsure` nur allein; leere Liste erlaubt |
-| `projectType` | `new` oder `existing` |
+| `goal` | `presence`, `inquiries`, `bookings`, `sales`, `media` (Medien-Weg) |
+| `extensions` | eindeutige Liste aus `wizard`, `booking_embed`, `booking_custom`, `language`, `cms`, `integration`, `3d`, `unsure`; `unsure` nur allein; leere Liste erlaubt |
+| `projectType` | `new`, `existing`, `media` oder `advice` |
 | `timing` | `flexible`, `soon`, `later` |
 | `description` | String, optional leer, maximal 5.000 Unicode-Codepoints; Zeilenumbrüche erlaubt |
 | `name` | nach Entfernen äußerer Leerzeichen nicht leer; maximal 120 Unicode-Codepoints, keine Steuerzeichen/Zeilenumbrüche |
 | `email` | gültige ASCII-Mailboxadresse, maximal 254 Zeichen, keine Steuerzeichen/Zeilenumbrüche; Plus-Adressen erlaubt; internationale Postfach-/Domain-Schreibweise muss vorher als ASCII vorliegen |
 | `selectedPackage` | `null`, `start`, `business`, `complete`, `custom` |
+| `scope` | `compact`, `extended`, `large`, `unknown` |
+| `texts` | `ready`, `notes`, `missing`, `unknown` |
+| `images` | `ready`, `partly`, `missing`, `unknown` |
+| `imageSource` | `null`, `customer_later`, `photo_compact`, `photo_standard`, `licensed`, `no_photos`, `open` |
+| `video` | `none`, `clip`, `unknown` |
+| `zone` | `region`, `outside`, `unknown` |
+| `mediaChoice` | `null`, `photo_compact`, `photo_standard`, `clip`, `photo_clip`, `unknown` |
+| `mediaUse` | eindeutige Liste aus `website`, `social`, `ads`, `third_party`; leer erlaubt |
+| `sites` | `oneSite` oder `multipleSites` |
+| `drone` | Wahrheitswert (kein String, keine Zahl) |
+| `removedLines` | eindeutige Liste abwählbarer Positionen: `migration`, `text_notes`, `text_interview`; leer erlaubt |
+| `catalogVersion` | Jahr-Monat-Buchstabe, z. B. `2026-11-a` |
+| `shownLines` | Liste mit höchstens 30 Einträgen `{ id, status, min, max }`: bekannte, nicht doppelte `id` aus `Input::LINES`; `status` ist `included`, `fixed`, `range`, `open` oder `external`; `min` und `max` sind ganze Euro von 0 bis 100000, `min` ≤ `max`; offene und enthaltene Positionen stehen bei 0; leere Liste erlaubt |
+
+**Preisangaben sind nicht verbindlich.** `shownLines` und `catalogVersion` zeigen, was der Besucher im Browser gesehen hat. Der Server rechnet nicht neu und prüft nur Form, bekannte Kennungen und Grenzen. Die E-Mail stellt Antworten, Positionen, offene Punkte und Katalogversion dar und nennt den Preis „vom Besucher gesehen“. Die Summe in der Mail folgt derselben Regel wie im Finder: nur `fixed` und `range`, nie `open` oder `external`; bei offenen Positionen steht nie eine alleinige Summe. Neue Positionen müssen in `src/pricing-catalog.ts` und in `Input::LINES` stehen. Ein Test (`src/inquiry-contract.test.ts`) vergleicht beide Listen.
 
 Gesamter UTF-8-JSON-Body höchstens **32.768 Bytes**. Kein Datei-Upload, keine Anhänge, keine Header-, Absender-, Betreff- oder Empfängerfelder. HTML-Sonderzeichen und Tags in Namen/Beschreibungen werden als reiner Text übermittelt, nie als HTML-Mail. Name, E-Mail und Beschreibung werden außen getrimmt; Beschreibungsumbrüche vereinheitlicht; Erweiterungen sortiert. Grenzen gelten vor dem Trimmen. Browser-`maxlength` zählt UTF-16-Einheiten und kann bei Emoji früher begrenzen.
 

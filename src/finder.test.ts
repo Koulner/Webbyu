@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountFinder } from './finder';
-import { createBriefStore } from './state';
+import { requestBrief } from './finder-pricing';
+import { createBriefStore, type BriefState } from './state';
 import { INQUIRY_TIMEOUT_MS } from './inquiry-client';
 import type { InquiryRequest, InquiryResponse } from './inquiry-contract';
 
@@ -33,11 +34,26 @@ describe('project finder', () => {
   afterEach(() => { finder.dispose(); container.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
   function next() { container.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }
+  /** Website route: Vorhaben, Ziel, Umfang und Inhalte liegen hinter uns, die Orientierung ist offen. */
+  function toResult() { next(); next(); next(); next(); }
+  function choose(name: string, value: string) { container.querySelector<HTMLInputElement>(`input[name="${name}"][value="${value}"]`)!.click(); }
+  function change(name: string, value: string) {
+    const input = container.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${name}"]`)!;
+    input.value = value;
+    input.dispatchEvent(new Event(input instanceof HTMLSelectElement ? 'change' : 'input', { bubbles: true }));
+  }
+  function preview() { store.update({ name: 'Ada Beispiel', email: 'ada+projekt@example.com', description: 'Unsere Idee' }); toResult(); next(); }
+  function action(name: string) { return container.querySelector<HTMLButtonElement>(`[data-action="${name}"]`)!; }
+  function posted(index = 0): InquiryRequest { return JSON.parse(fetchMock.mock.calls[index][1].body); }
+  const text = (selector: string) => container.querySelector(selector)?.textContent ?? '';
+  const hasInput = (name: string, value?: string) => container.querySelector(`input[name="${name}"]${value ? `[value="${value}"]` : ''}`) !== null;
+  const lineTexts = () => [...container.querySelectorAll('.finder-line-copy strong')].map(item => item.textContent);
+  const summary = () => container.querySelector('[data-summary]')!.textContent!;
 
   it('defaults to a local summary without mandatory contact data or any sending path', async () => {
     finder.dispose();
     finder = mountFinder(container, store);
-    next(); next(); next();
+    next(); next(); next(); next();
     expect(container.querySelector<HTMLInputElement>('[name="name"]')!.required).toBe(false);
     expect(container.querySelector<HTMLInputElement>('[name="email"]')!.required).toBe(false);
     next();
@@ -51,79 +67,277 @@ describe('project finder', () => {
     await settle();
     expect(fetchMock).not.toHaveBeenCalled();
   });
-  function choose(value: string) { container.querySelector<HTMLInputElement>(`input[value="${value}"]`)!.click(); }
-  function change(name: string, value: string) {
-    const input = container.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${name}"]`)!;
-    input.value = value;
-    input.dispatchEvent(new Event(input instanceof HTMLSelectElement ? 'change' : 'input', { bubbles: true }));
-  }
-  function preview() { store.update({ name: 'Ada Beispiel', email: 'ada+projekt@example.com', description: 'Unsere Idee' }); next(); next(); next(); next(); }
-  function action(name: string) { return container.querySelector<HTMLButtonElement>(`[data-action="${name}"]`)!; }
-  function posted(index = 0): InquiryRequest { return JSON.parse(fetchMock.mock.calls[index][1].body); }
 
-  it('treats uncertainty as exclusive and retains all choices and text when revisiting steps', () => {
-    choose('bookings');
+  it('walks the website route and retains all choices and text when revisiting steps', () => {
+    expect(container.querySelectorAll('.finder-progress li')).toHaveLength(5);
+    expect(text('.finder-heading')).toContain('Worum geht');
+    expect(container.querySelectorAll('input[name="finder-purpose"]')).toHaveLength(4);
+    choose('finder-purpose', 'existing');
     next();
-    choose('cms');
-    choose('unsure');
+    choose('finder-goal', 'bookings');
+    next();
+    choose('finder-scope', 'extended');
+    choose('finder-extension', 'cms');
+    choose('finder-extension', 'unsure');
     expect(store.get().extensions).toEqual(['unsure']);
-    choose('seo');
-    expect(store.get().extensions).toEqual(['seo']);
+    choose('finder-extension', 'language');
+    expect(store.get().extensions).toEqual(['language']);
+    choose('finder-extension', 'cms');
     next();
-    change('projectType', 'existing');
+    choose('finder-texts', 'notes');
+    choose('finder-images', 'missing');
+    choose('finder-image-source', 'photo_standard');
+    choose('finder-video', 'clip');
+    choose('finder-zone', 'region');
+    next();
     change('timing', 'later');
     change('description', 'Ein Atelier mit Terminbuchung.');
-    next();
     change('name', 'Ada Beispiel');
     change('email', 'ada@example.com');
     change('selectedPackage', 'complete');
-    container.querySelector<HTMLButtonElement>('[data-action="back"]')!.click();
-    expect(container.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toBe('Ein Atelier mit Terminbuchung.');
+    action('back').click();
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-zone"][value="region"]')!.checked).toBe(true);
     next();
-    expect(container.querySelector<HTMLInputElement>('[name="email"]')!.value).toBe('ada@example.com');
+    expect(container.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toBe('Ein Atelier mit Terminbuchung.');
     finder.openAtStart();
-    expect(container.querySelector<HTMLInputElement>('[value="bookings"]')!.checked).toBe(true);
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-purpose"][value="existing"]')!.checked).toBe(true);
     next();
-    expect(container.querySelector<HTMLInputElement>('[value="seo"]')!.checked).toBe(true);
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-goal"][value="bookings"]')!.checked).toBe(true);
+    next();
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-scope"][value="extended"]')!.checked).toBe(true);
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-extension"][value="cms"]')!.checked).toBe(true);
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-extension"][value="language"]')!.checked).toBe(true);
+    next();
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-texts"][value="notes"]')!.checked).toBe(true);
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-image-source"][value="photo_standard"]')!.checked).toBe(true);
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-video"][value="clip"]')!.checked).toBe(true);
     next();
     expect(container.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toBe('Ein Atelier mit Terminbuchung.');
-    expect(container.querySelector<HTMLSelectElement>('[name="projectType"]')!.value).toBe('existing');
     expect(container.querySelector<HTMLSelectElement>('[name="timing"]')!.value).toBe('later');
-    next();
     expect(container.querySelector<HTMLInputElement>('[name="name"]')!.value).toBe('Ada Beispiel');
     expect(container.querySelector<HTMLInputElement>('[name="email"]')!.value).toBe('ada@example.com');
     expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('complete');
   });
 
-  it('reflects external hero and package choices without erasing inputs', () => {
+  it('reflects external goal and package choices without erasing inputs', () => {
     store.update({ goal: 'sales', selectedPackage: 'complete', description: 'Unsere Idee' });
-    expect(container.querySelector<HTMLInputElement>('[value="sales"]')!.checked).toBe(true);
+    next();
+    expect(container.querySelector<HTMLInputElement>('input[name="finder-goal"][value="sales"]')!.checked).toBe(true);
     next(); next(); next();
     expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('complete');
-    store.update({ goal: 'presence', selectedPackage: null });
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('start');
+    store.update({ selectedPackage: null });
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('auto');
     expect(store.get().description).toBe('Unsere Idee');
   });
 
-  it.each([
-    ['presence', 'start'],
-    ['inquiries', 'business'],
-    ['bookings', 'custom'],
-    ['sales', 'custom'],
-  ])('takes the %s route to its recommendation and allows a manual choice', (goal, recommendation) => {
-    choose(goal);
+  it('does not let the goal choose or reset a package', () => {
+    store.update({ selectedPackage: 'business' });
+    next();
+    choose('finder-goal', 'sales');
+    expect(store.get().selectedPackage).toBe('business');
+    choose('finder-goal', 'presence');
+    expect(store.get()).toMatchObject({ goal: 'presence', selectedPackage: 'business' });
+  });
+
+  it.each<[string, Partial<BriefState>, string]>([
+    ['nothing special', {}, 'Webbyu Start'],
+    ['standard photos', { images: 'missing', imageSource: 'photo_standard' }, 'Webbyu Business'],
+    ['standard photos, texts and a clip', { images: 'missing', imageSource: 'photo_standard', texts: 'missing', video: 'clip' }, 'Webbyu Complete'],
+    ['a shop', { goal: 'sales' }, 'Individuell klären'],
+    ['a large scope', { scope: 'large' }, 'Individuell klären'],
+    ['a custom booking', { extensions: ['booking_custom'] }, 'Individuell klären'],
+    ['a system integration', { extensions: ['integration'], images: 'missing', imageSource: 'photo_standard' }, 'Individuell klären'],
+  ])('recommends for %s and allows a manual choice that can be given up again', (_, patch, label) => {
+    store.update(patch);
+    toResult();
+    expect(text('.finder-recommendation h4')).toBe(label);
+    expect(text('.finder-recommendation-label')).toBe('Meine erste Orientierung');
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('auto');
+    change('selectedPackage', label === 'Webbyu Business' ? 'start' : 'business');
+    expect(text('.finder-recommendation-label')).toBe('Ihre Paketauswahl');
+    change('selectedPackage', 'auto');
+    expect(text('.finder-recommendation-label')).toBe('Meine erste Orientierung');
+    expect(text('.finder-recommendation h4')).toBe(label);
+  });
+
+  it('shows the orientation in three blocks with the sum, the notice and the tax text before the contact fields', () => {
+    toResult();
+    expect([...container.querySelectorAll('.finder-block h4')].map(item => item.textContent)).toEqual(['Einmalige Erstellung', 'Noch zu klären', 'Laufende Kosten bei Ihren Anbietern']);
+    expect(text('.finder-sum')).toBe('Summe1.180–2.130 € + 2 offene Positionen. Kein vollständiger Gesamtpreis.');
+    expect(text('.finder-fineprint')).toBe('Unverbindliche Orientierung. Verbindlich ist das schriftliche Angebot. Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.');
+    expect(lineTexts()).toEqual(expect.arrayContaining(['Grundlage Ihrer Website', 'Konzept', 'Korrektur', 'Livegang', 'Übergabe', 'Erweiterte Umsetzung', 'Texte, Umfang noch offen', 'Bildquelle noch offen', 'Video, Umfang noch offen', 'Domain und Hosting', 'Rechtstexte']));
+    const html = container.innerHTML;
+    expect(html.indexOf('finder-blocks')).toBeLessThan(html.indexOf('name="timing"'));
+    expect(html.indexOf('name="timing"')).toBeLessThan(html.indexOf('name="description"'));
+    expect(html.indexOf('name="description"')).toBeLessThan(html.indexOf('name="name"'));
+    expect(html.indexOf('name="name"')).toBeLessThan(html.indexOf('name="email"'));
+    expect(container.querySelectorAll('[name="timing"]')).toHaveLength(1);
+    // Timing and description moved here from the scope step.
+    action('back').click(); action('back').click();
+    expect(container.querySelector('[name="timing"], [name="description"]')).toBeNull();
+  });
+
+  it('lets the visitor deselect a position, shows the consequence and takes it back', () => {
+    store.update({ projectType: 'existing', texts: 'notes', scope: 'compact', images: 'ready', video: 'none' });
+    toResult();
+    expect(text('.finder-sum')).toContain('1.370 €');
+    expect(container.querySelector('[data-line="text_notes"][data-action="remove-line"]')).not.toBeNull();
+    expect(container.querySelector('[data-line="base_start"]')).toBeNull();
+    container.querySelector<HTMLButtonElement>('[data-line="text_notes"]')!.click();
+    expect(text('.finder-sum')).toContain('1.180 €');
+    expect(text('.finder-removed')).toContain('Texte aus Ihren Stichpunkten');
+    expect(text('.finder-removed')).toContain('Texte liefern Sie selbst. Der Projektstart setzt fertige Texte voraus.');
+    expect(store.get().removedLines).toEqual(['text_notes']);
+    expect(document.activeElement).toBe(container.querySelector('[data-action="restore-line"][data-line="text_notes"]'));
+    container.querySelector<HTMLButtonElement>('[data-action="restore-line"]')!.click();
+    expect(text('.finder-sum')).toContain('1.370 €');
+    expect(container.querySelector('.finder-removed')).toBeNull();
+    expect(store.get().removedLines).toEqual([]);
+    expect(document.activeElement).toBe(container.querySelector('[data-action="remove-line"][data-line="text_notes"]'));
+  });
+
+  it('turns Complete into an individual composition when a module is deselected', () => {
+    store.update({ selectedPackage: 'complete', zone: 'region', scope: 'compact' });
+    toResult();
+    expect(text('.finder-recommendation h4')).toBe('Webbyu Complete');
+    expect(text('.finder-sum')).toContain('1.900 € + 1 offene Position');
+    container.querySelector<HTMLButtonElement>('[data-line="text_interview"]')!.click();
+    expect(text('.finder-recommendation h4')).toBe('Individuelle Zusammenstellung');
+    expect(text('.finder-sum')).toContain('1.510 € + 1 offene Position');
+    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('complete');
+  });
+
+  it('asks for the place only when photos or a clip belong to the project', () => {
     next(); next(); next();
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(recommendation);
-    expect(container.querySelector('.finder-price')!.textContent).toBe('Angebot auf Anfrage');
-    change('selectedPackage', recommendation === 'complete' ? 'start' : 'complete');
-    expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Ihre Paketauswahl');
-    expect(container.querySelector('.finder-price')!.textContent).toBe('Angebot auf Anfrage');
-    finder.openAtStart();
-    expect(document.activeElement).toBe(container.querySelector('.finder-heading'));
-    choose(goal === 'sales' ? 'presence' : 'sales');
+    expect(hasInput('finder-zone')).toBe(false);
+    expect(hasInput('finder-image-source')).toBe(true);
+    choose('finder-video', 'clip');
+    expect(hasInput('finder-zone')).toBe(true);
+    choose('finder-video', 'none');
+    expect(hasInput('finder-zone')).toBe(false);
+    choose('finder-image-source', 'licensed');
+    expect(hasInput('finder-zone')).toBe(false);
+    choose('finder-image-source', 'photo_compact');
+    expect(hasInput('finder-zone')).toBe(true);
+    choose('finder-images', 'ready');
+    expect(hasInput('finder-image-source')).toBe(false);
+    expect(hasInput('finder-zone')).toBe(false);
+  });
+
+  it('never turns missing photos into an appointment and explains the consequence for the design', () => {
     next(); next(); next();
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe(goal === 'sales' ? 'start' : 'custom');
-    expect(container.querySelector('.finder-recommendation-label')!.textContent).toBe('Meine erste Orientierung');
+    choose('finder-images', 'missing');
+    choose('finder-video', 'none');
+    choose('finder-texts', 'ready');
+    next();
+    expect(lineTexts()).toContain('Bildquelle noch offen');
+    action('back').click();
+    choose('finder-image-source', 'customer_later');
+    expect(hasInput('finder-zone')).toBe(false);
+    next();
+    expect(lineTexts().filter(item => /Foto|Anfahrt|Bildquelle/.test(item ?? ''))).toEqual([]);
+    expect(text('.finder-hints')).toContain('Sie liefern die Bilder später');
+    action('back').click();
+    choose('finder-image-source', 'no_photos');
+    next();
+    expect(text('.finder-hints')).toContain('Schrift, Farbe und Fläche');
+    expect(lineTexts().filter(item => /Foto|Anfahrt/.test(item ?? ''))).toEqual([]);
+  });
+
+  it('asks for the place on the orientation step when a chosen package brings photos along', () => {
+    store.update({ selectedPackage: 'business' });
+    toResult();
+    expect(hasInput('finder-zone')).toBe(true);
+    expect(lineTexts()).toContain('Anfahrt außerhalb der Region');
+    choose('finder-zone', 'region');
+    expect(lineTexts()).toContain('Anfahrt in Ihrer Region');
+    expect(lineTexts()).not.toContain('Anfahrt außerhalb der Region');
+  });
+
+  it('suggests the selection aid for the inquiry goal and adds it on request', () => {
+    toResult();
+    expect(text('.finder-suggestion')).toContain('Auswahlhilfe');
+    expect(text('.finder-suggestion')).toContain('490 €');
+    action('add-wizard').click();
+    expect(store.get().extensions).toEqual(['wizard']);
+    expect(container.querySelector('.finder-suggestion')).toBeNull();
+    expect(lineTexts()).toContain('Auswahlhilfe');
+    store.update({ goal: 'presence', extensions: [] });
+    expect(container.querySelector('.finder-suggestion')).toBeNull();
+  });
+
+  it('walks the media route without a goal question, website positions or hosting', () => {
+    choose('finder-purpose', 'media');
+    expect(store.get()).toMatchObject({ projectType: 'media', goal: 'media', mediaChoice: 'unknown' });
+    expect(container.querySelectorAll('.finder-progress li')).toHaveLength(4);
+    next();
+    expect(hasInput('finder-media-choice', 'photo_clip')).toBe(true);
+    choose('finder-media-choice', 'photo_clip');
+    choose('finder-media-use', 'website');
+    choose('finder-media-use', 'third_party');
+    next();
+    choose('finder-zone', 'outside');
+    choose('finder-sites', 'multipleSites');
+    choose('finder-drone', 'drone');
+    next();
+    expect(text('.finder-recommendation h4')).toBe('Foto- und Videoprojekt');
+    expect(container.querySelector('[name="selectedPackage"]')).toBeNull();
+    expect(lineTexts()).toEqual(['Fotos Standard', 'Kurzclip beim Fototermin', 'Anfahrt außerhalb der Region', 'Drohnenaufnahmen', 'Mehrere Standorte oder Weitergabe an Dritte']);
+    expect(text('.finder-sum')).toContain('590 € + 4 offene Positionen. Kein vollständiger Gesamtpreis.');
+    expect(container.querySelector('.finder-block h4')!.textContent).toBe('Einmalige Erstellung');
+    expect(container.textContent).not.toContain('Domain und Hosting');
+    expect(container.textContent).not.toContain('Grundlage Ihrer Website');
+    expect(text('.finder-fineprint')).toContain('Gemäß § 19 UStG');
+    change('name', 'Ada Beispiel');
+    change('email', 'ada@example.com');
+    next();
+    expect(summary()).toContain('Fotos und Kurzclip');
+    expect(summary()).toContain('Website, Weitergabe an Dritte');
+    expect(summary()).toContain('Gewünscht, wird gesondert geklärt');
+    expect(summary()).toContain('Einmalige Erstellung');
+    expect(summary()).not.toMatch(/Funktionen|Texte|Bildquelle|Erweiterte Umsetzung|Domain und Hosting/);
+    action('edit').click();
+    choose('finder-purpose', 'new');
+    expect(store.get().goal).toBe('inquiries');
+    expect(container.querySelectorAll('.finder-progress li')).toHaveLength(5);
+  });
+
+  it('sends the media route with its own answers and without website answers', async () => {
+    fetchMock.mockResolvedValue(response({ status: 'success', requestId: id, duplicate: false }));
+    store.update({ extensions: ['cms'], scope: 'large', texts: 'missing', selectedPackage: 'complete', name: 'Ada Beispiel', email: 'ada@example.com' });
+    choose('finder-purpose', 'media');
+    next();
+    choose('finder-media-choice', 'photo_compact');
+    next();
+    choose('finder-zone', 'region');
+    next();
+    next();
+    action('send').click();
+    await settle();
+    expect(posted()).toMatchObject({
+      goal: 'media', projectType: 'media', extensions: [], scope: 'unknown', texts: 'unknown', selectedPackage: null, mediaChoice: 'photo_compact', zone: 'region',
+      catalogVersion: '2026-11-a', shownLines: [{ id: 'photo_compact_solo', status: 'fixed', min: 349, max: 349 }, { id: 'travel_included', status: 'included', min: 0, max: 0 }],
+    });
+  });
+
+  it('takes the advice route straight to the contact without any price', async () => {
+    fetchMock.mockResolvedValue(response({ status: 'success', requestId: id, duplicate: false }));
+    choose('finder-purpose', 'advice');
+    expect(container.querySelectorAll('.finder-progress li')).toHaveLength(2);
+    next();
+    expect(text('.finder-heading')).toContain('erreiche');
+    expect(container.querySelector('.finder-blocks')).toBeNull();
+    expect(container.querySelector('[name="selectedPackage"]')).toBeNull();
+    change('description', 'Ich weiß noch nicht, was ich brauche.');
+    change('name', 'Ada Beispiel');
+    change('email', 'ada@example.com');
+    next();
+    expect(summary()).toContain('Noch unklar');
+    expect(summary()).toContain('Ich weiß noch nicht, was ich brauche.');
+    expect(summary()).not.toMatch(/€|Preisorientierung|Ihr Ziel/);
+    action('send').click();
+    await settle();
+    expect(posted()).toMatchObject({ projectType: 'advice', shownLines: [], removedLines: [], extensions: [], selectedPackage: null, catalogVersion: '2026-11-a' });
   });
 
   it('requires valid contact data and safely displays the complete local summary without a request', () => {
@@ -131,8 +345,8 @@ describe('project finder', () => {
     const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
     const storageSpy = vi.spyOn(Storage.prototype, 'setItem');
     vi.stubGlobal('fetch', fetchSpy);
-    store.update({ goal: 'sales', extensions: ['cms', '3d'], projectType: 'existing', timing: 'soon', description: '<img src=x onerror="alert(1)">', selectedPackage: 'complete' });
-    next(); next(); next();
+    store.update({ goal: 'sales', extensions: ['cms', '3d'], projectType: 'existing', timing: 'soon', description: '<img src=x onerror="alert(1)">', selectedPackage: 'complete', scope: 'extended', texts: 'notes', zone: 'region' });
+    toResult();
     next();
     expect(container.querySelector('[data-summary]')).toBeNull();
     change('name', '  ');
@@ -142,74 +356,127 @@ describe('project finder', () => {
     change('name', 'Ada Beispiel');
     change('email', 'ada@example.com');
     next();
-    const summary = container.querySelector('[data-summary]')!;
-    expect(summary).not.toBeNull();
-    expect(summary.textContent).toContain('Produkte verkaufen');
-    expect(summary.textContent).toContain('Webbyu Complete');
-    expect(summary.textContent).toContain('Angebot auf Anfrage');
-    expect(summary.textContent).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf/);
-    expect(summary.textContent).toContain('Inhalte selbst pflegen');
-    expect(summary.textContent).toContain('Etwas Besonderes erleben');
-    expect(summary.textContent).toContain('Eine bestehende Website erneuern');
-    expect(summary.textContent).toContain('Möglichst bald');
-    expect(summary.textContent).toContain('<img src=x onerror="alert(1)">');
-    expect(summary.querySelector('img')).toBeNull();
-    expect(summary.textContent).toContain('Ada Beispiel');
-    expect(summary.textContent).toContain('ada@example.com');
+    expect(container.querySelector('[data-summary]')).not.toBeNull();
+    expect(summary()).toContain('Produkte verkaufen');
+    expect(summary()).toContain('Webbyu Complete');
+    expect(summary()).toContain('Inhalte selbst pflegen');
+    expect(summary()).toContain('Etwas Besonderes erleben');
+    expect(summary()).toContain('Eine bestehende Website erneuern');
+    expect(summary()).toContain('Möglichst bald');
+    expect(summary()).toContain('<img src=x onerror="alert(1)">');
+    expect(container.querySelector('[data-summary] img')).toBeNull();
+    expect(summary()).toContain('Ada Beispiel');
+    expect(summary()).toContain('ada@example.com');
     expect(container.textContent).toContain('Nichts versendet');
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrSpy).not.toHaveBeenCalled();
     expect(storageSpy).not.toHaveBeenCalled();
-    container.querySelector<HTMLButtonElement>('[data-action="edit"]')!.click();
+    action('edit').click();
     expect(store.get().name).toBe('Ada Beispiel');
   });
 
-  it.each(['start', 'business', 'complete', 'custom'] as const)('copies the %s briefing with an offer on request only after the copy button is pressed', async selectedPackage => {
+  it('shows the same three blocks in the preview as the mail will, with the catalog version', () => {
+    store.update({ projectType: 'existing', texts: 'notes', scope: 'extended', images: 'missing', imageSource: 'photo_standard', video: 'clip', zone: 'region', extensions: ['wizard', 'cms'], removedLines: ['migration'] });
+    preview();
+    const entries = Object.fromEntries([...container.querySelectorAll('[data-summary] dl > div')].map(row => [row.querySelector('dt')!.textContent, row.querySelector('dd')!.textContent]));
+    expect(Object.keys(entries)).toEqual(expect.arrayContaining(['Einmalige Erstellung', 'Noch zu klären', 'Laufende Kosten bei Ihren Anbietern', 'Summe Erstellung', 'Abgewählt', 'Preisorientierung']));
+    expect(entries['Einmalige Erstellung']).toContain('Grundlage Ihrer Website: 990 €');
+    expect(entries['Einmalige Erstellung']).toContain('Erweiterte Umsetzung: 750 €');
+    expect(entries['Einmalige Erstellung']).toContain('Fotos Standard im Websiteprojekt: 520 €');
+    expect(entries['Einmalige Erstellung']).toContain('Anfahrt in Ihrer Region: enthalten');
+    expect(entries['Noch zu klären']).toContain('Kurzclip beim Fototermin: offen, Richtwert 390–490 €, kein Festpreis');
+    expect(entries['Noch zu klären']).toContain('Inhalte selbst pflegen: offen');
+    expect(entries['Laufende Kosten bei Ihren Anbietern']).toContain('Domain und Hosting: je nach Anbieter');
+    expect(entries['Summe Erstellung']).toBe('2.940 € + 2 offene Positionen. Kein vollständiger Gesamtpreis.');
+    expect(entries['Abgewählt']).toContain('Bestehende Website übernehmen');
+    expect(entries['Preisorientierung']).toBe('Unverbindliche Orientierung. Verbindlich ist das schriftliche Angebot. Gemäß § 19 UStG wird keine Umsatzsteuer berechnet. Katalog 2026-11-a.');
+    expect(entries['Zusammenstellung']).toBe('Automatische Empfehlung: Webbyu Complete');
+    expect(entries['Ort']).toBe('In der Region');
+  });
+
+  it('keeps unknown identifiers from the store out of the request and names the step to correct', () => {
+    store.update({ extensions: ['photos'], name: 'Ada', email: 'ada@example.com' });
+    next(); next();
+    next();
+    expect(container.textContent).toContain('Bitte prüfen Sie Ihre Angaben');
+    expect(container.querySelector('[data-action="fix"][data-field="extensions"]')!.textContent).toBe('Funktionen prüfen');
+    expect(container.querySelector('[data-summary]')).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(text('.finder-progress [aria-current="step"]')).toContain('Umfang');
+    store.update({ extensions: ['cms'], scope: 'huge' as never });
+    next();
+    expect(container.querySelector('[data-action="fix"][data-field="scope"]')).not.toBeNull();
+  });
+
+  it('posts the prices exactly as seen, with the catalog version, and only answers that apply', async () => {
+    fetchMock.mockResolvedValue(response({ status: 'success', requestId: id, duplicate: false }));
+    store.update({ mediaChoice: 'clip', mediaUse: ['social'], drone: true, sites: 'multipleSites', images: 'ready', imageSource: 'photo_standard', texts: 'notes', scope: 'extended', removedLines: ['text_notes', 'migration'] });
+    preview();
+    action('send').click();
+    await settle();
+    const request = posted();
+    expect(request).toEqual(JSON.parse(JSON.stringify({ ...requestBrief(store.get()), requestId: id, website: '' })));
+    expect(request).toMatchObject({ catalogVersion: '2026-11-a', mediaChoice: null, mediaUse: [], drone: false, sites: 'oneSite', imageSource: null, removedLines: ['text_notes'], zone: 'unknown' });
+    expect(request.shownLines.map(item => item.id)).toEqual(['base_start', 'concept', 'correction', 'golive', 'handover', 'scope_extended', 'clip_unknown', 'hosting', 'legal']);
+    expect(request.shownLines).toHaveLength(9); // the deselected text position is not among the shown ones
+    expect(request.shownLines[0]).toEqual({ id: 'base_start', status: 'fixed', min: 990, max: 990 });
+    expect(store.get().shownLines).toEqual(request.shownLines);
+    expect(store.get().catalogVersion).toBe('2026-11-a');
+  });
+
+  it.each(['start', 'business', 'complete', 'custom'] as const)('copies the %s briefing with prices and the notice on request only after the copy button is pressed', async selectedPackage => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
     store.update({ selectedPackage, name: 'Ada Beispiel', email: 'ada@example.com', description: 'Ein neuer Auftritt.' });
-    next(); next(); next(); next();
+    toResult(); next();
     expect(writeText).not.toHaveBeenCalled();
-    container.querySelector<HTMLButtonElement>('[data-action="copy"]')!.click();
+    action('copy').click();
     await Promise.resolve();
     expect(writeText).toHaveBeenCalledTimes(1);
-    expect(writeText.mock.calls[0][0]).toContain('Ihre Idee: Ein neuer Auftritt.');
-    expect(writeText.mock.calls[0][0]).toContain('Angebot: Angebot auf Anfrage');
-    expect(writeText.mock.calls[0][0]).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf/);
-    expect(writeText.mock.calls[0][0]).toContain('Vorschau – nichts versendet.');
+    const copied = writeText.mock.calls[0][0] as string;
+    expect(copied).toContain('Ihre Idee: Ein neuer Auftritt.');
+    expect(copied).toContain('Einmalige Erstellung: ');
+    expect(copied).toContain('Noch zu klären: ');
+    expect(copied).toContain('Laufende Kosten bei Ihren Anbietern: ');
+    expect(copied).toContain('Unverbindliche Orientierung. Verbindlich ist das schriftliche Angebot.');
+    expect(copied).toContain('Katalog 2026-11-a');
+    expect(copied).toContain('Vorschau – nichts versendet.');
     expect(container.querySelector('.finder-copy-status')!.textContent).toContain('wurde kopiert');
   });
 
-  it('retains a sales goal and scope exclusions when Complete is manually requested and copied', async () => {
+  it('retains a sales goal and the scope notice when Complete is manually requested and copied', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
-    store.update({ goal: 'sales', extensions: ['videos'], name: 'Ada', email: 'ada@example.com' });
-    next(); next(); next();
-    expect(container.querySelector<HTMLSelectElement>('[name="selectedPackage"]')!.value).toBe('custom');
-    expect(container.querySelector('.finder-recommendation')!.textContent).toContain('in keinem der drei Website-Pakete');
+    store.update({ goal: 'sales', extensions: ['cms'], name: 'Ada', email: 'ada@example.com' });
+    toResult();
+    expect(text('.finder-recommendation h4')).toBe('Individuell klären');
+    expect(text('.finder-recommendation')).toContain('Dafür gibt es keinen Pauschalumfang: Shop.');
+    expect(text('.finder-recommendation')).toContain('in keinem der drei Website-Pakete');
     change('selectedPackage', 'complete');
     expect(store.get().goal).toBe('sales');
-    expect(container.querySelector('.finder-scope-note')!.textContent).toContain('eigenes Angebot');
+    expect(text('.finder-hints')).toContain('Shops, komplexe Buchungen und individuelle Integrationen benötigen einen gesonderten Umfang und ein eigenes Angebot.');
+    expect(text('.finder-hints')).toContain('Außerhalb der drei Pakete liegt: Shop.');
+    expect(lineTexts()).toEqual(expect.arrayContaining(['Shop', 'Inhalte selbst pflegen']));
     next();
-    container.querySelector<HTMLButtonElement>('[data-action="copy"]')!.click();
+    action('copy').click();
     await Promise.resolve();
-    expect(writeText.mock.calls[0][0]).toContain('Paketwunsch: Webbyu Complete');
-    expect(writeText.mock.calls[0][0]).toContain('Angebot: Angebot auf Anfrage');
+    expect(writeText.mock.calls[0][0]).toContain('Zusammenstellung: Webbyu Complete');
     expect(writeText.mock.calls[0][0]).toContain('Shops, komplexe Buchungen');
     expect(writeText.mock.calls[0][0]).toContain('Produkte verkaufen');
+    expect(writeText.mock.calls[0][0]).toContain('Shop: offen');
   });
 
   it('keeps the briefing available when clipboard access is unavailable', async () => {
     vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('Denied')) } });
     store.update({ name: 'Ada Beispiel', email: 'ada@example.com' });
-    next(); next(); next(); next();
-    container.querySelector<HTMLButtonElement>('[data-action="copy"]')!.click();
+    toResult(); next();
+    action('copy').click();
     await Promise.resolve();
     expect(container.querySelector('[data-summary]')).not.toBeNull();
     const fallback = container.querySelector<HTMLTextAreaElement>('[data-focus="copy-fallback"]')!;
     expect(fallback.value).toContain('ada@example.com');
-    expect(fallback.value).toContain('Angebot: Angebot auf Anfrage');
-    expect(fallback.value).not.toMatch(/€|\bEUR\b|Preisentw[uü]rf|Steuerbasis|Planungsentwurf/);
+    expect(fallback.value).toContain('Summe Erstellung: ');
+    expect(fallback.value).toContain('Unverbindliche Orientierung.');
     expect(fallback.selectionStart).toBe(0);
     expect(fallback.selectionEnd).toBe(fallback.value.length);
     expect(document.activeElement).toBe(fallback);
@@ -231,7 +498,7 @@ describe('project finder', () => {
     action('send').click();
     action('send').dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(posted()).toEqual({ ...store.get(), requestId: id, website: '' });
+    expect(posted()).toEqual(JSON.parse(JSON.stringify({ ...requestBrief(store.get()), requestId: id, website: '' })));
     expect(action('send').disabled).toBe(true);
     expect(action('copy').disabled).toBe(false);
     expect(action('edit').disabled).toBe(false);
@@ -280,7 +547,7 @@ describe('project finder', () => {
     expect(action('edit').disabled).toBe(false);
     await vi.advanceTimersByTimeAsync(3_600_000);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    action('edit').click(); next(); next(); next();
+    action('edit').click(); toResult();
     expect(container.querySelector<HTMLInputElement>('[name="email"]')!.value).toBe(before.email);
     expect(container.textContent).toContain(message);
   });
@@ -309,7 +576,7 @@ describe('project finder', () => {
   it('keeps the same ID on manual retry and reverted contents, creates one for changed contents, and preserves uncertainty', async () => {
     fetchMock.mockImplementation(() => Promise.resolve(response({ status: 'temporary', outcome: 'unknown' }, 503)));
     preview(); action('send').click(); await settle();
-    action('edit').click(); next(); next(); next(); next();
+    action('edit').click(); toResult(); next();
     action('send').click(); await settle();
     expect(posted(1).requestId).toBe(id);
     store.update({ description: 'Andere Idee' });
@@ -349,7 +616,7 @@ describe('project finder', () => {
     let finish!: (value: Response) => void;
     fetchMock.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
     preview(); action('send').click();
-    action('edit').click(); next(); next();
+    action('edit').click(); toResult();
     change('description', 'Neue Angaben während der Übermittlung');
     const field = container.querySelector<HTMLTextAreaElement>('[name="description"]')!;
     field.focus(); field.setSelectionRange(5, 12, 'backward');
@@ -419,16 +686,20 @@ describe('project finder', () => {
 
   it('enforces field lengths before preview and retains the oversized draft for correction', () => {
     store.update({ name: 'Ada', email: 'ada@example.com', description: 'x'.repeat(5001) });
-    next(); next(); next();
+    toResult();
     const description = container.querySelector<HTMLTextAreaElement>('[name="description"]')!;
     expect(description.maxLength).toBe(5000);
     expect(description.value).toHaveLength(5001);
-    expect(document.activeElement).toBe(description);
-    expect(container.textContent).toContain('höchstens 5.000 Zeichen');
-    expect(fetchMock).not.toHaveBeenCalled();
-    change('description', 'Korrigiert'); next();
     expect(container.querySelector<HTMLInputElement>('[name="name"]')!.maxLength).toBe(120);
     expect(container.querySelector<HTMLInputElement>('[name="email"]')!.maxLength).toBe(254);
+    next();
+    expect(container.querySelector('[data-summary]')).toBeNull();
+    expect(document.activeElement).toBe(container.querySelector('[name="description"]'));
+    expect(container.textContent).toContain('höchstens 5.000 Zeichen');
+    expect(container.querySelector<HTMLTextAreaElement>('[name="description"]')!.value).toHaveLength(5001);
+    expect(fetchMock).not.toHaveBeenCalled();
+    change('description', 'Korrigiert'); next();
+    expect(container.querySelector('[data-summary]')).not.toBeNull();
   });
 
   it('keeps timeout unknown despite a late success and never schedules a retry', async () => {

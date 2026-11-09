@@ -68,10 +68,19 @@ try {
   r = await localFetch(base + '/api/inquiry.php');
   assert.equal(r.status, 405); assert.equal(r.headers.get('allow'), 'POST'); assert.equal(r.headers.get('cache-control'), 'no-store');
   assert.deepEqual(await r.json(), { status: 'invalid', fields: [] });
-  const payload = { requestId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', website: '', goal: 'inquiries', extensions: [], projectType: 'new', timing: 'flexible', description: '', name: 'Test', email: 'test@example.org', selectedPackage: null };
+  const payload = {
+    requestId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', website: '', goal: 'inquiries', extensions: [], projectType: 'new', timing: 'flexible', description: '', name: 'Test', email: 'test@example.org', selectedPackage: null,
+    scope: 'unknown', texts: 'unknown', images: 'unknown', imageSource: null, video: 'unknown', zone: 'unknown', mediaChoice: null, mediaUse: [], sites: 'oneSite', drone: false,
+    removedLines: [], catalogVersion: '2026-11-a', shownLines: [{ id: 'base_start', status: 'fixed', min: 990, max: 990 }],
+  };
   const options = { method: 'POST', headers: { Host: 'webbyu.de', Origin: 'https://webbyu.de', 'Content-Type': 'application/json' }, body: JSON.stringify(payload) };
   r = await localFetch(base + '/api/inquiry.php', options);
   assert.equal(r.status, 503); assert.deepEqual(await r.json(), { status: 'temporary', outcome: 'not_sent' });
+  // Unknown identifiers are rejected before any configuration or mail is touched.
+  r = await localFetch(base + '/api/inquiry.php', { ...options, body: JSON.stringify({ ...payload, shownLines: [{ id: 'unbekannt', status: 'fixed', min: 1, max: 1 }] }) });
+  assert.equal(r.status, 422); assert.deepEqual(await r.json(), { status: 'invalid', fields: ['shownLines'] });
+  r = await localFetch(base + '/api/inquiry.php', { ...options, body: JSON.stringify({ ...payload, extensions: ['photos'] }) });
+  assert.equal(r.status, 422); assert.deepEqual(await r.json(), { status: 'invalid', fields: ['extensions'] });
   r = await localFetch(base + '/api/inquiry.php', { ...options, body: 'x'.repeat(32769) });
   assert.equal(r.status, 413); assert.equal((await r.json()).status, 'invalid');
   r = await localFetch(base + '/api/inquiry.php', { ...options, headers: { ...options.headers, Origin: 'https://evil.example' } });
