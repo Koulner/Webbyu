@@ -59,6 +59,13 @@ function mockDemos() {
     mountDemoDialog,
   };
 }
+it('shows no counters, chapter numbers or all-caps labels, and the footer carries no second home link',()=>{
+  renderJourney(root);mount();
+  for(const gone of ['[data-scene-index]','[data-step-count]','.journey-chapter-number','.journey-facts']) expect(root.querySelector(gone)).toBeNull();
+  expect(root.textContent).not.toMatch(/\d\d ?\/ ?\d\d|VERBUNDENE|VORSCHAU ÖFFNEN|DER WEG VON|MEINE ARBEITSWEISE/);
+  expect(root.querySelector('.journey-footer a[href="/"]')).toBeNull();
+  expect([...root.querySelectorAll('.journey-footer a')].map(a=>a.textContent)).toEqual(['Impressum','Datenschutz']);
+});
 function mount(extra:Parameters<typeof mountJourney>[1]={}) {
   const demos=mockDemos();
   app=mountJourney(root,{loadScene:async()=>({initLandscape:()=>scene}),loadDemos:async()=>demos,...extra});
