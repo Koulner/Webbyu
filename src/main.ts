@@ -6,13 +6,15 @@ import './content.css';
 import './home.css';
 import './home-motion.css';
 import './ai-badge.css';
-import { extensions, packages, type DemoId, type PackageId } from './data';
-import { briefStore, type BriefStore } from './state';
+import './backside.css';
+import { extensions, goals, packages, type DemoId, type PackageId } from './data';
+import { briefStore, type BriefState, type BriefStore } from './state';
 import { mountJourneyPreview } from './journey-preview';
 import { mountFinder } from './finder';
 import { renderPage } from './shell';
 import { mountPrivacy } from './privacy';
 import { mountHomeMotion } from './home-motion';
+import { mountBackside } from './backside';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 type DemoModule = Pick<typeof import('./demos'), 'prepareDemo' | 'createDemo' | 'disposeDemo' | 'mountDemoDialog'>;
@@ -29,6 +31,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
   if (requestedPackage) store.update({ selectedPackage: requestedPackage });
   const mounts = renderPage(root);
   const motion = mountHomeMotion(root);
+  const backside = mountBackside(root);
   const privacy = mountPrivacy();
   const events = new AbortController();
   const listenerOptions = { signal: events.signal };
@@ -123,6 +126,13 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
     });
   }
   const unsubscribeExtensions = store.subscribe(state => syncExtensionButtons(state.extensions));
+  // Die Rückseite zeigt nur, was der Besucher selbst gewählt hat; sie füllt sich erst nach der ersten Antwort.
+  const notes = root.querySelector<HTMLElement>('[data-brief-notes]');
+  const unsubscribeNotes = store.subscribe((state: BriefState) => notes?.replaceChildren(...[
+    `Ziel: ${goals.find(goal => goal.id === state.goal)?.label ?? 'Fotos und Videos'}`,
+    state.selectedPackage && `Rahmen: ${packages.find(pkg => pkg.id === state.selectedPackage)?.name ?? 'Individuell klären'}`,
+    state.extensions.some(id => extensions.some(e => e.id === id)) && `Ergänzungen: ${state.extensions.flatMap(id => extensions.find(e => e.id === id)?.short ?? []).join(', ')}`,
+  ].filter((line): line is string => Boolean(line)).map(text => Object.assign(document.createElement('li'), { textContent: text }))));
   syncExtensionButtons(store.get().extensions);
   extensionButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -183,6 +193,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}) {
       disposed = true;
       events.abort();
       motion.dispose();
+      backside.dispose();
+      unsubscribeNotes();
       privacy.dispose();
       journeyPreview.dispose();
       demoDialog?.dispose();

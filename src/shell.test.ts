@@ -27,7 +27,7 @@ describe('page shell contract', () => {
     root.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(link => {
       if (link.hash) expect(root.querySelector(link.hash)).not.toBeNull();
     });
-    expect(root.querySelector('h1 em')?.textContent).toBe('Stark im Alltag.');
+    expect(root.querySelector('h1 em')?.textContent).toBe('Rückseite.');
     expect(root.querySelector('.hero-story')?.textContent).toContain('Bad Oldesloe');
     // The gallery is now the single collection, not duplicated as decorative demos.
     expect(root.querySelector('[data-preview]')).toBeNull();

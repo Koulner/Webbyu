@@ -1,10 +1,34 @@
-import { hofPlakat } from './package-demos/hof/feuer';
-import { packageDemoCards, packageDemos } from './package-demos/catalogue';
+import { packageDemos } from './package-demos/catalogue';
 import { businessNotice, concepts, extensions, packages, packageQuestions, scopeNotice, services, situations } from './data';
 import type { PageMounts } from './contracts';
 import { wordmarkImg } from './wordmark';
 
 const arrow = '<span aria-hidden="true">↗</span>';
+
+/** Rückseiten der fiktiven Paketbeispiele, entnommen aus ihren Nachweisblättern unter pilot/. */
+const sides = {
+  eiche: { path: 'demos/business/', name: 'Eiche &amp; Form', caption: 'Eiche &amp; Form · fiktive Tischlerei · Paket Business',
+    notes: [['Kundenfrage', '„Geht das bei meinem schiefen Raum überhaupt?“'], ['Leitidee', 'Die Schiefe ist der Anfang. Eine keilförmige Passleiste nimmt sie auf.'], ['Verworfen', '„Die Werkakte“: spricht nur Menschen mit genau diesem Raum an.'], ['Zielhandlung', 'Vier Maße eintragen, dann anfragen.']],
+    sketch: `<svg class="sketch" viewBox="0 0 400 260" role="img" aria-label="Skizze der schiefen Nische: oben 1.184, unten 1.207 Millimeter, rechts die keilförmige Passleiste."><path pathLength="1" class="thin" d="M110 30 V236 M276 30 V236"/><path pathLength="1" d="M122 44 L262 44 L276 222 L110 222 Z"/><path pathLength="1" class="fill" d="M262 44 L276 222 L262 222 Z"/><path pathLength="1" class="thin" d="M122 22 H262 M110 246 H276"/><text x="192" y="16">1.184 oben</text><text x="193" y="258">1.207 unten</text><text x="300" y="140" class="left">Passleiste</text><path pathLength="1" class="thin" d="M296 136 L272 136"/></svg>` },
+  klarblick: { path: 'demos/start/', name: 'Klarblick', caption: 'Klarblick · fiktive Fensterreinigung · Paket Start',
+    notes: [['Kundenfrage', '„Kommt ihr an mein schwieriges Fenster überhaupt dran?“'], ['Leitidee', 'Die Seite ist eine Hausfront. Jeder Fenstertyp ist ein eigener Abschnitt.'], ['Verworfen', '„Die Fensterliste“: zu wenig zum Erinnern, zu nah an Eiche &amp; Form.'], ['Zielhandlung', 'Das eigene Haus ankreuzen.']],
+    sketch: `<svg class="sketch" viewBox="0 0 400 260" role="img" aria-label="Skizze eines Giebels mit rundem Fenster in 7,40 Metern Höhe, erreichbar mit der Reinwasser-Stange."><path pathLength="1" d="M60 236 V120 L200 34 L340 120 V236"/><path pathLength="1" d="M200 79 a26 26 0 1 0 0.01 0 M200 79 V131 M174 105 H226"/><path pathLength="1" class="thin" d="M372 236 V105 M364 105 H380 M364 236 H380"/><text x="372" y="96">7,40 m</text><path pathLength="1" class="thin" d="M150 236 L188 126"/><text x="96" y="252" class="left">Reinwasser-Stange, 10 m</text></svg>` },
+  hof: { path: 'demos/complete/', name: 'Hof &amp; Flamme', caption: 'Hof &amp; Flamme · fiktives Restaurant · Paket Complete',
+    notes: [['Kundenfrage', '„Was bekomme ich, was kostet es, ist etwas frei?“'], ['Leitidee', 'Die Karte folgt einem Feuer, das kälter wird.'], ['Verworfen', '„Die lange Tafel“: zu nah an Klarblicks Hausfront.'], ['Zielhandlung', 'In zwei Sätzen einen Platz anfragen.']],
+    sketch: `<svg class="sketch" viewBox="0 0 400 260" role="img" aria-label="Skizze der fallenden Herdtemperatur: 430 Grad um 18:30, 260 um 19:45, 164 um 21:00, 110 um 22:15."><path pathLength="1" class="thin" d="M40 24 V226 H384"/><path pathLength="1" d="M52 40 C 120 120, 180 160, 250 186 S 350 210, 372 212"/><path pathLength="1" class="thin" d="M52 40 v6 M150 128 v6 M250 186 v6 M352 208 v6"/><text x="58" y="34" class="left">18:30 · 430 °C</text><text x="156" y="120" class="left">19:45 · 260 °C</text><text x="252" y="176" class="left">21:00 · 164 °C</text><text x="384" y="246">22:15 · 110 °C</text></svg>` },
+};
+type Side = typeof sides[keyof typeof sides];
+
+const flip = (caption: string) => `<figcaption><span>${caption}</span><button class="flip" type="button" aria-pressed="false">Rückseite zeigen</button></figcaption>`;
+const panel = (side: Side, base: string, hero = false) => `
+  <figure class="panel${hero ? ' panel--hero' : ''}" data-panel${hero ? ' data-hero' : ''}>
+    <div class="card">
+      <div class="face front"><div class="viewport" inert><iframe src="${base}${side.path}" title="${side.name}, fiktive Beispielwebsite" tabindex="-1" loading="lazy"></iframe></div><span class="face-tag">Vorderseite</span></div>
+      <div class="face back"><div class="back-notes"><p class="face-tag face-tag--back">Rückseite</p><dl>${side.notes.map(([term, text]) => `<dt>${term}</dt><dd>${text}</dd>`).join('')}</dl></div>${side.sketch}</div>
+      <span class="sheen" aria-hidden="true"></span>
+    </div>
+    ${flip(side.caption)}
+  </figure>`;
 
 /** Shared by the build and the browser fallback; no DOM access during rendering. */
 export function renderPageHtml(base: string): string {
@@ -34,42 +58,32 @@ export function renderPageHtml(base: string): string {
     </nav>
     <main id="main" tabindex="-1">
       <section id="hero-story" class="hero-story section-shell" aria-labelledby="hero-title">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Webdesign aus Bad Oldesloe · Für Unternehmen mit Persönlichkeit</p>
+        <canvas class="room-light" aria-hidden="true"></canvas>
         <div class="hero-layout">
           <div class="hero-copy">
-            <h1 id="hero-title">Klar im Auftritt.<br><em>Stark im Alltag.</em></h1>
-            <p class="hero-description">Ihr Unternehmen hat seinen eigenen Charakter. Ihre Website sollte ihn zeigen. Ich verbinde Gestaltung, Inhalte und hilfreiche Funktionen zu einem Auftritt, der zu Ihnen passt.</p>
-            <p class="hero-promise">Individuell gestaltet. Persönlich entwickelt.</p>
+            <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Lukas Wagner · Webdesign aus Bad Oldesloe</p>
+            <h1 id="hero-title">Jede Website hat eine <em>Rückseite.</em></h1>
+            <p class="hero-description">Ihre Kunden sehen die Vorderseite: Angebot, Bilder, Kontakt. Dahinter stehen die Fragen, die Ihr Unternehmen ausmachen, und die Entscheidungen, die daraus folgen. Ich gestalte beides, für jedes Unternehmen neu.</p>
             <div class="hero-actions">
-              <a class="button button--primary" href="#projektfinder">Ihr Projekt besprechen ${arrow}</a>
-              <a class="text-link" href="#arbeiten">Arbeiten entdecken <span aria-hidden="true">↓</span></a>
+              <a class="button button--primary" href="#projektfinder">Ihr Vorhaben durchdenken ${arrow}</a>
+              <a class="text-link" href="#arbeiten">Rückseiten ansehen <span aria-hidden="true">↓</span></a>
             </div>
           </div>
-          <div class="studio-stage" aria-label="Drei unterschiedliche Markenwelten als Konzeptstudien">
-            <span class="stage-orbit" aria-hidden="true"></span>
-            <span class="stage-caption">GESTALTUNG, DIE ZU IHNEN PASST.</span>
-            <a class="stage-piece stage-piece--wood" href="${base}demos/business/" aria-label="Eiche & Form: Business-Demo entdecken">
-              <span class="stage-piece-top">EICHE & FORM <span aria-hidden="true">↗</span></span>
-              <img src="${base}package-demos/eiche-fall14-breit.webp" alt="Entwurfsvisualisierung einer Garderobe aus Eiche in einer Altbaunische" width="1600" height="1000" fetchpriority="high">
-              <span class="stage-piece-title">Gerade Möbel für<br><em>schiefe Häuser.</em></span><span class="stage-piece-bottom">01 — TISCHLEREI / BUSINESS</span>
-            </a>
-            <a class="stage-piece stage-piece--clear" href="${base}demos/start/" aria-label="Klarblick: Start-Demo entdecken"><span class="stage-piece-top">klarblick <span aria-hidden="true">↗</span></span><span class="clear-window" aria-hidden="true"></span><strong>Dieses eine<br>Fenster.</strong><span class="stage-piece-bottom">02 — FENSTERREINIGUNG / START</span></a>
-            <a class="stage-piece stage-piece--food" href="${base}demos/complete/" aria-label="Hof & Flamme: Complete-Demo entdecken">${hofPlakat()}<span class="stage-piece-top">HOF & FLAMME <span aria-hidden="true">↗</span></span><span class="stage-piece-title">Wir kochen,<br>bis das Feuer<br>aus ist.</span><span class="stage-piece-bottom">03 — RESTAURANT / COMPLETE</span></a>
-            <span class="stage-stamp" aria-hidden="true">Für Ihren<br><em>eigenen</em><br>Auftritt. ↗</span>
-            <p class="stage-footnote">Drei fiktive Marken. Drei eigene Welten.</p>
-          </div>
+          ${panel(sides.eiche, base, true)}
         </div>
         <div class="hero-bottom"><p><span class="status-dot" aria-hidden="true"></span> Lukas Wagner · Konzept, Gestaltung & Entwicklung</p><button type="button" class="motion-control" aria-pressed="false" hidden><span aria-hidden="true">◉</span><span data-motion-label>Bewegung reduzieren</span></button><span>Bad Oldesloe · Stormarn · Hamburg <span aria-hidden="true">↘</span></span></div>
       </section>
 
       <section id="arbeiten" class="work-section" aria-labelledby="work-title" aria-describedby="gallery-disclaimer">
         <div class="section-shell">
-          <div class="section-kicker"><span>01 / AUSGEWÄHLTE KONZEPTSTUDIEN</span><span>Drei Pakete. Drei vollständige Websites.</span></div>
+          <div class="section-kicker"><span>01 / DREI BEISPIELE</span><span>Erfundene Unternehmen. Echte Arbeitsweise.</span></div>
           <div class="section-heading gallery-heading">
-            <h2 id="work-title">So unterschiedlich wie<br><em>Ihr Unternehmen.</em></h2>
-            <p>Vom klaren Unternehmensauftritt bis zur eigenen Markenwelt: Entdecken Sie drei vollständige Beispielwebsites und finden Sie den passenden Einstieg für Ihr Vorhaben.</p>
+            <h2 id="work-title">Drei Unternehmen.<br><em>Drei Rückseiten.</em></h2>
+            <p>Auf jeder Rückseite steht, von welcher Kundenfrage die Gestaltung ausgeht und welche Richtung dafür verworfen wurde.</p>
           </div>
-          ${packageDemoCards(base)}
+          <article class="side-row">${panel(sides.klarblick, base)}<div class="side-copy"><h3>Ein Haus voller Fenster.</h3><p><b>Vorne</b> sehen Besucher ihr eigenes Haus wieder: das runde Fenster im Giebel, das über der Treppe.</p><p><b>Hinten</b> steht, warum: Die Höhe ist das eigentliche Problem, und eine Seite wird von oben nach unten gelesen.</p><a class="text-link" href="${base}demos/start/">Klarblick ansehen ${arrow}</a></div></article>
+          <article class="side-row side-row--flip">${panel(sides.hof, base)}<div class="side-copy"><h3>Ein Abend am Feuer.</h3><p><b>Vorne</b> läuft die Karte in der Reihenfolge, in der der Herd abkühlt.</p><p><b>Hinten</b> ordnet eine einzige Kurve Gänge, Schriftgröße und Papierfarbe.</p><a class="text-link" href="${base}demos/complete/">Hof &amp; Flamme ansehen ${arrow}</a></div></article>
+          <article class="side-row"><figure class="panel panel--yours" data-panel><div class="card"><div class="face front"><div class="blank" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></div><span class="face-tag">Ihre Vorderseite</span></div><div class="face back"><div class="back-notes"><p class="face-tag face-tag--back">Ihre Rückseite</p><dl><dt>Kundenfrage</dt><dd>Noch offen.</dd><dt>Leitidee</dt><dd>Entsteht aus Ihrem Unternehmen.</dd><dt>Zielhandlung</dt><dd>Beginnt mit Ihrer ersten Antwort.</dd></dl></div></div><span class="sheen" aria-hidden="true"></span></div>${flip('Ihr Unternehmen')}</figure><div class="side-copy"><h3>Und Ihre?</h3><p>Eine Vorlage hätte vorne schon alles fertig. Bei Ihnen beginnt die Arbeit hinten: mit dem, was Ihre Kunden fragen, und dem, was nach dem Klick bei Ihnen passiert.</p><a class="text-link" href="#projektfinder">Mit Ihrer Rückseite beginnen <span aria-hidden="true">↓</span></a></div></article>
           <details class="studio-lab"><summary><span><span class="lab-label">DAS WEBBYU LABOR</span><strong>Was kann eine Website noch?</strong><span class="lab-description">Auswahlhilfen, Shops und räumliche Erlebnisse ausprobieren.</span></span><span class="lab-toggle" aria-hidden="true">+</span></summary><div class="studio-lab-content"><p>Die Reise verbindet die drei Paketbeispiele mit zwei zusätzlichen Funktionsstudien für Shops und besondere Interaktionen. Diese Erweiterungen werden gesondert angeboten.</p>
           <div id="journey-preview" class="journey-embed" role="region" aria-label="Die Reise – interaktive Vorschau">
             <div class="journey-embed-bar">
@@ -100,6 +114,20 @@ export function renderPageHtml(base: string): string {
           <p>Was soll für Ihre Kunden leichter werden? Eine Website erklärt Ihr Angebot, beantwortet Fragen und bereitet Entscheidungen vor. Deshalb beginnt meine Arbeit mit Ihrem Unternehmen.</p>
         </div>
         <div class="approach-intro"><p>Vielleicht finden Kunden nicht die passende Leistung. Vielleicht fehlen bei Anfragen immer dieselben Angaben. Oder Sie übertragen Informationen mehrmals von Hand.</p><p>Ich kläre mit Ihnen, wo es hakt. Daraus entsteht ein Auftritt mit den Funktionen, die für Ihre Aufgabe sinnvoll sind — vom verständlichen Unternehmensauftritt bis zum angebundenen Shop.</p></div>
+        <div class="layers">
+          <div class="stack-wrap" aria-hidden="true"><div class="stack">
+            <div class="layer" style="--i:3"><span class="layer-tag">04 Betrieb</span><div class="l-run"><b>ihre-firma.de</b><i>Domain: auf Ihren Namen</i><i>Hosting: Ihr Vertrag</i><i>Übergabe: Dateien &amp; Zugänge</i></div></div>
+            <div class="layer" style="--i:2"><span class="layer-tag">03 Funktion</span><div class="l-func"><i></i><i></i><i class="short"></i><b>Anfrage vorbereiten</b></div></div>
+            <div class="layer" style="--i:1"><span class="layer-tag">02 Gestaltung</span><div class="l-look"><b></b><i></i><i></i><i></i></div></div>
+            <div class="layer" style="--i:0"><span class="layer-tag">01 Inhalt</span><div class="l-text"><b></b><i></i><i></i><i class="short"></i><i></i><i class="short"></i></div></div>
+          </div></div>
+          <ol class="layer-list">
+            <li><span>01 Inhalt</span><p>Was fragen Ihre Kunden, bevor sie anrufen?</p></li>
+            <li><span>02 Gestaltung</span><p>Woran erkennt man Sie, wenn Ihr Logo fehlt?</p></li>
+            <li><span>03 Funktion</span><p>Welche Angabe fehlt Ihnen bei Anfragen immer wieder?</p></li>
+            <li><span>04 Betrieb</span><p>Wem gehört die Domain? <b>Ihnen.</b></p></li>
+          </ol>
+        </div>
         <div class="situation-heading"><span>KENNEN SIE DAS?</span><p>Drei typische Ausgangspunkte — und was daraus werden kann.</p></div>
         <div class="situation-list">${situations.map((situation, index) => `
           <details class="situation" ${index === 0 ? 'open' : ''}>
@@ -185,6 +213,7 @@ export function renderPageHtml(base: string): string {
               <p class="finder-assurance">${businessNotice}</p>
               <p class="finder-local-note">Der Projektfinder hilft Ihnen, Ihre Wünsche zusammenzustellen. Sie können die Zusammenfassung kopieren und mich direkt kontaktieren.</p>
               <p class="finder-contact-note">Bad Oldesloe, Stormarn & Hamburg.<br>Persönliche Gespräche bei Ihnen nach Vereinbarung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
+            <div class="finder-back"><p class="face-tag face-tag--back">Ihre Rückseite · Notizen</p><ol class="brief-notes" data-brief-notes><li class="is-empty">Noch leer. Ihre Antworten im Projektberater erscheinen hier als Notizen.</li></ol><p class="brief-local">Ihre Angaben bleiben auf Ihrem Gerät, bis Sie sie selbst weitergeben.</p></div>
             </div>
             <div id="finder-mount"></div>
           </div>
