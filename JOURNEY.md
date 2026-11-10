@@ -4,24 +4,16 @@
 
 Nutzerentscheidungen vom 9. und 10. November 2026 ersetzen die räumliche Landschaft und gehen den älteren Punkten unten vor:
 
-- Die Reise zeigt **ein einziges Bild, das mit jeder Station weiter wächst** (`src/journey/scene.ts`). Keine Station kehrt zu einer früheren Form zurück:
-  - Übersicht: drei sich überschneidende Kreise für Inhalt, Gestaltung und Funktion.
-  - Die Idee: eine Website-Skizze aus Linien.
-  - Das Fundament: drei Ebenen.
-  - Projektstationen: das Projektbild in voller Schärfe.
-  - Der nächste Abschnitt: Collage aller fünf Projekte mit leerem Rahmen „Ihr Projekt“.
-- **Jede Station hat ihren eigenen Übergang** (Nutzerentscheidung 10. November 2026: „jedes mal dieselbe transformation für ganz unterschiedliche dinge … trifft nicht unser kernkonzept“; die große Ansammlung heller Funken störte). Das Verglühen in Funken ist ersatzlos entfernt. Die einzelnen Übergänge sind ein Vorschlag, die gestalterische Freigabe gibt der Nutzer:
-  - Die Idee: die Skizze entsteht von oben links, wie mit dem Stift gezogen.
-  - Das Fundament: Ebene für Ebene von unten.
-  - Klarblick (Fensterreinigung): ein gerader Zug mit dem Abzieher von oben, scharfe Kante.
-  - Eiche & Form (Tischlerei): ein Hobelzug von links, die Kante folgt der Maserung.
-  - Hof & Flamme (Restaurant): das Bild breitet sich von einer Flamme unten in der Mitte aus, mit warmem Schein am Rand.
-  - Safran Atelier (von der Blüte zum Faden): Faden für Faden von oben.
-  - Raumgut (Sortiment zur Auswahl): das ganze Bild wird aus der Unschärfe scharf.
-  - Der nächste Abschnitt: ein Projekt nach dem anderen, zuletzt der leere Rahmen.
-  Rückwärts läuft der Übergang der verlassenen Station umgekehrt. Ohne WebGL zeigt die Vektordarstellung die Stationen ohne Übergang.
+- **Prototyp „verwandelnde Masse“** (Nutzeridee 10. November 2026, ersetzt das wachsende Bild in `src/journey/scene.ts`): Im Zentrum steht eine graue, formlose Masse, die sich beim Scrollen verwandelt. Ein einziges Netz (Ikosaeder-Kugel, ein Draw-Call); der Vertex-Shader bildet die Kugelrichtung auf Gestalt A und B ab und mischt beide entlang einer Front, die aus dem Inhalt der Zielstation kommt. Die Kamera fährt über alle neun Positionen (Übersicht und acht Stationen), gedämpft und ohne Schnitt. Gestalt, Material und Front sind ein Vorschlag, die gestalterische Freigabe gibt der Nutzer:
+  - Übersicht: graue, weiche, leicht asymmetrische Masse, seidenmatt.
+  - Klarblick: ein gerader Abzieherzug von oben zieht die Masse zur ebenen, klaren Scheibe; vor der Kante staut sie sich wie Wasser. Glas mit Spiegelstreifen, lässt den Seitengrund durchscheinen. Kamera fast frontal.
+  - Eiche & Form: ein Hobelzug von links schneidet einen exakten Korpus, dessen Oberkante einer schiefen Linie folgt; Eichenmaserung aus Rauschen im Objektraum, Tür- und Sockelfuge, matt. Kamera schräg von oben.
+  - Hof & Flamme: Wärme steigt von unten durch die Masse; sie streckt sich zu einer Flamme mit drei aufsteigenden Zungen, innen warm glühend. Kamera auf Tischhöhe, leicht von unten.
+  - Die Idee, Das Fundament, Safran Atelier, Raumgut und Der nächste Abschnitt zeigen im Prototyp die formlose Masse mit eigenem Rauschen. Eigene Gestalten für sie sind vorgeschlagen und folgen erst nach Freigabe.
+  Unterwegs wird die Masse kurz flüssig, am stärksten an der Front; wo die Front vorbei ist, setzt sie sich. Rückwärts läuft die Verwandlung der verlassenen Station umgekehrt. Ohne WebGL zeigt die Vektordarstellung die Stationen ohne Übergang.
+- **Jede Station hat ihre eigene Verwandlung** (Nutzerentscheidung 10. November 2026: „jedes mal dieselbe transformation für ganz unterschiedliche dinge … trifft nicht unser kernkonzept“). Abgelehnt und entfernt: Wischen, Unschärfe und Linien als Übergang, die große Wolke heller Funken, dieselbe Transformation für alle Stationen.
 - **Netzwerkkarte, Stationsmarker und Bildkarte** sind im WebGL-Betrieb ausgeblendet. Stationen bleiben über die untere Navigation, Zurück/Weiter und die Textspalte erreichbar. Live-Demos laden erst über „Konzept ausprobieren“.
-- **Ruhe zwischen den Stationen** (Nutzerentscheidung 10. November 2026, die Reise wirkte überreizt): Es bewegt sich nur der Übergang beim Weiterreisen, gebunden an Scrollen oder Stationswechsel, eine Bewegung zur Zeit. Keine Dauerschleife, kein Pulsieren, keine losen Funken; die Darstellungsschleife endet, sobald eine Station erreicht ist. Ein Sprung über mehrere Stationen wechselt einmal von der sichtbaren Station direkt zur Zielstation.
+- **Ruhe zwischen den Stationen** (Nutzerentscheidung 10. November 2026, die Reise wirkte überreizt): Es bewegt sich nur der Übergang beim Weiterreisen, gebunden an Scrollen oder Stationswechsel, eine Bewegung zur Zeit. Keine Dauerschleife, kein Pulsieren, keine losen Funken, keine selbstlaufende Zeit im Shader; alles Bewegte ist eine Funktion des Fortschritts, und die Darstellungsschleife endet, sobald eine Station erreicht ist. Ein Sprung über mehrere Stationen verwandelt einmal von der sichtbaren Gestalt direkt zur Zielgestalt, auch die Kamera.
 - **Die Animation ist immer sichtbar:** Text liegt mit transparentem oder halbtransparentem Hintergrund davor, auch mobil.
 - Keine Blume des Lebens und keine anderen esoterischen Bilder oder Begriffe (Nutzerkorrektur 10. November 2026).
 

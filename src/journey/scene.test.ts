@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { initLandscape, TRANSITIONS } from './scene';
+import { FORMS, initLandscape } from './scene';
 import { renderJourney } from './page';
 import { stations } from './data';
 
@@ -41,7 +41,10 @@ beforeEach(()=>{
 afterEach(()=>{controller?.dispose();controller=undefined;document.body.replaceChildren();vi.restoreAllMocks();vi.unstubAllGlobals();});
 const flush=()=>{elapsed+=16;const pending=[...frames.values()];frames.clear();pending.forEach(callback=>callback(elapsed));};
 
-describe('journey picture element',()=>{
+type Blob=import('three').Mesh<import('three').BufferGeometry,import('three').ShaderMaterial>;
+const piece=()=>(gpu.render.mock.lastCall![0] as import('three').Scene).children[0] as Blob;
+
+describe('journey transforming mass',()=>{
   it('renders as decoration, replaces the network map and disposes the canvas once',()=>{
     controller=initLandscape(map);
     expect(map.dataset.render).toBe('material');
@@ -78,26 +81,35 @@ describe('journey picture element',()=>{
     expect(frames.size).toBe(0);
   });
 
-  it('gives every station its own transition',()=>{
-    const modes=stations.map(station=>TRANSITIONS.indexOf(station.id));
-    expect(modes.every(mode=>mode>=0)).toBe(true);
-    expect(new Set(modes).size).toBe(stations.length);
+  it('gives Klarblick, Eiche & Form and Hof & Flamme their own form on one mesh',()=>{
+    const forms=['klarblick','eiche-und-form','hof-und-flamme'].map(id=>FORMS[id]);
+    expect(forms.every(form=>form>0)).toBe(true);
+    expect(new Set(forms).size).toBe(3);
+    expect(Object.keys(FORMS).every(id=>stations.some(station=>station.id===id))).toBe(true);
+    controller=initLandscape(map);
+    controller.setProgress(3,true);flush();
+    expect(piece().material.uniforms.uFormA.value).toBe(FORMS['eiche-und-form']);
+    expect(piece().geometry.index).not.toBeNull();
+    // The shader deforms the sphere far beyond its bounds.
+    expect(piece().frustumCulled).toBe(false);
   });
 
   it('changes once from the visible station to the target when jumping over several stations',()=>{
     controller=initLandscape(map);
-    const uniforms=()=>((gpu.render.mock.lastCall![0] as import('three').Scene).children[0] as import('three').Mesh<import('three').PlaneGeometry,import('three').ShaderMaterial>).material.uniforms;
+    const uniforms=()=>piece().material.uniforms;
     controller.setProgress(1,true);flush();
-    const fundament=uniforms().uTexA.value;
-    controller.setProgress(6,true);flush();
+    const fundament=uniforms().uSeedA.value;
+    controller.setProgress(4,true);flush();
     controller.setProgress(0);
-    const seen=new Set<unknown>(), modes=new Set<number>();
-    // At rest uTexB already holds the next station, so only frames of the running transition count.
-    for(let i=0;i<400&&frames.size;i++){flush();if(frames.size){seen.add(uniforms().uTexA.value);seen.add(uniforms().uTexB.value);modes.add(uniforms().uMode.value);}}
+    const seeds=new Set<number>(), fronts=new Set<number>();
+    // At rest form B already holds the next station, so only frames of the running transition count.
+    for(let i=0;i<400&&frames.size;i++){flush();if(frames.size){seeds.add(uniforms().uSeedA.value);seeds.add(uniforms().uSeedB.value);fronts.add(uniforms().uFormB.value);}}
     expect(frames.size).toBe(0);
-    expect(seen.has(fundament)).toBe(false);
-    // Backwards the transition of the station being left runs in reverse.
-    expect([...modes]).toEqual([TRANSITIONS.indexOf('raumgut')]);
+    expect(seeds.has(fundament)).toBe(false);
+    expect(seeds.size).toBe(2);
+    // Backwards the transition of the station being left (Hof & Flamme) runs in reverse.
+    expect([...fronts]).toEqual([FORMS['hof-und-flamme']]);
+    expect(uniforms().uT.value).toBe(0);
   });
 
   it('stops work when disabled, offscreen or hidden; reduced motion jumps without animation',()=>{
