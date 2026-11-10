@@ -1,4 +1,4 @@
-import { AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, DataTexture, Group, Mesh, PerspectiveCamera, PlaneGeometry, Points, Scene, ShaderMaterial, Texture, WebGLRenderer } from 'three';
+import { BufferAttribute, BufferGeometry, CanvasTexture, DataTexture, Group, Mesh, PerspectiveCamera, PlaneGeometry, Points, Scene, ShaderMaterial, Texture, WebGLRenderer } from 'three';
 import flower from '../assets/demos/saffron/flower.webp';
 import { stations } from './data';
 import type { LandscapeController } from './controller';
@@ -6,7 +6,8 @@ import type { LandscapeController } from './controller';
 /**
  * Ein einziges Element, das mit jeder Station weiter wächst: Glutball, Skizze, Ebenen, fünf fertige Websites und
  * am Ende alle Projekte zusammen mit einem leeren Rahmen für das nächste. Beim Weiterreisen verglüht es von unten nach
- * oben zu Funken und setzt sich zur nächsten Form zusammen. Lose Funken folgen dem Luftzug des Zeigers.
+ * oben zu Funken und setzt sich zur nächsten Form zusammen. Bewegung gibt es nur beim Weiterreisen; zwischen den Stationen
+ * ruht das Element.
  */
 const IMAGES: Record<string, string> = {
   klarblick: 'package-demos/klarblick-concept.webp',
@@ -16,7 +17,7 @@ const IMAGES: Record<string, string> = {
 };
 const WIDTH = 3.2, HEIGHT = 2;
 /** `soft`: die Form besteht in Ruhe aus Funken (Glutball, Ebenen); sonst zeigt eine scharfe Bildfläche das Projekt. */
-type Shape = { position: Float32Array; color: Float32Array; soft: number; tint: number[]; texture?: Texture };
+type Shape = { position: Float32Array; color: Float32Array; soft: number; texture?: Texture };
 
 /** Glutball: dichter, heißer Kern, nach außen dünner und röter. */
 function emberBall(count: number): Shape {
@@ -27,7 +28,7 @@ function emberBall(count: number): Shape {
     const heat = 1 - r / .8;
     color.set([1, .4 + heat * .5, .1 + heat * .6], i * 3);
   }
-  return { position, color, soft: 1, tint: [1, .6, .25] };
+  return { position, color, soft: 1 };
 }
 
 /** Idee: eine Website als Skizze aus Funkenlinien (Rahmen, Kopfzeile, Überschrift, Text, Bildfeld, Knopf). */
@@ -52,7 +53,7 @@ function sketch(count: number): Shape {
     const warm = Math.random();
     color.set([1, .62 + warm * .25, .28 + warm * .3], i * 3);
   }
-  return { position, color, soft: 1, tint: [1, .7, .35] };
+  return { position, color, soft: 1 };
 }
 
 /** Fundament: drei Ebenen für Inhalt, Gestaltung und Funktion. */
@@ -64,7 +65,7 @@ function layers(count: number): Shape {
     position.set([x - layer * .18, (layer - 1) * .55, z], i * 3);
     color.set(tones[layer], i * 3);
   }
-  return { position, color, soft: 1, tint: [.8, .9, .7] };
+  return { position, color, soft: 1 };
 }
 
 /** Bild: scharfe Textur für die Ruhe, ein Punktraster derselben Ansicht für das Verglühen. */
@@ -79,7 +80,7 @@ function picture(image: HTMLImageElement | HTMLCanvasElement, cols: number, rows
   const context = small.getContext('2d', { willReadFrequently: true })!;
   context.drawImage(sharp, 0, 0, cols, rows);
   const pixels = context.getImageData(0, 0, cols, rows).data;
-  const position = new Float32Array(cols * rows * 3), color = new Float32Array(cols * rows * 3), sum = [0, 0, 0];
+  const position = new Float32Array(cols * rows * 3), color = new Float32Array(cols * rows * 3);
   for (let i = 0; i < cols * rows; i++) {
     const x = i % cols, y = Math.floor(i / cols);
     // Durchsichtige Stellen (Lücken der Collage) verglühen als schwache Glut statt als schwarze Punkte.
@@ -87,10 +88,8 @@ function picture(image: HTMLImageElement | HTMLCanvasElement, cols: number, rows
     const r = pixels[i * 4] / 255 * alpha + (1 - alpha) * .5, g = pixels[i * 4 + 1] / 255 * alpha + (1 - alpha) * .22, b = pixels[i * 4 + 2] / 255 * alpha + (1 - alpha) * .08;
     position.set([(x / (cols - 1) - .5) * WIDTH, (.5 - y / (rows - 1)) * HEIGHT, 0], i * 3);
     color.set([r, g, b], i * 3);
-    sum[0] += r; sum[1] += g; sum[2] += b;
   }
-  const peak = Math.max(...sum, 1e-6);
-  return { position, color, soft: 0, tint: sum.map(value => value / peak), texture: new CanvasTexture(sharp) };
+  return { position, color, soft: 0, texture: new CanvasTexture(sharp) };
 }
 
 /** Ende der Reise: alle Projekte nebeneinander und ein glimmender leerer Rahmen für das nächste. */
@@ -129,26 +128,20 @@ const burnTiming = `
 
 const emberVertex = `
   attribute vec3 positionB; attribute vec3 colorA; attribute vec3 colorB; attribute vec2 cell;
-  uniform float uT; uniform float uSize; uniform float uTime; uniform float uSoftA; uniform float uSoftB; uniform vec2 uGrid;
+  uniform float uT; uniform float uSize; uniform float uSoftA; uniform float uSoftB; uniform vec2 uGrid;
   varying vec3 vColor; varying float vBurn; varying float vSoft; varying float vVisible;
   ${burnTiming}
   void main(){
     float seed = hash(cell);
     float t = burnAt(cell, uGrid, uT);
     float burn = sin(t * 3.14159);
-    // Glutball und Ebenen drehen sich langsam, damit sie leben.
-    float spin = uTime * .3;
-    mat2 turn = mat2(cos(spin), -sin(spin), sin(spin), cos(spin));
-    vec3 a = position, b = positionB;
-    a.xz = mix(a.xz, turn * a.xz, uSoftA);
-    b.xz = mix(b.xz, turn * b.xz, uSoftB);
-    vec3 drift = vec3(sin(seed * 41. + uTime * 1.3 + a.y * 3.), 1.6 + seed, cos(seed * 23. + uTime)) * burn * (.35 + seed * .5);
-    vec3 p = mix(a, b, t * t * (3. - 2. * t)) + drift;
+    // Die Flugbahn hängt nur vom Fortschritt ab: Zurückscrollen zeigt dasselbe Bild.
+    vec3 drift = vec3(sin(seed * 41. + position.y * 3.), 1.6 + seed, cos(seed * 23.)) * burn * (.35 + seed * .5);
+    vec3 p = mix(position, positionB, t * t * (3. - 2. * t)) + drift;
     vec4 mv = modelViewMatrix * vec4(p, 1.);
     gl_Position = projectionMatrix * mv;
     vSoft = t < .5 ? uSoftA : uSoftB;
-    float flicker = mix(1., .65 + .35 * sin(uTime * 5. + seed * 40.), vSoft);
-    gl_PointSize = uSize * (1. + burn * 1.6) * (1. + vSoft * .8) * flicker * (7.5 / -mv.z);
+    gl_PointSize = uSize * (1. + burn * 1.6) * (1. + vSoft * .8) * (7.5 / -mv.z);
     // Funken leuchten in den Farben der jeweiligen Vorschau, mit einem Rest warmer Glut.
     vec3 base = mix(colorA, colorB, t);
     vec3 glow = mix(base / max(max(base.r, base.g), max(base.b, .2)), vec3(1., .55 + seed * .2, .2), .22);
@@ -185,22 +178,6 @@ const pictureFragment = `
     gl_FragColor = color;
   }`;
 
-const sparkVertex = `
-  attribute float seed; uniform float uTime; uniform float uSize; varying float vSeed; varying float vFlicker;
-  void main(){
-    vec4 mv = modelViewMatrix * vec4(position, 1.);
-    gl_Position = projectionMatrix * mv;
-    vFlicker = .55 + .45 * sin(uTime * (2.5 + seed * 5.) + seed * 30.);
-    vSeed = seed;
-    gl_PointSize = uSize * (.5 + seed) * vFlicker * (7.5 / -mv.z);
-  }`;
-const sparkFragment = `
-  uniform vec3 uTint; varying float vSeed; varying float vFlicker;
-  void main(){
-    float glow = smoothstep(.5, 0., length(gl_PointCoord - .5));
-    vec3 warm = mix(vec3(1., .42, .1), vec3(1., .85, .5), vSeed);
-    gl_FragColor = vec4(mix(warm, uTint, .45) * glow, glow * vFlicker);
-  }`;
 
 export function initLandscape(container: HTMLElement): LandscapeController {
   const host = container.querySelector<HTMLElement>('.journey-webgl')!;
@@ -212,8 +189,9 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   const disposers: (() => void)[] = [];
   let renderer: WebGLRenderer | undefined;
   let disposed = false, enabled = true, visible = true;
-  let frame = 0, lastTime = 0, current = -1, target = -1, pair = '', halfWidth = 4, halfHeight = 2.2, pixelsPerUnit = 200;
-  let pointerX = 99, pointerY = 99, pointerTime = 0, windX = 0, windY = 0;
+  let frame = 0, lastTime = 0, current = -1, target = -1, halfWidth = 4, halfHeight = 2.2, pixelsPerUnit = 200;
+  // Ein Sprung über mehrere Stationen verglüht nur einmal: von der sichtbaren Form (leap) direkt zur Zielform.
+  let pairA: Shape | undefined, pairB: Shape | undefined, leap: Shape | undefined, leapAt = 0, leapForward = true;
 
   const ball = emberBall(count), idea = sketch(count), base = layers(count);
   const shapes: Shape[] = stations.map(station => station.id === 'die-idee' ? idea : station.id === 'das-fundament' ? base : ball);
@@ -231,7 +209,7 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   geometry.setAttribute('cell', new BufferAttribute(cells, 2));
   const grid = { value: [cols, rows] };
   const progress = { value: 0 };
-  const uniforms = { uT: progress, uGrid: grid, uSize: { value: 4 }, uTime: { value: 0 }, uSoftA: { value: 1 }, uSoftB: { value: 1 } };
+  const uniforms = { uT: progress, uGrid: grid, uSize: { value: 4 }, uSoftA: { value: 1 }, uSoftB: { value: 1 } };
   const material = new ShaderMaterial({ uniforms, vertexShader: emberVertex, fragmentShader: emberFragment, transparent: true, depthWrite: false });
   const embers = new Points(geometry, material);
   embers.renderOrder = 1;
@@ -242,41 +220,13 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   const piece = new Group();
   piece.add(plane, embers);
 
-  const sparkCount = compact ? 140 : 380;
-  const sparkPosition = new Float32Array(sparkCount * 3), sparkVelocity = new Float32Array(sparkCount * 3);
-  const sparkSeeds = new Float32Array(sparkCount).map(() => Math.random());
-  for (let i = 0; i < sparkCount; i++) sparkPosition.set([(Math.random() * 2 - 1) * 4, (Math.random() * 2 - 1) * 2.4, -2 + Math.random() * 3.4], i * 3);
-  const sparkGeometry = new BufferGeometry();
-  sparkGeometry.setAttribute('position', new BufferAttribute(sparkPosition, 3));
-  sparkGeometry.setAttribute('seed', new BufferAttribute(sparkSeeds, 1));
-  const sparkUniforms = { uTime: { value: 0 }, uSize: { value: 6 }, uTint: { value: [1, .6, .25] } };
-  const sparkMaterial = new ShaderMaterial({ uniforms: sparkUniforms, vertexShader: sparkVertex, fragmentShader: sparkFragment, transparent: true, depthWrite: false, blending: AdditiveBlending });
-  const sparks = new Points(sparkGeometry, sparkMaterial);
-
-  function drift(step: number, time: number) {
-    const fade = Math.exp(-3 * step), drag = Math.exp(-1.8 * step);
-    windX *= fade; windY *= fade;
-    for (let i = 0; i < sparkCount; i++) {
-      const k = i * 3, dx = sparkPosition[k] - pointerX, dy = sparkPosition[k + 1] - pointerY;
-      const gust = .3 + 3 * Math.exp(-(dx * dx + dy * dy) * .9);
-      sparkVelocity[k] = (sparkVelocity[k] + (windX * gust + Math.sin(time * .7 + sparkSeeds[i] * 20) * .08) * step) * drag;
-      sparkVelocity[k + 1] = (sparkVelocity[k + 1] + (windY * gust + .25 + sparkSeeds[i] * .2) * step) * drag;
-      sparkPosition[k] += sparkVelocity[k] * step;
-      sparkPosition[k + 1] += sparkVelocity[k + 1] * step;
-      if (sparkPosition[k + 1] > halfHeight + .4) { sparkPosition[k + 1] = -halfHeight - .3; sparkPosition[k] = (Math.random() * 2 - 1) * halfWidth; }
-      if (sparkPosition[k + 1] < -halfHeight - .5) sparkPosition[k + 1] = halfHeight + .3;
-      if (Math.abs(sparkPosition[k]) > halfWidth + .5) sparkPosition[k] = -Math.sign(sparkPosition[k]) * (halfWidth + .4);
-    }
-    (sparkGeometry.getAttribute('position') as BufferAttribute).needsUpdate = true;
-  }
-
   function cleanup() {
     if (disposed) return;
     disposed = true;
     cancelAnimationFrame(frame);
     frame = 0;
     for (const dispose of disposers.reverse()) dispose();
-    for (const value of [geometry, material, planeGeometry, pictureMaterial, sparkGeometry, sparkMaterial, blank]) value.dispose();
+    for (const value of [geometry, material, planeGeometry, pictureMaterial, blank]) value.dispose();
     shapes.forEach(shape => shape.texture?.dispose());
     renderer?.dispose();
     renderer?.forceContextLoss();
@@ -306,7 +256,7 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   const scene = new Scene();
   const camera = new PerspectiveCamera(32, 1, .1, 50);
   camera.position.set(0, 0, 7.5);
-  scene.add(piece, sparks);
+  scene.add(piece);
   container.dataset.render = 'material';
 
   // Bilder der Projekte nachladen; bis dahin zeigt die Station den Glutball. Sind alle da, entsteht die Collage für das Ende.
@@ -322,17 +272,16 @@ export function initLandscape(container: HTMLElement): LandscapeController {
       shapes[i] = picture(image, cols, rows, detail);
       loaded.set(i, image);
       if (loaded.size === expected) shapes[stations.length - 1] = picture(collage([...loaded.keys()].sort((a, b) => a - b).map(key => loaded.get(key)!), detail), cols, rows, detail);
-      pair = '';
       invalidate();
     };
     image.src = source;
   });
 
   function setPair(from: number) {
-    const key = `${from}`;
-    if (key === pair) return;
-    pair = key;
-    const a = shapeAt(from), b = shapeAt(from + 1);
+    if (leap && from !== leapAt) leap = undefined;
+    const a = leap && leapForward ? leap : shapeAt(from), b = leap && !leapForward ? leap : shapeAt(from + 1);
+    if (a === pairA && b === pairB) return;
+    pairA = a; pairB = b;
     for (const [name, data] of [['position', a.position], ['positionB', b.position], ['colorA', a.color], ['colorB', b.color]] as const) {
       const attribute = geometry.getAttribute(name) as BufferAttribute;
       (attribute.array as Float32Array).set(data);
@@ -364,29 +313,17 @@ export function initLandscape(container: HTMLElement): LandscapeController {
     const step = lastTime ? Math.min(.05, (time - lastTime) / 1000) : .016;
     lastTime = time;
     current = reduced.matches ? target : current + (target - current) * Math.min(1, step * 2.6);
-    if (Math.abs(target - current) < .002) current = target;
-    const from = Math.floor(current), seconds = time / 1000;
-    const ambient = !reduced.matches;
+    if (Math.abs(target - current) < .002) { current = target; leap = undefined; }
+    const from = Math.floor(current);
     setPair(from);
     progress.value = current - from;
-    uniforms.uTime.value = ambient ? seconds : 0;
     const scale = compact ? Math.min(1, (halfWidth * 1.8) / WIDTH) : 1;
     uniforms.uSize.value = Math.max(2 * ratio, (WIDTH / cols) * pixelsPerUnit * scale * ratio * 1.15);
     piece.scale.setScalar(scale);
-    // Der Glutball schwebt leicht; Bilder stehen ruhig.
-    const hover = ambient ? Math.sin(seconds * .9) * .06 * Math.max(uniforms.uSoftA.value, uniforms.uSoftB.value) : 0;
-    piece.position.set(compact ? 0 : halfWidth * .28, (compact ? halfHeight * .34 : 0) + hover, 0);
+    piece.position.set(compact ? 0 : halfWidth * .28, compact ? halfHeight * .34 : 0, 0);
     piece.rotation.set(-.08, compact ? 0 : -.22, 0);
-    sparks.visible = ambient;
-    if (ambient) {
-      drift(step, seconds);
-      const tintA = shapeAt(from).tint, tintB = shapeAt(from + 1).tint, blend = current - from;
-      sparkUniforms.uTime.value = seconds;
-      sparkUniforms.uSize.value = pixelsPerUnit * .03 * ratio;
-      sparkUniforms.uTint.value = tintA.map((value, i) => value + (tintB[i] - value) * blend);
-    }
     try { gpu.render(scene, camera); } catch { fallback(); return; }
-    if (current !== target || ambient) frame = requestAnimationFrame(render);
+    if (current !== target) frame = requestAnimationFrame(render);
     else lastTime = 0;
   }
   function invalidate() {
@@ -401,19 +338,6 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   disposers.push(() => visibilityObserver.disconnect());
   document.addEventListener('visibilitychange', invalidate);
   disposers.push(() => document.removeEventListener('visibilitychange', invalidate));
-  const blow = (event: PointerEvent) => {
-    const rect = container.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const x = ((event.clientX - rect.left) / rect.width * 2 - 1) * halfWidth, y = (1 - (event.clientY - rect.top) / rect.height * 2) * halfHeight;
-    const elapsed = (event.timeStamp - pointerTime) / 1000;
-    if (pointerTime && elapsed > 0 && elapsed < .12) {
-      windX = Math.max(-6, Math.min(6, windX + (x - pointerX) / Math.max(elapsed, .008) * .08));
-      windY = Math.max(-6, Math.min(6, windY + (y - pointerY) / Math.max(elapsed, .008) * .08));
-    }
-    pointerX = x; pointerY = y; pointerTime = event.timeStamp;
-  };
-  addEventListener('pointermove', blow, { passive: true });
-  disposers.push(() => removeEventListener('pointermove', blow));
   reduced.addEventListener?.('change', invalidate);
   disposers.push(() => reduced.removeEventListener?.('change', invalidate));
   resize();
@@ -421,7 +345,13 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   return {
     setProgress(value, immediate = false) {
       target = Math.min(stations.length - 1, Math.max(-1, Number.isFinite(value) ? value : -1));
-      if (immediate) current = target;
+      if (immediate) { current = target; leap = undefined; }
+      else if (pairA && pairB && Math.abs(target - current) > 1) {
+        leap = progress.value < .5 ? pairA : pairB;
+        leapForward = target > current;
+        leapAt = leapForward ? Math.floor(target) - 1 : Math.ceil(target);
+        current = leapForward ? leapAt : leapAt + .999;
+      }
       invalidate();
     },
     setEnabled(value) {

@@ -5,7 +5,7 @@
 Nutzerentscheidungen vom 9. und 10. November 2026 ersetzen die räumliche Landschaft und gehen den älteren Punkten unten vor:
 
 - Die Reise zeigt **ein einziges Element, das mit jeder Station weiter wächst** (`src/journey/scene.ts`). Keine Station kehrt zu einer früheren Form zurück:
-  - Übersicht: schwebender Glutball aus gebündelten Funken.
+  - Übersicht: ruhender Glutball aus gebündelten Funken.
   - Die Idee: eine Website-Skizze aus Funkenlinien.
   - Das Fundament: drei Ebenen.
   - Projektstationen: das Projektbild in voller Schärfe.
@@ -13,7 +13,7 @@ Nutzerentscheidungen vom 9. und 10. November 2026 ersetzen die räumliche Landsc
   Nur beim Verglühen zerfällt das Element in Funken.
 - **Beim Weiterreisen** verglüht das Element von unten nach oben zu Funken und setzt sich zur nächsten Form zusammen. Die Funken leuchten in den Farben der jeweiligen Vorschau. Der Nutzer beschreibt das „wie ein Phönix“; ein Vogel oder Phönix wird nicht dargestellt.
 - **Netzwerkkarte, Stationsmarker und Bildkarte** sind im WebGL-Betrieb ausgeblendet. Stationen bleiben über die untere Navigation, Zurück/Weiter und die Textspalte erreichbar. Live-Demos laden erst über „Konzept ausprobieren“.
-- **Schwebende Funken** folgen dem Luftzug des Zeigers. Dafür läuft die Darstellung dauerhaft, solange die Bühne sichtbar und Bewegung erlaubt ist. Das ersetzt die frühere Regel „keine dauerhafte Animationsschleife“. Bei reduzierter Bewegung, im Hintergrundtab, außerhalb des Sichtbereichs und bei geöffneter Demo steht sie still.
+- **Ruhe zwischen den Stationen** (Nutzerentscheidung 10. November 2026, die Reise wirkte überreizt): Es bewegt sich nur das Verglühen beim Weiterreisen, gebunden an Scrollen oder Stationswechsel. Drehung, Schweben und Flackern des Glutballs sowie die losen Funken mit Zeiger-Luftzug sind entfernt; die Darstellungsschleife endet, sobald eine Station erreicht ist. Ein Sprung über mehrere Stationen verglüht einmal von der sichtbaren Form direkt zur Zielform. Das ersetzt die Regel „Schwebende Funken“ vom selben Tag.
 - **Die Animation ist immer sichtbar:** Text liegt mit transparentem oder halbtransparentem Hintergrund davor, auch mobil.
 - Keine Blume des Lebens und keine anderen esoterischen Bilder oder Begriffe (Nutzerkorrektur 10. November 2026).
 

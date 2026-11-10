@@ -62,20 +62,37 @@ describe('journey particle element',()=>{
     expect(frames.size).toBe(0);
   });
 
-  it('keeps the sparks moving only while motion is allowed and rests completely under reduced motion',()=>{
+  it('rests between stations, ignores the pointer and moves only while travelling',()=>{
     controller=initLandscape(map);flush();
-    expect(frames.size).toBe(1);
-    window.dispatchEvent(new MouseEvent('pointermove',{clientX:100,clientY:100}));
-    window.dispatchEvent(new MouseEvent('pointermove',{clientX:180,clientY:120}));
-    for(let i=0;i<30;i++) flush();
-    expect(frames.size).toBe(1);
-    controller.setEnabled(false);
     expect(frames.size).toBe(0);
-    media.matches=true;controller.setEnabled(true);controller.setProgress(3);
+    window.dispatchEvent(new MouseEvent('pointermove',{clientX:100,clientY:100}));
+    expect(frames.size).toBe(0);
+    controller.setProgress(1);
+    for(let i=0;i<400&&frames.size;i++) flush();
+    expect(frames.size).toBe(0);
+    media.matches=true;controller.setProgress(3);
     for(let i=0;i<5&&frames.size;i++) flush();
     expect(frames.size).toBe(0);
     controller.setProgress(Number.NaN);flush();
     expect(frames.size).toBe(0);
+  });
+
+  it('burns once from the visible form to the target when jumping over several stations',()=>{
+    controller=initLandscape(map);
+    const shown=()=>{
+      const piece=(gpu.render.mock.lastCall![0] as import('three').Scene).children[0];
+      const geometry=(piece.children[1] as import('three').Points).geometry;
+      return ['position','positionB'].map(name=>Array.from(geometry.getAttribute(name).array.slice(0,30)).join());
+    };
+    controller.setProgress(1,true);flush();
+    const fundament=shown()[0];
+    controller.setProgress(6,true);flush();
+    controller.setProgress(0);
+    const seen=new Set<string>();
+    // At rest positionB already holds the next station, so only frames of the running transition count.
+    for(let i=0;i<400&&frames.size;i++){flush();if(frames.size) shown().forEach(form=>seen.add(form));}
+    expect(frames.size).toBe(0);
+    expect(seen.has(fundament)).toBe(false);
   });
 
   it('stops work when disabled, offscreen or hidden; reduced motion jumps without animation',()=>{
