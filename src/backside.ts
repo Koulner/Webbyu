@@ -78,7 +78,9 @@ export function mountBackside(root: HTMLElement, loadLight: () => Promise<LightM
       const goal = FRONT + (BACK - FRONT) * target(panel);
       panel.angle += (goal - panel.angle) * (panel.forced ? .1 : .16);
       const progress = (panel.angle - FRONT) / (BACK - FRONT);
-      panel.card.style.setProperty('--ry', `${(panel.angle + pointerX * 6).toFixed(2)}deg`);
+      const renderedAngle = Number((panel.angle + pointerX * 6).toFixed(2));
+      panel.card.style.setProperty('--ry', `${renderedAngle}deg`);
+      panel.card.dataset.facing = renderedAngle >= 90 ? 'back' : 'front';
       panel.card.style.setProperty('--rx', `${(5 - pointerY * 5).toFixed(2)}deg`);
       panel.card.style.setProperty('--sheen', `${(120 - progress * 140).toFixed(1)}%`);
       panel.card.style.setProperty('--sheen-o', Math.sin(clamp(progress) * Math.PI).toFixed(3));

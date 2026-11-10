@@ -40,8 +40,11 @@
 /* Räumlich: eine Karte mit zwei Seiten */
 .is-3d .panel { perspective: 1700px; --draw: 0; }
 .is-3d .card { display: block; aspect-ratio: 16 / 10; transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(var(--ry)); will-change: transform; }
-.is-3d .face { position: absolute; inset: 0; aspect-ratio: auto; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.is-3d .back { transform: rotateY(180deg); }
+.is-3d .face { position: absolute; inset: 0; aspect-ratio: auto; backface-visibility: visible; -webkit-backface-visibility: visible; }
+.is-3d .back { transform: rotateY(180deg); visibility: hidden; }
+/* Beide Flächen wechseln gemeinsam beim tatsächlich gerenderten 90°-Winkel. */
+.is-3d .card[data-facing='back'] .front { visibility: hidden; }
+.is-3d .card[data-facing='back'] .back { visibility: visible; }
 .is-3d .sheen { display: block; position: absolute; inset: 0; border-radius: 12px; pointer-events: none; transform: translateZ(1px); mix-blend-mode: soft-light; opacity: var(--sheen-o, 0); background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .55) 46%, transparent 62%) var(--sheen, 120%) 0 / 260% 100% no-repeat; }
 .is-3d .flip { display: inline-flex; align-items: center; flex: none; min-height: 44px; padding: .5rem .9rem; border: 1.5px solid var(--color-ink); border-radius: 999px; background: transparent; color: var(--color-ink); font: 600 .82rem var(--font-sans); cursor: pointer; }
 .is-3d .flip:hover, .is-3d .flip[aria-pressed='true'] { border-color: var(--color-blue); color: var(--color-blue); }
