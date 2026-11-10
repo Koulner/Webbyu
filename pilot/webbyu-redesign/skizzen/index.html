@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Webbyu Redesign · Richtungen</title>
+<style>
+  @font-face { font-family: 'Instrument Sans'; font-weight: 400 700; src: url('/fonts/instrument-sans-latin-wght-normal.woff2') format('woff2'); }
+  body { margin: 0; padding: clamp(1rem, 5vw, 4rem); background: #f4f4f1; color: #16181a; font: 400 1rem/1.55 'Instrument Sans', system-ui, sans-serif; }
+  main { max-width: 64rem; margin: 0 auto; }
+  h1 { font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: -.04em; line-height: 1; margin: 0 0 1rem; }
+  h2 { margin: 0 0 .4rem; font-size: 1.6rem; letter-spacing: -.02em; }
+  .dir { padding: 1.6rem 0; border-top: 1px solid #c9cac4; }
+  .tag { font: 600 .78rem ui-monospace, Consolas, monospace; color: #2236f0; margin: 0 0 .4rem; }
+  dl { display: grid; grid-template-columns: 9rem 1fr; gap: .4rem 1rem; margin: 1rem 0; }
+  dt { font-weight: 600; }
+  dd { margin: 0; }
+  a.open { display: inline-block; padding: .6rem 1.1rem; border-radius: 999px; background: #16181a; color: #fff; font-weight: 600; text-decoration: none; }
+  @media (max-width: 640px) { dl { grid-template-columns: 1fr; } dt { margin-top: .6rem; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Webbyu Redesign: Richtungen zur Auswahl</h1>
+  <p>Stand 9. November 2026, Branch <code>redesign/unikat-2026</code>. Skizzen sind Konzeptnachweise, keine fertigen Seiten. Schrift ist Platzhalter. Die Demos bleiben als fiktiv gekennzeichnet. Bewertungen sind ein Vorschlag von Claude; die Auswahl trifft Lukas.</p>
+
+  <section class="dir">
+    <p class="tag">Empfehlung</p>
+    <h2>A · Vorderseite und Rückseite</h2>
+    <dl>
+      <dt>Kerngedanke</dt><dd>Kunden sehen die Vorderseite. Webbyu gestaltet auch die Rückseite aus Fragen, Entscheidungen und Abläufen. Abgeleitet aus dem vorhandenen Satz „Verständlich nach außen. Durchdacht dahinter.“</dd>
+      <dt>3D</dt><dd>Echte Demo-Seiten (live, als DOM) drehen sich beim Scrollen um. Auf der Rückseite stehen Kundenfrage, Leitidee, verworfene Richtung und Zielhandlung aus den echten Nachweisblättern. Dazu ein WebGL-Raumlicht: Lichtinseln und Schatten folgen den Flächen, der Schatten wird beim Drehen schmal.</dd>
+      <dt>Mittelteil</dt><dd>Vier Ebenen (Inhalt, Gestaltung, Funktion, Betrieb) fächern sich räumlich auf, jede mit einer Frage an den Kunden.</dd>
+      <dt>Zielhandlung</dt><dd>Projektberater: Antworten werden zu Notizen auf „Ihrer Rückseite“, mit der Anschlussfrage. Hinweis: bleibt auf dem Gerät.</dd>
+      <dt>Mobil</dt><dd>Flächen hochkant mit der echten mobilen Demo-Ansicht. Die Drehung folgt der Position im Bild. Bei reduzierter Bewegung stehen beide Seiten untereinander.</dd>
+      <dt>Schwäche</dt><dd>Kann zum Gimmick werden. Trägt nur mit echten, konkreten Rückseiten. Drei Live-iframes kosten Ladezeit; in der Umsetzung werden Vorschaubilder statisch geladen und die Live-Seite erst bei Bedarf.</dd>
+    </dl>
+    <a class="open" href="./a/">Skizze A öffnen</a>
+  </section>
+
+  <section class="dir">
+    <p class="tag">Gegenrichtung</p>
+    <h2>B · Aus Ihrem Material geformt</h2>
+    <dl>
+      <dt>Kerngedanke</dt><dd>Ein einziges Werkstück durchläuft die Seite und nimmt das Material jeder Marke an: Rohling, Eiche, Glas, Glut. Bei „Zwei Richtungen“ teilt es sich.</dd>
+      <dt>3D</dt><dd>Vollflächige WebGL-Bühne, prozedurale Materialien im Shader, Zeiger neigt das Objekt.</dd>
+      <dt>Mobil</dt><dd>Objekt oben, Text darunter auf dunklem Verlauf.</dd>
+      <dt>Schwäche</dt><dd>Die Skizze bestätigt das Risiko: Das Objekt wirkt wie eine austauschbare 3D-Vorführung. Es zeigt Material, aber nicht, was Webbyu für Kunden konkret klärt. Die Demos sind nur verlinkt, nicht zu sehen.</dd>
+    </dl>
+    <a class="open" href="./b/">Skizze B öffnen</a>
+  </section>
+
+  <section class="dir">
+    <p class="tag">Nur beschrieben</p>
+    <h2>C · Eine Strecke</h2>
+    <dl>
+      <dt>Kerngedanke</dt><dd>Der Weg vom ersten Gespräch zur Übergabe als eine Kamerafahrt entlang einer Linie. Die Linie verzweigt sich bei den Richtungen. Die Reise wird zur Startseite.</dd>
+      <dt>Warum nicht gebaut</dt><dd>Die Schwächen sind schon belegt: Pakete und Kontakt liegen tief im Erlebnis. Eine Landschaftsversion der Reise wurde bereits verworfen, ihre Abnahme ist offen. Den Bau einer dritten 3D-Skizze rechtfertigt das nicht.</dd>
+      <dt>Übernehmbar</dt><dd>Die verzweigte Linie als Motiv für „Zwei Richtungen“ und die Stationen „Prüfen“ und „Übergabe“ als Inhalt.</dd>
+    </dl>
+  </section>
+
+  <section class="dir">
+    <h2>Selbstprüfung neben Raumgut (Vorschlag, keine Freigabe)</h2>
+    <dl>
+      <dt>Hierarchie</dt><dd>A: Überschrift, Satz, zwei Handlungen, daneben ein Beweisstück, nah an Raumguts Klarheit. B: starke Überschrift, aber die Bühne dominiert und der Inhalt wird dünn.</dd>
+      <dt>Konkreter Inhalt</dt><dd>A zeigt echte Demo-Seiten und echte Entscheidungen. B zeigt Materialstimmungen.</dd>
+      <dt>Bildkohärenz</dt><dd>A: Raumlicht, Papier und Korrekturblau bleiben durchgehend gleich; die Farben der Kunden liegen nur auf der Vorderseite. B ist in sich stimmig, aber dunkel und generisch.</dd>
+      <dt>Austauschtest</dt><dd>A: Eine andere Agentur könnte den Dreheffekt kopieren, aber keine Rückseiten ohne eigenen Prozess vorweisen. B: Logo tauschen genügt.</dd>
+      <dt>Portfolio</dt><dd>A verwendet keine Serif-Kursive, keine Kartenstapel und keine Datenfelder-Optik der Demos. Offen: Die Schrift ist noch die alte Instrument Sans. Ein neuer, lokal eingebundener OFL-Schnitt gehört in Phase 3.</dd>
+    </dl>
+  </section>
+</main>
+</body>
+</html>
