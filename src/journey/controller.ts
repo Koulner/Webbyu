@@ -111,6 +111,8 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     root.querySelector('[data-preview-name]')!.textContent=station.label;
     previewLoading.hidden=false;
     previewLoading.textContent='Website-Vorschau wird geladen …';
+    // Das Lichtpunkt-Element ersetzt die sichtbare Vorschau; die Live-Demo lädt erst über „Konzept ausprobieren“.
+    if(map.dataset.render==='material') return;
     if(connection?.saveData && !sessions.has(id)) {
       previewLoading.textContent='Datensparmodus aktiv. Zum Laden der Website-Vorschau öffnen.';
       return;

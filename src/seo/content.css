@@ -1,4 +1,14 @@
 :root {
+  /* Redesign 2026, Richtung A wie die Startseite: Raumgrau, Graphit, Korrekturblau. Notizen sind die Rückseite des Texts. */
+  --color-ivory: #e3e3de;
+  --color-paper: #fafaf7;
+  --color-ink: #16181a;
+  --color-aubergine: #2236f0;
+  --color-muted: #5b6064;
+  --color-border: #c9cac4;
+  --color-highlight: #a3adff;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+  --backside: var(--color-paper) linear-gradient(rgba(34, 54, 240, .1) 1px, transparent 1px) 0 0 / 100% 22px;
   color-scheme: light;
   font-family: var(--font-sans);
   color: var(--color-ink);
@@ -14,7 +24,7 @@ body { margin: 0; }
 button, input, textarea { font: inherit; }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: .07em; }
 a:hover { text-decoration-thickness: .13em; }
-a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid #355b65; outline-offset: 5px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--color-aubergine); outline-offset: 5px; }
 [hidden] { display: none !important; }
 .content-main { max-width: var(--page-max-width); margin-inline: auto; padding-inline: var(--page-gutter); }
 .content-main:focus { outline: none; }
@@ -72,7 +82,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .content-faq details { border-bottom: 1px solid var(--color-border); }
 .content-faq summary { cursor: pointer; padding: 20px 4px; font-weight: 600; line-height: 1.55; }
 .content-faq details p { padding: 0 4px 24px; color: #42535b; }
-.content-note { padding: 28px; background: #e8ece3; border-left: 3px solid #537065; margin-block: 30px; }
+.content-note { padding: 28px; background: var(--backside); border-radius: 12px; box-shadow: 0 0 0 1.5px var(--color-aubergine); margin-block: 30px; }
 .content-note h3 { font-size: 1.12rem; }
 .content-example-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-block: 30px; }
 .content-example { padding: 28px; border: 1px solid var(--color-border); background: #f7f6f1; min-width: 0; }
@@ -87,7 +97,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .content-article-card h2 a { text-decoration: none; }
 .content-article-card h2 a:hover { text-decoration: underline; }
 .content-card-author { color: var(--color-muted); font-size: .83rem; margin-top: auto !important; padding-top: 14px; }
-.content-toc { padding: 28px 32px; background: #e8ece3; max-width: 840px; margin: 0 auto 52px; }
+.content-toc { padding: 28px 32px; background: var(--backside); border-radius: 12px; max-width: 840px; margin: 0 auto 52px; }
 .content-main .content-toc h2 { font-size: 1.1rem; letter-spacing: -.02em; margin-bottom: 14px; }
 .content-toc ol { columns: 2; column-gap: 30px; margin: 0; font-size: .95rem; }
 .content-toc li { break-inside: avoid; padding: 4px 0; }
@@ -172,3 +182,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .content-wordmark { display: inline-flex; align-items: center; min-height: 44px; }
 .content-wordmark img { display: block; width: 154px; height: auto; }
 @media (max-width: 600px) { .content-wordmark img { width: 135px; } }
+.content-eyebrow, .content-section-label, .content-card-number, .content-step-list li::before { font-family: var(--font-mono); color: var(--color-aubergine); }
+.content-card, .content-example, .content-article-card, .content-briefing { background: var(--color-paper); border-radius: 12px; }
+.content-card { padding: 22px; border-top: 0; box-shadow: 0 0 0 1px rgba(22, 24, 26, .08); }

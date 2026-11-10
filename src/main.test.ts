@@ -212,7 +212,7 @@ describe('homepage integration', () => {
     expect(document.querySelector<HTMLDialogElement>('.concept-dialog')!.open).toBe(true);
     button('.concept-dialog-close').click();
     expect(document.activeElement).toBe(launch);
-    const frame = root.querySelector<HTMLIFrameElement>('.journey-preview iframe') ?? root.querySelector<HTMLIFrameElement>('iframe');
+    const frame = root.querySelector<HTMLIFrameElement>('#journey-preview iframe');
     expect(frame).not.toBeNull();
     window.dispatchEvent(new MessageEvent('message', { origin: new URL(frame!.src).origin, source: frame!.contentWindow, data: { type: 'webbyu:journey-home', hash: '#projektfinder' } }));
     expect(document.activeElement).toBe(root.querySelector('.finder-heading'));

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Richtung A · Vorderseite und Rückseite</title>
+<link rel="stylesheet" href="./a.css">
+</head>
+<body>
+<canvas class="room" aria-hidden="true"></canvas>
+<p class="sketch-note">Skizze Richtung A · Konzeptnachweis, keine fertige Seite · <a href="../">Alle Richtungen</a></p>
+
+<header class="top">
+  <a class="mark" href="#" aria-label="Webbyu – Startseite"><img src="/webbyu-wortmarke-405.webp" alt="" width="2172" height="724"></a>
+  <nav aria-label="Hauptnavigation">
+    <a href="#rueckseiten">Rückseiten</a>
+    <a href="#ebenen">Ablauf</a>
+    <a href="#pakete">Pakete</a>
+    <a href="#">Über mich</a>
+    <a href="#">Ratgeber</a>
+  </nav>
+  <a class="btn btn--small" href="#berater">Projekt besprechen</a>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="kicker">Lukas Wagner · Webdesign aus Bad Oldesloe</p>
+      <h1 id="hero-title">Jede Website hat eine <span class="accent">Rückseite.<svg viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M3 11 C 70 4, 150 3, 297 8"/></svg></span></h1>
+      <p class="lead">Ihre Kunden sehen die Vorderseite: Angebot, Bilder, Kontakt. Dahinter stehen die Fragen, die Ihr Unternehmen ausmachen, und die Entscheidungen, die daraus folgen. Ich gestalte beides, für jedes Unternehmen neu.</p>
+      <div class="actions">
+        <a class="btn" href="#berater">Ihr Vorhaben durchdenken <span aria-hidden="true">→</span></a>
+        <a class="textlink" href="#rueckseiten">Rückseiten ansehen <span aria-hidden="true">↓</span></a>
+      </div>
+    </div>
+
+    <figure class="panel panel--hero" data-panel data-hero>
+      <div class="card">
+        <div class="face front">
+          <div class="viewport" inert><iframe src="/demos/business/" title="Eiche &amp; Form, fiktive Beispielwebsite" tabindex="-1" data-w="1280"></iframe></div>
+          <span class="face-tag">Vorderseite</span>
+        </div>
+        <div class="face back">
+          <div class="back-notes">
+            <p class="face-tag face-tag--back">Rückseite</p>
+            <dl>
+              <dt>Kundenfrage</dt><dd>„Geht das bei meinem schiefen Raum überhaupt?“</dd>
+              <dt>Leitidee</dt><dd>Die Schiefe ist der Anfang. Eine keilförmige Passleiste nimmt sie auf.</dd>
+              <dt>Verworfen</dt><dd>„Die Werkakte“: spricht nur Menschen mit genau diesem Raum an.</dd>
+              <dt>Zielhandlung</dt><dd>Vier Maße eintragen, dann anfragen.</dd>
+            </dl>
+          </div>
+          <svg class="sketch" viewBox="0 0 400 260" role="img" aria-label="Skizze der schiefen Nische: oben 1.184, unten 1.207 Millimeter, rechts die keilförmige Passleiste.">
+            <path pathLength="1" class="thin" d="M110 30 V236 M276 30 V236"/>
+            <path pathLength="1" d="M122 44 L262 44 L276 222 L110 222 Z"/>
+            <path pathLength="1" class="fill" d="M262 44 L276 222 L262 222 Z"/>
+            <path pathLength="1" class="thin" d="M122 22 H262 M110 246 H276"/>
+            <text x="192" y="16">1.184 oben</text>
+            <text x="193" y="258">1.207 unten</text>
+            <text x="300" y="140" class="left">Passleiste</text>
+            <path pathLength="1" class="thin" d="M296 136 L272 136"/>
+          </svg>
+        </div>
+        <span class="sheen" aria-hidden="true"></span>
+      </div>
+      <figcaption><span>Eiche &amp; Form · fiktive Tischlerei · Paket Business</span><button class="flip" type="button" aria-pressed="false">Rückseite zeigen</button></figcaption>
+    </figure>
+    <p class="scroll-hint" aria-hidden="true">Scrollen dreht die Seite um</p>
+  </section>
+
+  <section class="sides" id="rueckseiten" aria-labelledby="sides-title">
+    <header class="section-head">
+      <p class="kicker">Drei Beispiele</p>
+      <h2 id="sides-title">Drei Unternehmen. Drei Rückseiten.</h2>
+      <p>Die Beispiele sind erfunden, die Arbeitsweise ist es nicht. Auf jeder Rückseite steht, von welcher Kundenfrage die Gestaltung ausgeht und welche Richtung dafür verworfen wurde.</p>
+    </header>
+
+    <article class="side-row">
+      <figure class="panel" data-panel>
+        <div class="card">
+          <div class="face front">
+            <div class="viewport" inert><iframe src="/demos/start/" title="Klarblick, fiktive Beispielwebsite" tabindex="-1" loading="lazy" data-w="1280"></iframe></div>
+            <span class="face-tag">Vorderseite</span>
+          </div>
+          <div class="face back">
+            <div class="back-notes">
+              <p class="face-tag face-tag--back">Rückseite</p>
+              <dl>
+                <dt>Kundenfrage</dt><dd>„Kommt ihr an mein schwieriges Fenster überhaupt dran?“</dd>
+                <dt>Leitidee</dt><dd>Die Seite ist eine Hausfront. Jeder Fenstertyp ist ein eigener Abschnitt.</dd>
+                <dt>Verworfen</dt><dd>„Die Fensterliste“: zu wenig zum Erinnern, zu nah an Eiche &amp; Form.</dd>
+                <dt>Zielhandlung</dt><dd>Das eigene Haus ankreuzen.</dd>
+              </dl>
+            </div>
+            <svg class="sketch" viewBox="0 0 400 260" role="img" aria-label="Skizze eines Giebels mit rundem Fenster in 7,40 Metern Höhe, erreichbar mit der Reinwasser-Stange.">
+              <path pathLength="1" d="M60 236 V120 L200 34 L340 120 V236"/>
+              <path pathLength="1" d="M200 79 a26 26 0 1 0 0.01 0 M200 79 V131 M174 105 H226"/>
+              <path pathLength="1" class="thin" d="M372 236 V105 M364 105 H380 M364 236 H380"/>
+              <text x="372" y="96">7,40 m</text>
+              <path pathLength="1" class="dash" d="M150 236 L188 126"/>
+              <text x="96" y="252" class="left">Reinwasser-Stange, 10 m</text>
+            </svg>
+          </div>
+          <span class="sheen" aria-hidden="true"></span>
+        </div>
+        <figcaption><span>Klarblick · fiktive Fensterreinigung · Paket Start</span><button class="flip" type="button" aria-pressed="false">Rückseite zeigen</button></figcaption>
+      </figure>
+      <div class="side-copy">
+        <h3>Ein Haus voller Fenster.</h3>
+        <p><b>Vorne</b> sehen Besucher ihr eigenes Haus wieder: das runde im Giebel, das über der Treppe.</p>
+        <p><b>Hinten</b> steht, warum: Die Höhe ist das eigentliche Problem, und eine Seite wird von oben nach unten gelesen.</p>
+        <a class="textlink" href="/demos/start/">Klarblick ansehen <span aria-hidden="true">↗</span></a>
+      </div>
+    </article>
+
+    <article class="side-row side-row--flip">
+      <figure class="panel" data-panel>
+        <div class="card">
+          <div class="face front">
+            <div class="viewport" inert><iframe src="/demos/complete/" title="Hof &amp; Flamme, fiktive Beispielwebsite" tabindex="-1" loading="lazy" data-w="1280"></iframe></div>
+            <span class="face-tag">Vorderseite</span>
+          </div>
+          <div class="face back">
+            <div class="back-notes">
+              <p class="face-tag face-tag--back">Rückseite</p>
+              <dl>
+                <dt>Kundenfrage</dt><dd>„Was bekomme ich, was kostet es, ist etwas frei?“</dd>
+                <dt>Leitidee</dt><dd>Die Karte folgt einem Feuer, das kälter wird.</dd>
+                <dt>Verworfen</dt><dd>„Die lange Tafel“: zu nah an Klarblicks Hausfront.</dd>
+                <dt>Zielhandlung</dt><dd>In zwei Sätzen einen Platz anfragen.</dd>
+              </dl>
+            </div>
+            <svg class="sketch" viewBox="0 0 400 260" role="img" aria-label="Skizze der fallenden Herdtemperatur: 430 Grad um 18:30, 260 um 19:45, 164 um 21:00, 110 um 22:15.">
+              <path pathLength="1" class="thin" d="M40 24 V226 H384"/>
+              <path pathLength="1" d="M52 40 C 120 120, 180 160, 250 186 S 350 210, 372 212"/>
+              <path pathLength="1" class="thin" d="M52 40 v6 M150 128 v6 M250 186 v6 M352 208 v6"/>
+              <text x="58" y="34" class="left">18:30 · 430 °C</text>
+              <text x="156" y="120" class="left">19:45 · 260 °C</text>
+              <text x="252" y="176" class="left">21:00 · 164 °C</text>
+              <text x="384" y="246">22:15 · 110 °C</text>
+            </svg>
+          </div>
+          <span class="sheen" aria-hidden="true"></span>
+        </div>
+        <figcaption><span>Hof &amp; Flamme · fiktives Restaurant · Paket Complete</span><button class="flip" type="button" aria-pressed="false">Rückseite zeigen</button></figcaption>
+      </figure>
+      <div class="side-copy">
+        <h3>Ein Abend am Feuer.</h3>
+        <p><b>Vorne</b> läuft die Karte in der Reihenfolge, in der der Herd abkühlt.</p>
+        <p><b>Hinten</b> ordnet eine einzige Kurve Gänge, Schriftgröße und Papierfarbe.</p>
+        <a class="textlink" href="/demos/complete/">Hof &amp; Flamme ansehen <span aria-hidden="true">↗</span></a>
+      </div>
+    </article>
+
+    <article class="side-row">
+      <figure class="panel panel--yours" data-panel>
+        <div class="card">
+          <div class="face front">
+            <div class="blank" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></div>
+            <span class="face-tag">Ihre Vorderseite</span>
+          </div>
+          <div class="face back">
+            <div class="back-notes">
+              <p class="face-tag face-tag--back">Ihre Rückseite</p>
+              <dl>
+                <dt>Kundenfrage</dt><dd>Noch offen.</dd>
+                <dt>Leitidee</dt><dd>Entsteht aus Ihrem Unternehmen.</dd>
+                <dt>Zielhandlung</dt><dd>Beginnt mit Ihrer ersten Antwort.</dd>
+              </dl>
+              <a class="textlink" href="#berater">Jetzt beginnen <span aria-hidden="true">↓</span></a>
+            </div>
+          </div>
+          <span class="sheen" aria-hidden="true"></span>
+        </div>
+        <figcaption><span>Ihr Unternehmen</span><button class="flip" type="button" aria-pressed="false">Rückseite zeigen</button></figcaption>
+      </figure>
+      <div class="side-copy">
+        <h3>Und Ihre?</h3>
+        <p>Eine Vorlage hätte vorne schon alles fertig. Bei Ihnen beginnt die Arbeit hinten: mit dem, was Ihre Kunden fragen und was nach dem Klick bei Ihnen passiert.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="layers" id="ebenen" aria-labelledby="layers-title">
+    <header class="section-head">
+      <p class="kicker">Was dahinter liegt</p>
+      <h2 id="layers-title">Vier Ebenen. Eine Seite.</h2>
+      <p>Jede Ebene beginnt mit einer Frage an Sie. Erst wenn alle vier beantwortet sind, liegt die Seite flach und sieht einfach aus.</p>
+    </header>
+    <div class="stack-wrap" aria-hidden="true">
+      <div class="stack">
+        <div class="layer" style="--i:3"><span class="layer-tag">04 Betrieb</span><div class="l-run"><b>webbyu-kunde.de</b><i>Domain: auf Ihren Namen</i><i>Hosting: Ihr Vertrag</i><i>Übergabe: Dateien &amp; Zugänge</i></div></div>
+        <div class="layer" style="--i:2"><span class="layer-tag">03 Funktion</span><div class="l-func"><i></i><i></i><i class="short"></i><b>Anfrage vorbereiten</b></div></div>
+        <div class="layer" style="--i:1"><span class="layer-tag">02 Gestaltung</span><div class="l-look"><b></b><i></i><i></i><i></i></div></div>
+        <div class="layer" style="--i:0"><span class="layer-tag">01 Inhalt</span><div class="l-text"><b></b><i></i><i></i><i class="short"></i><i></i><i class="short"></i></div></div>
+      </div>
+    </div>
+    <ol class="layer-list">
+      <li><span>01 Inhalt</span><p>Was fragen Ihre Kunden, bevor sie anrufen?</p></li>
+      <li><span>02 Gestaltung</span><p>Woran erkennt man Sie, wenn Ihr Logo fehlt?</p></li>
+      <li><span>03 Funktion</span><p>Welche Angabe fehlt Ihnen bei Anfragen immer wieder?</p></li>
+      <li><span>04 Betrieb</span><p>Wem gehört die Domain? <b>Ihnen.</b></p></li>
+    </ol>
+  </section>
+
+  <section class="packages" id="pakete" aria-labelledby="packages-title">
+    <header class="section-head">
+      <p class="kicker">Pakete · Angebot auf Anfrage</p>
+      <h2 id="packages-title">Drei Rahmen. Jeder mit eigener Rückseite.</h2>
+    </header>
+    <div class="pkg-list">
+      <article><h3>Start</h3><p class="pkg-front">Ein kompakter Auftritt mit den Texten und Bildern, die Sie mitbringen.</p><p class="pkg-back">Dahinter: welche Seiten Ihr Angebot braucht und welche Angaben eine gute Anfrage.</p></article>
+      <article><h3>Business</h3><p class="pkg-front">Mehr Raum, eine durchdachte Struktur und eigene Fotografie nach Vereinbarung.</p><p class="pkg-back">Dahinter: Motive, Nutzungsrechte und die passenden Anfragewege.</p></article>
+      <article><h3>Complete</h3><p class="pkg-front">Website und Inhalte aus einem Guss: Foto, Video und Text.</p><p class="pkg-back">Dahinter: Formate, Produktion und Einbindung, geklärt vor dem Auftrag.</p></article>
+    </div>
+  </section>
+
+  <section class="berater" id="berater" aria-labelledby="berater-title">
+    <div class="b-front">
+      <p class="kicker">Projektberater · Vorderseite</p>
+      <h2 id="berater-title">Ihre Rückseite beginnt mit einer Frage.</h2>
+      <p>Was soll Ihre Website für Sie erledigen? Wählen Sie, was passt. Mehrere Antworten sind möglich.</p>
+      <div class="chips" role="group" aria-label="Ziele für Ihre Website">
+        <button type="button" aria-pressed="false" data-note="Ziel: Angebot verständlich zeigen|Nächste Frage: Was ist an Ihrem Angebot erklärungsbedürftig?">Mein Angebot verständlich zeigen</button>
+        <button type="button" aria-pressed="false" data-note="Ziel: passendere Anfragen|Nächste Frage: Welche Angabe fehlt Ihnen heute am häufigsten?">Passendere Anfragen erhalten</button>
+        <button type="button" aria-pressed="false" data-note="Ziel: Buchungen ermöglichen|Nächste Frage: Nutzen Sie schon einen Buchungsdienst?">Buchungen ermöglichen</button>
+        <button type="button" aria-pressed="false" data-note="Ziel: Produkte verkaufen|Nächste Frage: Wie viele Produkte, und gibt es schon einen Shop?">Produkte verkaufen</button>
+        <button type="button" aria-pressed="false" data-note="Ziel: Fotos und Videos|Nächste Frage: Wofür sollen die Aufnahmen eingesetzt werden?">Fotos &amp; Videos</button>
+      </div>
+      <p class="hint">Danach folgen wenige Fragen zu Umfang und Inhalten. Eine Preisorientierung sehen Sie, bevor Sie Name oder E-Mail angeben.</p>
+      <a class="btn" href="#berater">Weiter im Projektberater <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="b-back" aria-live="polite">
+      <p class="face-tag face-tag--back">Ihre Rückseite · Notizen</p>
+      <ol class="notes"><li class="empty">Noch leer. Wählen Sie links, was Ihre Website leisten soll.</li></ol>
+      <p class="local"><span aria-hidden="true">●</span> Bleibt auf Ihrem Gerät. Nichts wird gesendet.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Webbyu · Lukas Wagner · Bad Oldesloe, Stormarn &amp; Hamburg</p>
+  <p><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a> · <a href="tel:+4917642090983">+49 176 42090983</a></p>
+</footer>
+<script type="module" src="./a.js"></script>
+</body>
+</html>
