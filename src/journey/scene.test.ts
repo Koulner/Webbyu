@@ -81,11 +81,12 @@ describe('journey transforming mass',()=>{
     expect(frames.size).toBe(0);
   });
 
-  it('gives Klarblick, Eiche & Form and Hof & Flamme their own form on one mesh',()=>{
-    const forms=['klarblick','eiche-und-form','hof-und-flamme'].map(id=>FORMS[id]);
+  it('gives every station its own form on one mesh',()=>{
+    const forms=stations.map(station=>FORMS[station.id]);
+    // 0 stays the formless mass of the overview.
     expect(forms.every(form=>form>0)).toBe(true);
-    expect(new Set(forms).size).toBe(3);
-    expect(Object.keys(FORMS).every(id=>stations.some(station=>station.id===id))).toBe(true);
+    expect(new Set(forms).size).toBe(stations.length);
+    expect(stations.length).toBe(8);
     controller=initLandscape(map);
     controller.setProgress(3,true);flush();
     expect(piece().material.uniforms.uFormA.value).toBe(FORMS['eiche-und-form']);

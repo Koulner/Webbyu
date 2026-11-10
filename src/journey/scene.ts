@@ -6,16 +6,20 @@ import type { LandscapeController } from './controller';
 /**
  * Eine graue, formlose Masse, die sich mit jeder Station verwandelt. Ein einziges Netz: Der Vertex-Shader bildet die
  * Kugelrichtung auf Gestalt A und B ab und mischt beide entlang einer Front, die aus dem Inhalt der Zielstation kommt
- * (Abzieher von oben, Hobel von links, Wärme von unten). Unterwegs wird die Masse kurz flüssig. Alles Bewegte ist eine
- * Funktion des gedämpften Fortschritts; zwischen den Stationen ruht das Bild und es wird nicht gerendert.
+ * (Abzieher von oben, Hobel von links, Wärme von unten …). An der Front wird jede Gestalt kurz wieder graue, flüssige
+ * Masse, erst dahinter nimmt sie Form und Material der Zielstation an. Alles Bewegte ist eine Funktion des gedämpften
+ * Fortschritts; zwischen den Stationen ruht das Bild und es wird nicht gerendert.
  */
-/** Gestalt je Station. Fehlt eine Station, bleibt sie die formlose Masse (0). */
-export const FORMS: Record<string, number> = { klarblick: 1, 'eiche-und-form': 2, 'hof-und-flamme': 3 };
+/** Gestalt je Station; 0 ist die formlose Masse der Übersicht. */
+export const FORMS: Record<string, number> = {
+  'die-idee': 1, 'das-fundament': 2, klarblick: 3, 'eiche-und-form': 4,
+  'hof-und-flamme': 5, 'safran-atelier': 6, raumgut: 7, 'der-naechste-abschnitt': 8,
+};
 /** Kamera je Position (Übersicht, dann Stationen): Azimut und Höhe in Grad, Abstand relativ. */
 const POSES: [number, number, number][] = [
-  [28, 14, 1.1], [52, 22, 1.05], [14, 34, 1.08],
-  [6, 3, 1], [38, 27, 1.02], [-18, -7, 1.12],
-  [40, 30, 1.1], [-30, 40, 1.1], [0, 8, .98],
+  [28, 14, 1.1], [20, 6, 1.05], [24, 30, 1.05],
+  [6, 3, 1], [36, 24, 1.02], [-18, -6, 1.1],
+  [28, 44, 1], [-22, 14, 1], [0, 4, .82],
 ];
 /** Größter Radius der Gestalten, danach richtet sich der Kameraabstand. */
 const EXTENT = 1.35;
@@ -47,95 +51,208 @@ const noise = `
 
 const vertex = `
   uniform float uT; uniform int uFormA; uniform int uFormB; uniform float uSeedA; uniform float uSeedB;
-  varying vec3 vPos; varying vec3 vNormal; varying float vW; varying float vAct; varying float vCav;
+  varying vec3 vPos; varying vec3 vNormal; varying float vW; varying float vAct; varying float vAuxA; varying float vAuxB;
   ${noise}
+  const float PI = 3.14159265;
   float smin(float a, float b, float k){ float h = clamp(.5 + .5 * (b - a) / k, 0., 1.); return mix(b, a, h) - k * h * (1. - h); }
-  // Klarblick: eine ebene, klare Scheibe mit gerundeten Ecken. Ein Band um den Äquator wird zur runden Kante,
-  // damit die Kante genug Punkte bekommt; der Rest der Kugel wird zur exakt ebenen Fläche.
-  vec3 pane(vec3 d){
-    const float c = .07, band = .38, quarter = 1.5707963;
+  vec2 bez2(vec2 a, vec2 b, vec2 c, float t){ float s = 1. - t; return s * s * a + 2. * s * t * b + t * t * c; }
+  vec2 bez3(vec2 a, vec2 b, vec2 c, vec2 e, float t){ float s = 1. - t; return s * s * s * a + 3. * s * s * t * b + 3. * s * t * t * c + t * t * t * e; }
+  // Drehkörper: u läuft auf der Kugel von oben (0) nach unten (1), psi ist der Azimut; m ist (Abstand zur Achse, Höhe).
+  float meridian(vec3 d){ return acos(clamp(d.y, -1., 1.)) / PI; }
+  float azimuth(vec3 d){ vec2 h = dot(d.xz, d.xz) < 1e-12 ? vec2(1., 0.) : d.xz; return atan(h.y, h.x); }
+  vec3 lathe(vec2 m, float psi){ return vec3(m.x * cos(psi), m.y, m.x * sin(psi)); }
+  // Sektor für Zungen und Blätter: Mittelwinkel, Lage im Sektor (-1 bis 1) und Nummer. An den Sektorgrenzen treffen
+  // sich alle Nachbarn im selben Tal, darum bleibt die Fläche geschlossen, obwohl die Blätter oben frei stehen.
+  vec3 sector(float psi, float n){ float D = 2. * PI / n, k = floor(psi / D + .5); return vec3(k * D, (psi - k * D) / (D * .5), mod(k + n, n)); }
+  // Ebene Platte mit runder Kante: ein Band um den Äquator wird zur Kante, der Rest der Kugel zu den ebenen Flächen.
+  vec3 slab(vec3 d, vec2 size, float c, float band){
+    const float quarter = 1.5707963;
     float rho = length(d.xy), lat = abs(asin(clamp(d.z, -1., 1.)));
-    vec2 u = d.xy / max(rho, 1e-5), a = abs(u) / vec2(1.22, .86) + 1e-5;
+    vec2 u = d.xy / max(rho, 1e-5), a = abs(u) / size + 1e-5;
     float edge = pow(pow(a.x, 14.) + pow(a.y, 14.), -1. / 14.), rim = min(lat / band, 1.) * quarter;
     float radial = lat > band ? (edge - c) * (1. - (lat - band) / (quarter - band)) : edge - c + c * cos(rim);
     return vec3(u * radial, sign(d.z) * c * sin(rim));
   }
-  // Eiche & Form: ein exakter Korpus, die Oberkante folgt einer schiefen Linie.
+
+  // Übersicht: graue, weiche, leicht asymmetrische Masse; w ist die Mulde für die Schattierung.
+  vec4 mass(vec3 d, float seed){
+    float n = .24 * snoise(d * .62 + seed * vec3(7.13, 3.71, 5.29)) + .045 * snoise(d * 1.3 - seed * vec3(2.9, 6.1, 4.3));
+    return vec4(d * (1. + n) * vec3(1.06, .95, 1.), n);
+  }
+  // Die Idee: die Masse zieht sich zusammen und hebt einen Tropfen, der nur noch an einem Faden hängt.
+  vec3 drop(vec3 d, float seed){
+    float u = meridian(d);
+    vec2 m;
+    // Tropfen oben rund, unten spitz; Faden; der Grund steigt wie ein Meniskus zum Faden an; runder Grund.
+    if (u < .28) { float a = u / .28 * 2.85; m = vec2(.38 * sin(a) * pow(max(cos(a * .5), 0.), .6), .82 + .4 * cos(a)); }
+    else if (u < .38) m = bez2(vec2(.0344, .4365), vec2(.03, .32), vec2(.06, .22), (u - .28) / .1);
+    else if (u < .6) m = bez3(vec2(.06, .22), vec2(.08, .02), vec2(.53, .08), vec2(.639, -.089), (u - .38) / .22);
+    else { float b = mix(1., PI, (u - .6) / .4); m = vec2(.76 * sin(b), -.5 + .76 * cos(b)); }
+    m.x *= 1. + .06 * snoise(d * 1.2 + seed);
+    vec3 p = lathe(m, azimuth(d));
+    p.x += .14 * smoothstep(.3, 1.3, p.y);
+    return p;
+  }
+  // Das Fundament: drei gestaffelte, gegeneinander gedrehte Schichten. Abstand entlang des Strahls per Bisektion.
+  float box(vec3 p, vec3 b, float r){ vec3 q = abs(p) - b + r; return length(max(q, 0.)) + min(max(q.x, max(q.y, q.z)), 0.) - r; }
+  vec3 turn(vec3 p, float a){ float c = cos(a), s = sin(a); return vec3(c * p.x - s * p.z, p.y, s * p.x + c * p.z); }
+  float layers(vec3 p){
+    float a = box(turn(p - vec3(0., -.44, 0.), .2), vec3(1.05, .23, .78), .06);
+    float b = box(turn(p - vec3(.04, 0., 0.), -.32), vec3(.9, .23, .66), .06);
+    float c = box(turn(p - vec3(-.03, .44, 0.), .52), vec3(.74, .23, .54), .06);
+    return min(min(a, b), c);
+  }
+  vec3 foundation(vec3 d){
+    // Mittelpunkt in der unteren Schicht, damit fast jeder Strahl die Schichten genau einmal verlässt.
+    const vec3 o = vec3(0., -.42, 0.);
+    float lo = 0., hi = 1.7;
+    for (int i = 0; i < 18; i++) { float m = (lo + hi) * .5; if (layers(o + d * m) < 0.) lo = m; else hi = m; }
+    return o + d * (lo + hi) * .5;
+  }
+  // Eiche & Form: ein Korpus, die Oberkante folgt einer schiefen Linie wie unter einer Dachschräge.
   vec3 cabinet(vec3 d){
-    vec3 a = abs(d) / vec3(1., .86, .48) + 1e-5;
+    vec3 a = abs(d) / vec3(.8, 1., .46) + 1e-5;
     float r = pow(pow(a.x, 16.) + pow(a.y, 16.) + pow(a.z, 16.), -1. / 16.);
-    float slope = d.y + .46 * d.x;
-    if (slope > 0.) r = smin(r, .6 / slope, .02);
+    float slope = d.y + .32 * d.x;
+    if (slope > 0.) r = smin(r, .9 / slope, .02);
     return d * r;
   }
-  // Hof & Flamme: ein Tropfen, der nach oben in drei gedrehte Zungen ausläuft und leicht zur Seite schwingt.
+  // Hof & Flamme: ein runder Grund, aus dem drei Zungen verschieden hoch und leicht gedreht aufsteigen.
   vec3 flame(vec3 d){
-    float c = d.y, s = sqrt(max(0., (1. - c) * .5)), k = smoothstep(-.4, 1., c);
-    vec2 e = d.xz / max(length(d.xz), 1e-4);
-    float a = c * 1.7 + .5, c3 = 4. * e.x * e.x * e.x - 3. * e.x, s3 = 3. * e.y - 4. * e.y * e.y * e.y;
-    float tongue = c3 * cos(a) - s3 * sin(a);
-    vec2 xz = d.xz * 1.02 * pow(s, 1.8) * (1. + .85 * k * tongue);
-    xz.x += .12 * k * k * sin(c * 2.4 + 1.);
-    float y = c * 1.25 - .05 + .5 * k * k * tongue * smoothstep(0., .22, s) + .05 * snoise(d * 2.1 + 3.);
-    return vec3(xz.x, y, xz.y);
+    float u = meridian(d), psi = azimuth(d);
+    vec2 m;
+    if (u < .5) {
+      vec3 s = sector(psi, 3.);
+      float t = u / .5, h = 1.05 + .28 * cos(s.z * 2.4 + .7);
+      vec2 spine = bez3(vec2(0., .02), vec2(.14, h + 1.45), vec2(.66, .35), vec2(.66, -.5), t);
+      vec2 valley = bez3(vec2(0., .02), vec2(.2, .12), vec2(.66, .05), vec2(.66, -.5), t);
+      m = mix(spine, valley, abs(s.y));
+    } else { float b = mix(1.5707963, PI, (u - .5) / .5); m = vec2(.66 * sin(b), -.5 + .66 * cos(b)); }
+    vec3 p = lathe(m, azimuth(d) + .55 * (m.y + .2));
+    p.x += .12 * pow(smoothstep(-.2, 1.4, p.y), 2.);
+    return p + d * .04 * snoise(d * 2.1 + 3.);
   }
-  // xyz Lage auf der Gestalt, w Mulde (nur Masse) für die Schattierung.
+  // Safran Atelier: Krokus mit sechs Blütenblättern im Wechsel groß und klein, drei Fäden in der Mitte; w markiert die Fäden.
+  vec4 crocus(vec3 d){
+    float u = meridian(d), psi = azimuth(d), thread = 0.;
+    const vec2 S = vec2(0., -.22), R = vec2(.08, -.18), B = vec2(.17, -.38);
+    vec2 m;
+    if (u < .14) {
+      vec3 s = sector(psi + .52, 3.);
+      float t = u / .14;
+      m = mix(bez3(S, vec2(0., .72), vec2(.2, .8), R, t), bez3(S, vec2(.03, -.2), vec2(.06, -.19), R, t), pow(abs(s.y), .9));
+      thread = 1. - smoothstep(.75, 1., t);
+    } else if (u < .74) {
+      vec3 s = sector(psi, 6.);
+      float t = (u - .14) / .6, size = mod(s.z, 2.) < .5 ? 1. : .84;
+      vec2 tip = vec2(.8, .66) * size;
+      vec2 spine = t < .5 ? bez2(R, vec2(.5, -.06) * size, tip, t * 2.) : bez2(tip, vec2(.55, -.1) * size, B, t * 2. - 1.);
+      vec2 valley = t < .5 ? bez2(R, vec2(.15, -.17), vec2(.2, -.22), t * 2.) : bez2(vec2(.2, -.22), vec2(.21, -.3), B, t * 2. - 1.);
+      m = mix(spine, valley, pow(abs(s.y), 2.4));
+    } else {
+      float t = (u - .74) / .26;
+      m = vec2(B.x * (1. - t * t), mix(B.y, -.98, t));
+    }
+    return vec4(lathe(m, psi), thread);
+  }
+  // Raumgut: Lage im Raster der Vorderseite (Spalte, Zeile) und Fachmaske (0 Steg, 1 Fach).
+  vec3 rackCell(vec2 q){
+    vec2 g = vec2((q.x + .88) / .44, (.6 - q.y) / .4), l = fract(g) - .5;
+    float inside = step(0., g.x) * step(g.x, 4.) * step(0., g.y) * step(g.y, 3.);
+    return vec3(floor(g), inside * (1. - smoothstep(.2, .43, max(abs(l.x), abs(l.y)))));
+  }
+  // Raumgut: ein Regal aus Fächern; ein Fach tritt nach vorn. w: Fach (-1) oder vortretendes Fach (1).
+  vec4 rack(vec3 d){
+    vec3 p = slab(d, vec2(1.22, .9), .24, .4), cell = rackCell(p.xy);
+    float face = step(0., d.z) * step(.4, abs(asin(clamp(d.z, -1., 1.)))) * cell.z;
+    float pick = step(abs(cell.x - 2.), .1) * step(abs(cell.y - 1.), .1);
+    p.z += face * mix(-.13, .32, pick);
+    return vec4(p, face * (pick > .5 ? 1. : -1.));
+  }
+  // Ihr Projekt: wieder formlose Masse, aber offen, mit einer Mulde zur Kamera; w ist die Tiefe der Mulde.
+  vec4 open(vec3 d, float seed){
+    vec4 m = mass(d, seed);
+    float bowl = smoothstep(.42, 1., d.z), lip = smoothstep(.25, .42, d.z) * (1. - smoothstep(.42, .6, d.z));
+    float r = (1. + m.w * (1. - bowl)) * (1. - .88 * bowl) + .07 * lip;
+    return vec4(d * r * vec3(1.06, .95, 1.), bowl);
+  }
   vec4 form(int id, vec3 d, float seed){
     vec4 r = vec4(0.);
-    if (id == 1) r = vec4(pane(d), 0.);
-    else if (id == 2) r = vec4(cabinet(d), 0.);
-    else if (id == 3) r = vec4(flame(d), 0.);
-    else {
-      float n = .24 * snoise(d * .62 + seed * vec3(7.13, 3.71, 5.29)) + .045 * snoise(d * 1.3 - seed * vec3(2.9, 6.1, 4.3));
-      r = vec4(d * (1. + n) * vec3(1.06, .95, 1.), n);
-    }
+    if (id == 1) r = vec4(drop(d, seed), 0.);
+    else if (id == 2) r = vec4(foundation(d), 0.);
+    else if (id == 3) r = vec4(slab(d, vec2(1.22, .86), .07, .38), 0.);
+    else if (id == 4) r = vec4(cabinet(d), 0.);
+    else if (id == 5) r = vec4(flame(d), 0.);
+    else if (id == 6) r = crocus(d);
+    else if (id == 7) r = rack(d);
+    else if (id == 8) r = open(d, seed);
+    else r = mass(d, seed);
     return r;
   }
   // Wann sich diese Stelle verwandelt (x, 0 bis 1) und wie weich die Front ist (y). Die Front gehört zur Gestalt B.
   vec2 front(vec3 d){
-    if (uFormB == 1) return vec2((1. - d.y) * .5, .045);
-    if (uFormB == 2) return vec2((d.x + 1.) * .5 + d.y * .05, .035);
-    if (uFormB == 3) return vec2((d.y + 1.) * .5 + .12 * snoise(d * 2.3 + 11.), .3);
-    // Formlose Masse: sanft in großen Flecken, jede Station mit eigenem Rauschen.
-    return vec2(.5 + .32 * snoise(d * .8 + uSeedB * 1.7), .6);
+    vec2 f = vec2(.5 + .32 * snoise(d * .8 + uSeedB * 1.7), .6);
+    // Idee: weich von unten nach oben, der Tropfen hebt sich zuletzt.
+    if (uFormB == 1) f = vec2((d.y + 1.) * .5, .35);
+    // Fundament: Schicht für Schicht von unten.
+    else if (uFormB == 2) f = vec2((smoothstep(-.36, -.26, d.y) + smoothstep(.24, .34, d.y)) / 2.6 + (d.y + 1.) * .08, .08);
+    // Klarblick: ein gerader Abzieherzug von oben, scharf.
+    else if (uFormB == 3) f = vec2((1. - d.y) * .5, .045);
+    // Eiche & Form: ein Hobelzug von links, scharf.
+    else if (uFormB == 4) f = vec2((d.x + 1.) * .5 + d.y * .05, .035);
+    // Hof & Flamme: Wärme steigt von unten, weich und unruhig.
+    else if (uFormB == 5) f = vec2((d.y + 1.) * .5 + .12 * snoise(d * 2.3 + 11.), .3);
+    // Safran Atelier: die Blüte öffnet sich von oben.
+    else if (uFormB == 6) f = vec2((1. - d.y) * .5 + .05 * snoise(d * 3. + 5.), .3);
+    // Raumgut: Fach für Fach in Leserichtung, die Stege dazwischen gleiten mit.
+    else if (uFormB == 7) {
+      vec3 p = slab(d, vec2(1.22, .9), .24, .4), cell = rackCell(p.xy);
+      float order = clamp((.6 - p.y) / 1.2, 0., 1.) * .8 + clamp((p.x + .88) / 1.76, 0., 1.) * .2;
+      float inFace = step(0., d.z) * step(.4, abs(asin(clamp(d.z, -1., 1.)))) * cell.z;
+      f = vec2(mix(order, (cell.y * 4. + cell.x) / 12. * .92, inFace), .12);
+    }
+    // Ihr Projekt: die Mulde öffnet sich zur Kamera hin.
+    else if (uFormB == 8) f = vec2((1. - d.z) * .5, .4);
+    return f;
   }
-  vec3 surface(vec3 d, out float w, out float act, out float cav){
+  vec3 surface(vec3 d, out float w, out float act, out vec2 aux){
     vec2 f = front(d);
     f.x = clamp(f.x, 0., 1.);
-    float x = (uT * (1. + f.y) - f.x) / f.y, travel = sin(3.14159265 * uT);
+    float x = (uT * (1. + f.y) - f.x) / f.y, travel = sin(PI * uT);
     w = smoothstep(0., 1., x);
     act = 4. * w * (1. - w);
     vec4 a = uT < 1. ? form(uFormA, d, uSeedA) : vec4(0.), b = uT > 0. ? form(uFormB, d, uSeedB) : vec4(0.);
-    vec4 s = mix(a, b, w);
-    cav = s.w;
-    if (travel < .001) return s.xyz;
-    // Unterwegs wird die Masse flüssig, am stärksten an der Front; wo die Front vorbei ist, setzt sie sich.
-    float flow = (.06 * travel * (1. - w) + .07 * act) * snoise(d * 1.7 + vec3(0., -uT * 2.6, uT * 1.2) + uSeedB);
+    aux = vec2(a.w, b.w);
+    vec3 p = mix(a.xyz, b.xyz, w);
+    if (travel < .001) return p;
+    // An der Front wird die Gestalt kurz wieder Masse und flüssig; wo die Front vorbei ist, setzt sie sich.
+    p = mix(p, mass(d, uSeedB).xyz, act * .4);
+    p += d * (.06 * travel * (1. - w) + .07 * act) * snoise(d * 1.7 + vec3(0., -uT * 2.6, uT * 1.2) + uSeedB);
     // Abstand vor der Front, in Einheiten der Frontkoordinate.
     float ahead = f.x - (uT * (1. + f.y) - f.y * .5), pile = (ahead - .05) / .045, chip = (ahead + .02) / .03;
-    vec3 p = s.xyz + d * flow;
     // Klarblick: vor dem Abzieher staut sich die Masse wie Wasser.
-    if (uFormB == 1) p += d * .2 * travel * exp(-pile * pile);
+    if (uFormB == 3) p += d * .2 * travel * exp(-pile * pile);
     // Eiche & Form: hinter dem Hobel hebt sich ein Span.
-    if (uFormB == 2) p += vec3(-.3, 1., 0.) * .16 * travel * exp(-chip * chip) * smoothstep(.1, .7, d.y);
+    if (uFormB == 4) p += vec3(-.3, 1., 0.) * .16 * travel * exp(-chip * chip) * smoothstep(.1, .7, d.y);
     // Hof & Flamme: die Wärme dehnt die Masse und hebt sie an.
-    if (uFormB == 3) p += (d * .08 + vec3(0., .14, 0.)) * act;
+    if (uFormB == 5) p += (d * .08 + vec3(0., .14, 0.)) * act;
     return p;
   }
   void main(){
     vec3 d = normalize(position);
     vec3 t1 = normalize(cross(d, abs(d.y) < .99 ? vec3(0., 1., 0.) : vec3(1., 0., 0.))), t2 = cross(d, t1);
-    float w, act, cav, w1, a1, c1;
-    vec3 p = surface(d, w, act, cav);
-    vec3 p1 = surface(normalize(d + t1 * .006), w1, a1, c1), p2 = surface(normalize(d + t2 * .006), w1, a1, c1);
+    float w, act, w1, a1;
+    vec2 aux, x1;
+    vec3 p = surface(d, w, act, aux);
+    vec3 p1 = surface(normalize(d + t1 * .006), w1, a1, x1), p2 = surface(normalize(d + t2 * .006), w1, a1, x1);
     vNormal = normalize(cross(p1 - p, p2 - p));
-    vPos = p; vW = w; vAct = act; vCav = cav;
+    vPos = p; vW = w; vAct = act; vAuxA = aux.x; vAuxB = aux.y;
     gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.);
   }`;
 
 const fragment = `
   uniform int uFormA; uniform int uFormB;
-  varying vec3 vPos; varying vec3 vNormal; varying float vW; varying float vAct; varying float vCav;
+  varying vec3 vPos; varying vec3 vNormal; varying float vW; varying float vAct; varying float vAuxA; varying float vAuxB;
   ${noise}
   const vec3 KEY = vec3(-.5, .72, .48);
   vec3 N, V, R; float NL, NV, FR;
@@ -145,50 +262,76 @@ const fragment = `
     return c + vec3(2.2, 2.1, 1.9) * smoothstep(.82, .97, dot(r, normalize(vec3(-.5, .72, .48))));
   }
   float spec(float power){ return pow(max(dot(N, normalize(normalize(KEY) + V)), 0.), power); }
-  vec3 shade(int id){
+  vec3 shade(int id, float aux){
     vec3 key = vec3(1.25, 1.18, 1.05) * max(NL, 0.), sky = mix(vec3(.04, .08, .085), vec3(.3, .36, .36), N.y * .5 + .5), c = vec3(0.);
-    if (id == 1) {
+    if (id == 3) {
       // Glas: fast nur Spiegelung, zwei schräge Glanzstreifen, die mit dem Blick wandern; grünliche Kante.
       float band = vPos.x * .55 + vPos.y * .7 + R.x * .9;
       float streak = (1. - smoothstep(0., .12, abs(band - .3))) * .55 + (1. - smoothstep(0., .035, abs(band - .52))) * .8;
       float sheen = .05 * smoothstep(1.2, -1., band);
-      c = vec3(.012, .03, .034) + env(R) * mix(.05, 1., FR) + vec3(streak + sheen) + vec3(.3, .48, .34) * pow(1. - NV, 3.) + vec3(1.6) * spec(220.) + vec3(.2) * vAct;
-    } else if (id == 2) {
-      // Eiche: Jahresringe um eine Achse entlang x, verzogen durch Rauschen im Objektraum; matt.
-      vec3 q = vPos * vec3(.5, 1., 1.5) + vec3(0., 1.6, -.9);
-      float warp = .1 * snoise(vPos * vec3(.35, 1.6, 1.6)) + .015 * snoise(vPos * vec3(.5, 8., 8.));
-      float ring = fract((length(q.yz) + warp) * 12.);
+      c = vec3(.012, .03, .034) + env(R) * mix(.05, 1., FR) + vec3(streak + sheen) + vec3(.3, .48, .34) * pow(1. - NV, 3.) + vec3(1.6) * spec(220.);
+    } else if (id == 4) {
+      // Eiche: stehende Bretter, Jahresringe um eine senkrechte Achse, verzogen durch Rauschen im Objektraum; matt.
+      vec3 q = vPos * vec3(1.5, .45, 1.5) + vec3(-1.7, 0., -.9);
+      float warp = .1 * snoise(vPos * vec3(1.6, .35, 1.6)) + .015 * snoise(vPos * vec3(8., .5, 8.));
+      float ring = fract((length(q.xz) + warp) * 12.);
       float late = smoothstep(.62, .86, ring) * (1. - smoothstep(.88, 1., ring));
-      float pores = smoothstep(.2, .9, snoise(vPos * vec3(1.5, 55., 55.)));
-      // Fugen: eine Tür und ein Sockel machen aus dem Block einen Korpus.
-      float front = smoothstep(.44, .47, vPos.z);
-      float joint = front * max(1. - smoothstep(.006, .014, abs(vPos.x + .12)), 1. - smoothstep(.006, .014, abs(vPos.y + .7)));
-      vec3 albedo = mix(vec3(.36, .25, .155), vec3(.2, .13, .075), late * .7 + pores * .25) * (1. + .5 * vAct) * (1. - .75 * joint);
+      float pores = smoothstep(.2, .9, snoise(vPos * vec3(55., 1.5, 55.)));
+      // Fugen: zwei Türen und ein Sockel machen aus dem Block einen Korpus.
+      float face = smoothstep(.42, .45, vPos.z);
+      float joint = face * max(1. - smoothstep(.006, .014, abs(vPos.x)), 1. - smoothstep(.006, .014, abs(vPos.y + .84)));
+      vec3 albedo = mix(vec3(.33, .235, .16), vec3(.17, .115, .075), late * .7 + pores * .25) * (1. - .75 * joint);
       c = albedo * (key * 1.1 + sky * .7) + vec3(.06) * spec(18.) + env(R) * FR * .1;
-    } else if (id == 3) {
+    } else if (id == 5) {
       // Glut: dunkle, glänzende Haut, innen warm glühend; am Grund und in der Mitte am hellsten, nach oben kühler.
       float h = clamp((vPos.y + 1.2) / 2.6, 0., 1.);
       float inner = (pow(NV, 2.8) * (1. - .55 * h) + .25 * (1. - h) * (1. - h)) * (.85 + .3 * snoise(vPos * vec3(2.2, 1.4, 2.2) + vec3(0., -1.5, 0.)));
       vec3 glow = mix(vec3(.45, .05, .01), vec3(1., .36, .06), smoothstep(.15, .6, inner));
       glow = mix(glow, vec3(1.25, .8, .38), smoothstep(.6, 1., inner));
-      c = vec3(.05, .025, .015) * (key + sky) + glow * inner * .95 + env(R) * FR * .45 + vec3(.55, .45, .35) * spec(70.) + vec3(1., .45, .12) * vAct * .8;
+      c = vec3(.05, .025, .015) * (key + sky) + glow * inner * .95 + env(R) * FR * .45 + vec3(.55, .45, .35) * spec(70.);
+    } else if (id == 6) {
+      // Krokus: gedämpftes Violett mit feinen Adern, durchscheinend im Gegenlicht; die Fäden safranrot.
+      float vein = .5 + .5 * snoise(vPos * vec3(10., 2.5, 10.));
+      vec3 petal = mix(vec3(.24, .17, .32), vec3(.44, .38, .53), smoothstep(-.25, .75, vPos.y)) * (.85 + .15 * vein);
+      vec3 albedo = mix(petal, vec3(.55, .06, .025), aux);
+      float through = pow(max(-NL, 0.), 1.5) * (1. - aux);
+      c = albedo * (key * .95 + sky * .8 + vec3(.5, .4, .55) * through) + vec3(.1) * spec(30.) * (1. - aux) + env(R) * FR * .2 + vec3(.45, .07, .02) * aux * .3;
+    } else if (id == 7) {
+      // Raumgut: hell und naturmatt; Fächer innen im Schatten, das vortretende Fach etwas heller.
+      vec3 albedo = vec3(.4, .47, .37) * (1. + .2 * max(aux, 0.));
+      c = albedo * (key * 1.05 + sky * .75) * (1. - .5 * max(-aux, 0.)) + vec3(.05) * spec(16.) + env(R) * FR * .12;
     } else {
-      // Masse: graues, seidenmattes Material; Mulden etwas dunkler.
-      float ao = mix(.55, 1., smoothstep(-.2, .16, vCav)), wrap = max((NL + .2) / 1.2, 0.);
-      c = vec3(.19, .2, .2) * (vec3(1.3, 1.22, 1.08) * wrap * wrap + sky * .8) * ao + vec3(.2) * spec(28.) + env(R) * (.05 + FR * .3) * ao;
+      // Masse und ihre grauen Gestalten: Idee mit hellerer Spitze, Fundament mit drei gedämpften Tönen, Ihr Projekt offen.
+      vec3 albedo = vec3(.19, .2, .2);
+      float ao = id == 0 ? mix(.55, 1., smoothstep(-.2, .16, aux)) : 1., gloss = .2;
+      if (id == 1) { float tip = smoothstep(.35, 1.15, vPos.y); albedo = mix(albedo, vec3(.5, .5, .47), tip); gloss += .25 * tip; }
+      if (id == 2) {
+        // Inhalt, Gestaltung, Funktion von unten nach oben, stark entsättigt; die Fugen liegen im Schatten.
+        float layer = step(-.22, vPos.y) + step(.22, vPos.y);
+        vec3 tone = layer < .5 ? vec3(.48, .62, .42) : layer < 1.5 ? vec3(.48, .54, .63) : vec3(.67, .8, .33);
+        albedo = mix(albedo, tone * .4, .32);
+        ao = mix(.62, 1., smoothstep(0., .08, abs(abs(vPos.y) - .22)));
+      }
+      float wrap = max((NL + .2) / 1.2, 0.);
+      c = albedo * (vec3(1.3, 1.22, 1.08) * wrap * wrap + sky * .8) * ao + vec3(gloss) * spec(28.) + env(R) * (.05 + FR * .3) * ao;
+      // Ihr Projekt: feiner Rand im Akzent um die Mulde, innen ein leises Licht.
+      if (id == 8) c += vec3(.68, .84, .29) * .4 * smoothstep(0., .002, aux) * (1. - smoothstep(.004, .012, aux)) + vec3(.06, .075, .05) * smoothstep(.3, 1., aux);
     }
     return c;
   }
   void main(){
     N = normalize(vNormal); V = normalize(cameraPosition - vPos); R = reflect(-V, N);
     NL = dot(N, normalize(KEY)); NV = max(dot(N, V), 0.); FR = pow(1. - NV, 4.);
-    vec3 c = vW < .999 ? shade(uFormA) : vec3(0.);
-    if (vW > .001) c = mix(c, shade(uFormB), vW);
+    vec3 c = vW < .999 ? shade(uFormA, vAuxA) : vec3(0.);
+    if (vW > .001) c = mix(c, shade(uFormB, vAuxB), vW);
+    // An der Front wird jedes Material kurz wieder zur grauen Masse, erst dahinter nimmt es das neue an.
+    float liquid = vAct * .85;
+    if (liquid > .01) c = mix(c, shade(0, 0.), liquid);
     // Kühles Gegenlicht am Rand im Akzentton.
     c += vec3(.84, .93, .57) * .22 * FR * smoothstep(-.3, .5, dot(N, normalize(vec3(.65, .3, -.7))));
     c = (c * (2.51 * c + .03)) / (c * (2.43 * c + .59) + .14);
     // Glas lässt den Seitengrund durchscheinen, Spiegelungen und Kanten bleiben deckend.
-    float glass = (uFormA == 1 ? 1. - vW : 0.) + (uFormB == 1 ? vW : 0.);
+    float glass = ((uFormA == 3 ? 1. - vW : 0.) + (uFormB == 3 ? vW : 0.)) * (1. - liquid);
     gl_FragColor = vec4(pow(clamp(c, 0., 1.), vec3(1. / 2.2)), mix(1., clamp(.3 + .7 * FR + dot(c, vec3(.9)), 0., 1.), glass));
   }`;
 
