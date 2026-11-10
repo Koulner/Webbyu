@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { initLandscape } from './scene';
+import { initLandscape, TRANSITIONS } from './scene';
 import { renderJourney } from './page';
 import { stations } from './data';
 
@@ -36,11 +36,12 @@ beforeEach(()=>{
   vi.stubGlobal('matchMedia',()=>media);
   vi.stubGlobal('ResizeObserver',class {constructor(){} observe(){} disconnect(){}});
   vi.stubGlobal('IntersectionObserver',class {constructor(callback:typeof intersect){intersect=callback;}observe(){}disconnect(){}});
+  vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue(null);
 });
 afterEach(()=>{controller?.dispose();controller=undefined;document.body.replaceChildren();vi.restoreAllMocks();vi.unstubAllGlobals();});
 const flush=()=>{elapsed+=16;const pending=[...frames.values()];frames.clear();pending.forEach(callback=>callback(elapsed));};
 
-describe('journey particle element',()=>{
+describe('journey picture element',()=>{
   it('renders as decoration, replaces the network map and disposes the canvas once',()=>{
     controller=initLandscape(map);
     expect(map.dataset.render).toBe('material');
@@ -77,22 +78,26 @@ describe('journey particle element',()=>{
     expect(frames.size).toBe(0);
   });
 
-  it('burns once from the visible form to the target when jumping over several stations',()=>{
+  it('gives every station its own transition',()=>{
+    const modes=stations.map(station=>TRANSITIONS.indexOf(station.id));
+    expect(modes.every(mode=>mode>=0)).toBe(true);
+    expect(new Set(modes).size).toBe(stations.length);
+  });
+
+  it('changes once from the visible station to the target when jumping over several stations',()=>{
     controller=initLandscape(map);
-    const shown=()=>{
-      const piece=(gpu.render.mock.lastCall![0] as import('three').Scene).children[0];
-      const geometry=(piece.children[1] as import('three').Points).geometry;
-      return ['position','positionB'].map(name=>Array.from(geometry.getAttribute(name).array.slice(0,30)).join());
-    };
+    const uniforms=()=>((gpu.render.mock.lastCall![0] as import('three').Scene).children[0] as import('three').Mesh<import('three').PlaneGeometry,import('three').ShaderMaterial>).material.uniforms;
     controller.setProgress(1,true);flush();
-    const fundament=shown()[0];
+    const fundament=uniforms().uTexA.value;
     controller.setProgress(6,true);flush();
     controller.setProgress(0);
-    const seen=new Set<string>();
-    // At rest positionB already holds the next station, so only frames of the running transition count.
-    for(let i=0;i<400&&frames.size;i++){flush();if(frames.size) shown().forEach(form=>seen.add(form));}
+    const seen=new Set<unknown>(), modes=new Set<number>();
+    // At rest uTexB already holds the next station, so only frames of the running transition count.
+    for(let i=0;i<400&&frames.size;i++){flush();if(frames.size){seen.add(uniforms().uTexA.value);seen.add(uniforms().uTexB.value);modes.add(uniforms().uMode.value);}}
     expect(frames.size).toBe(0);
     expect(seen.has(fundament)).toBe(false);
+    // Backwards the transition of the station being left runs in reverse.
+    expect([...modes]).toEqual([TRANSITIONS.indexOf('raumgut')]);
   });
 
   it('stops work when disabled, offscreen or hidden; reduced motion jumps without animation',()=>{
