@@ -44,6 +44,8 @@ button:disabled { cursor: wait; }
 [data-render=webgl] .journey-vector, [data-render=material] .journey-vector { opacity: 0; visibility: hidden; }
 /* Richtung B: Das Werkstück ersetzt die Netzwerkkarte; Stationen bleiben über die untere Navigation erreichbar. */
 [data-render=material] .journey-markers, .journey-stage:has([data-render=material]) .journey-preview { visibility: hidden; }
+/* display statt visibility: der aktuelle Pin setzt sich sonst mit visibility: visible über den versteckten Elternteil hinweg. */
+[data-render=material] .journey-markers { display: none; }
 .journey-atmosphere { background: linear-gradient(90deg, #10272f99 0%, #10272f66 30%, #10272f00 52%), linear-gradient(0deg, #10272fb3, #10272f00 22%); pointer-events: none; }
 .journey-scene-label { position: absolute; right: 4vw; top: 135px; display: flex; flex-direction: column; gap: 11px; text-align: right; color: #d0ddce; max-width: 40%; }
 .journey-scene-label > span:last-child { font-family: var(--font-serif); font-size: 23px; line-height: 1.2; }
