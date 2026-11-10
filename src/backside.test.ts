@@ -29,6 +29,18 @@ describe('Vorder- und Rückseite', () => {
     expect(button.textContent).toBe('Vorderseite zeigen');
     expect(root.querySelector<HTMLElement>('[data-panel]')!.dataset.side).toBe('back');
     backside.dispose();
+  });
+
+  it('blendet die abgewandte Seite erst aus, wenn die Karte über 90 Grad gedreht ist', async () => {
+    media(false);
+    const root = fixture();
+    const backside = mountBackside(root, vi.fn(async () => ({ mountRoomLight: () => ({ render() {}, dispose() {} }) })));
+    const card = root.querySelector<HTMLElement>('.card')!;
+    root.querySelector('button')!.click();
+    await new Promise(resolve => setTimeout(resolve, 50));
+    expect(card.classList.contains('shows-back')).toBe(false);
+    await vi.waitFor(() => expect(card.classList.contains('shows-back')).toBe(true), { timeout: 3000 });
+    backside.dispose();
     expect(root.classList.contains('is-3d')).toBe(false);
   });
 
