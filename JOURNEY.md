@@ -1,5 +1,22 @@
 # Webbyu – Die Reise
 
+## Aktualisierung 10. November 2026 (Redesign, Branch `redesign/unikat-2026`)
+
+Nutzerentscheidungen vom 9. und 10. November 2026 ersetzen die räumliche Landschaft und gehen den älteren Punkten unten vor:
+
+- Die Reise zeigt **ein einziges Element, das mit jeder Station weiter wächst** (`src/journey/scene.ts`). Keine Station kehrt zu einer früheren Form zurück:
+  - Übersicht: schwebender Glutball aus gebündelten Funken.
+  - Die Idee: eine Website-Skizze aus Funkenlinien.
+  - Das Fundament: drei Ebenen.
+  - Projektstationen: das Projektbild in voller Schärfe.
+  - Der nächste Abschnitt: Collage aller fünf Projekte mit glimmendem leerem Rahmen „Ihr Projekt“.
+  Nur beim Verglühen zerfällt das Element in Funken.
+- **Beim Weiterreisen** verglüht das Element von unten nach oben zu Funken und setzt sich zur nächsten Form zusammen. Die Funken leuchten in den Farben der jeweiligen Vorschau. Der Nutzer beschreibt das „wie ein Phönix“; ein Vogel oder Phönix wird nicht dargestellt.
+- **Netzwerkkarte, Stationsmarker und Bildkarte** sind im WebGL-Betrieb ausgeblendet. Stationen bleiben über die untere Navigation, Zurück/Weiter und die Textspalte erreichbar. Live-Demos laden erst über „Konzept ausprobieren“.
+- **Schwebende Funken** folgen dem Luftzug des Zeigers. Dafür läuft die Darstellung dauerhaft, solange die Bühne sichtbar und Bewegung erlaubt ist. Das ersetzt die frühere Regel „keine dauerhafte Animationsschleife“. Bei reduzierter Bewegung, im Hintergrundtab, außerhalb des Sichtbereichs und bei geöffneter Demo steht sie still.
+- **Die Animation ist immer sichtbar:** Text liegt mit transparentem oder halbtransparentem Hintergrund davor, auch mobil.
+- Keine Blume des Lebens und keine anderen esoterischen Bilder oder Begriffe (Nutzerkorrektur 10. November 2026).
+
 ## Aktualisierung 4. November 2026
 
 Die Reise zeigt acht Stationen: Klarblick (Start), Eiche & Form (Business) und Hof & Flamme (Complete) ersetzen Meisterwerk und Nordlicht. Safran Atelier und Raumgut bleiben als Funktionsstudien. Die Paketstationen zeigen ein Bild und verlinken auf die eigenständigen Demo-Websites; die Funktionsstudien behalten ihre interaktive Großansicht. Auch die sichtbaren Direktzugriffe und Verweise auf der Informationsseite wurden angepasst. Die bisherigen Demo-Quelldateien bleiben im Projekt erhalten. Keine Veröffentlichung; visuelle Prüfung und Freigabe stehen noch aus.
