@@ -3,6 +3,8 @@ import { landscapeSvg, mapProjection } from './map';
 import { wordmarkImg } from '../wordmark';
 
 const arrow = '<span aria-hidden="true">↗</span>';
+const examples = stations.filter(station => station.packageId || station.demoId || station.pages).length;
+const two = (n: number) => String(n).padStart(2, '0');
 export function renderJourneyHtml(home: string): string {
   return `
     <a class="journey-skip" href="#reise-kapitel">Zu den Kapiteln springen</a>
@@ -13,7 +15,7 @@ export function renderJourneyHtml(home: string): string {
     </header>
     <main class="journey-layout">
       <div class="journey-stage-wrap">
-        <div class="journey-stage" role="region" aria-label="Verbundene Erlebnisräume mit acht Stationen">
+        <div class="journey-stage" role="region" aria-label="Verbundene Erlebnisräume mit ${stations.length} Stationen">
           <div class="journey-viewport" data-map>
             <div class="journey-vector">${landscapeSvg()}</div>
             <div class="journey-webgl" aria-hidden="true"></div>
@@ -43,10 +45,10 @@ export function renderJourneyHtml(home: string): string {
             <h2 id="landschaft-title" class="journey-sr">Übersicht der Reise</h2>
             <p class="journey-lead">Inhalt. Gestaltung. Funktion.</p>
             <p>Eine gute Website verbindet, was zusammengehört. Entdecken Sie, wie aus einer Aufgabe ein eigener digitaler Auftritt entsteht.</p>
-            <div class="journey-facts" aria-label="Acht Stationen, fünf Beispiele"><span><b>08</b> Stationen</span><span><b>05</b> Beispiele</span></div>
+            <div class="journey-facts" aria-label="${stations.length} Stationen, ${examples} Beispiele"><span><b>${two(stations.length)}</b> Stationen</span><span><b>${two(examples)}</b> Beispiele</span></div>
             <a class="journey-action journey-start" href="#die-idee">Die Reise entdecken <span aria-hidden="true">→</span></a>
             <p class="journey-scroll-cue"><span aria-hidden="true">↕</span> Scrollen oder mit Weiter die Station wechseln.</p>
-            <p class="journey-disclaimer">Die Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Paketumfang und zusätzliche Funktionen werden individuell vereinbart.</p>
+            <p class="journey-disclaimer">Die Beispiele zeigen fiktive Marken und ein Eigenprojekt, keine Kundenreferenzen. Paketumfang und zusätzliche Funktionen werden individuell vereinbart.</p>
           </div>
         </section>
         ${stations.map((station, i) => `<section class="journey-chapter" id="${station.id}" aria-labelledby="${station.id}-title" data-chapter="${i}">
@@ -54,7 +56,7 @@ export function renderJourneyHtml(home: string): string {
             <div class="journey-chapter-heading"><span class="journey-chapter-number" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><p class="journey-eyebrow">${station.eyebrow}</p></div>
             <h2 id="${station.id}-title">${station.title}</h2>
             ${station.story ? `<dl class="journey-project-story"><div><dt>Die Aufgabe</dt><dd>${station.story.task}</dd></div><div><dt>Der Ansatz</dt><dd>${station.story.approach}</dd></div><div><dt>Der Nutzen</dt><dd>${station.story.benefit}</dd></div></dl>` : `<p>${station.description}</p><p class="journey-detail">${station.detail}</p>`}
-            ${station.packageId ? `<a class="journey-action" href="${home}demos/${station.packageId}/" target="_top">Beispielwebsite ansehen ${arrow}</a><p class="journey-simulation">${station.label} · Fiktive Marke · Paketbeispiel</p>` : station.demoId ? `<button class="journey-action" type="button" data-journey-demo="${station.demoId}">Konzept ausprobieren ${arrow}</button><p class="journey-simulation">${station.label} · Fiktive Marke · lokale Simulation</p>` : i === stations.length - 1 ? `<a class="journey-action" href="${home}#projektfinder">Ihr Vorhaben besprechen ${arrow}</a>` : `<a class="journey-action" href="#${stations[i + 1].id}">${i === 0 ? 'Das Fundament entdecken' : 'Die Arbeiten entdecken'} ${arrow}</a>`}
+            ${station.pages ? `${station.pages.map(([label, path]) => `<a class="journey-action" href="${home}${path}" target="_top">${label} ${arrow}</a>`).join('')}<p class="journey-simulation">${station.label} · Eigenprojekt · Bilder sind Platzhalter aus Stockmaterial</p>` : station.packageId ? `<a class="journey-action" href="${home}demos/${station.packageId}/" target="_top">Beispielwebsite ansehen ${arrow}</a><p class="journey-simulation">${station.label} · Fiktive Marke · Paketbeispiel</p>` : station.demoId ? `<button class="journey-action" type="button" data-journey-demo="${station.demoId}">Konzept ausprobieren ${arrow}</button><p class="journey-simulation">${station.label} · Fiktive Marke · lokale Simulation</p>` : i === stations.length - 1 ? `<a class="journey-action" href="${home}#projektfinder">Ihr Vorhaben besprechen ${arrow}</a>` : `<a class="journey-action" href="#${stations[i + 1].id}">${i === 0 ? 'Das Fundament entdecken' : 'Die Arbeiten entdecken'} ${arrow}</a>`}
             ${station.note ? `<p class="journey-inline-note"><span>Meine Arbeitsweise</span>„${station.note}“</p>` : ''}
           </div>
         </section>`).join('')}
@@ -70,7 +72,7 @@ export function renderJourneyHtml(home: string): string {
     <div class="journey-dock">
       <a class="journey-travel journey-travel-back" data-travel-back href="${home}"><span aria-hidden="true">←</span><span data-back-label>Zur Startseite</span></a>
       <div class="journey-dock-center">
-        <div class="journey-position"><span data-step-count>00 / 08</span><span data-map-title>Übersicht</span><a class="journey-overview" href="#landschaft"><span aria-hidden="true">⤢</span> Übersicht</a></div>
+        <div class="journey-position"><span data-step-count>00 / ${two(stations.length)}</span><span data-map-title>Übersicht</span><a class="journey-overview" href="#landschaft"><span aria-hidden="true">⤢</span> Übersicht</a></div>
         <nav class="journey-chapters" aria-label="Kapitel der Reise"><a href="#landschaft" aria-label="Übersicht" aria-current="step"><span>00</span><b>Übersicht</b></a>${stations.map((station, i) => `<a href="#${station.id}" aria-label="${String(i + 1).padStart(2, '0')} ${station.label}"><span>${String(i + 1).padStart(2, '0')}</span><b>${station.label}</b></a>`).join('')}</nav>
       </div>
       <a class="journey-travel journey-travel-next" data-travel-next href="#die-idee"><span data-next-label>Reise beginnen</span><span aria-hidden="true">→</span></a>

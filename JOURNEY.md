@@ -17,6 +17,10 @@ Nutzerentscheidungen vom 9. und 10. November 2026 ersetzen die räumliche Landsc
 - **Die Animation ist immer sichtbar:** Text liegt mit transparentem oder halbtransparentem Hintergrund davor, auch mobil.
 - Keine Blume des Lebens und keine anderen esoterischen Bilder oder Begriffe (Nutzerkorrektur 10. November 2026).
 
+## Aktualisierung 11. November 2026
+
+Neue Station 08 „Koulner“ vor dem Ausblick: ein Eigenprojekt (Foto- und Videoportfolio) in drei Stufen unter `/demos/koulner/stufe-1/` bis `stufe-3/`. Die Station verlinkt die drei Seiten über `pages` in `src/journey/data.ts`; Stationen- und Beispielzahl im Einstieg werden aus den Daten gezählt. Die Bilder sind Stockmaterial als Platzhalter, nur in 960er-Fassungen versioniert.
+
 ## Aktualisierung 4. November 2026
 
 Die Reise zeigt acht Stationen: Klarblick (Start), Eiche & Form (Business) und Hof & Flamme (Complete) ersetzen Meisterwerk und Nordlicht. Safran Atelier und Raumgut bleiben als Funktionsstudien. Die Paketstationen zeigen ein Bild und verlinken auf die eigenständigen Demo-Websites; die Funktionsstudien behalten ihre interaktive Großansicht. Auch die sichtbaren Direktzugriffe und Verweise auf der Informationsseite wurden angepasst. Die bisherigen Demo-Quelldateien bleiben im Projekt erhalten. Keine Veröffentlichung; visuelle Prüfung und Freigabe stehen noch aus.

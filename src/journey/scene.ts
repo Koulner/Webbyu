@@ -4,7 +4,7 @@ import { stations } from './data';
 import type { LandscapeController } from './controller';
 
 /**
- * Ein einziges Element, das mit jeder Station weiter wächst: Glutball, Skizze, Ebenen, fünf fertige Websites und
+ * Ein einziges Element, das mit jeder Station weiter wächst: Glutball, Skizze, Ebenen, sechs fertige Websites und
  * am Ende alle Projekte zusammen mit einem leeren Rahmen für das nächste. Beim Weiterreisen verglüht es von unten nach
  * oben zu Funken und setzt sich zur nächsten Form zusammen. Lose Funken folgen dem Luftzug des Zeigers.
  */
@@ -13,6 +13,7 @@ const IMAGES: Record<string, string> = {
   'eiche-und-form': 'package-demos/eiche-fall14-breit.webp',
   'hof-und-flamme': 'package-demos/hof-concept.webp',
   raumgut: 'reference-assets/raumgut/hero.jpg',
+  koulner: 'koulner/menschen-portraet-01-960.webp',
 };
 const WIDTH = 3.2, HEIGHT = 2;
 /** `soft`: die Form besteht in Ruhe aus Funken (Glutball, Ebenen); sonst zeigt eine scharfe Bildfläche das Projekt. */
