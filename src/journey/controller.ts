@@ -158,7 +158,6 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     map.dataset.project=String(Boolean(stations[index]?.demoId || stations[index]?.packageId));
     sections.forEach((section,i)=>section.classList.toggle('is-current',i===index+1));
     root.querySelector('[data-scene-caption]')!.textContent=index<0?'Jede Idee eröffnet einen neuen Zusammenhang.':stations[index].visual.caption;
-    root.querySelector('[data-scene-index]')!.textContent=index<0?'WEBBYU / VERBUNDENE ERLEBNISRÄUME':`${String(index+1).padStart(2,'0')} / ${stations[index].label.toUpperCase()}`;
     const note=stations[index]?.note;
     // Notes remain readable in the chapter; the optional detail never opens over it automatically.
     guide.hidden=true;
@@ -170,7 +169,6 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     links.forEach((link,i) => i===index+1 ? link.setAttribute('aria-current','step') : link.removeAttribute('aria-current'));
     pins.forEach((pin,i) => i===index ? pin.setAttribute('aria-current','step') : pin.removeAttribute('aria-current'));
     root.querySelector('[data-map-title]')!.textContent = index<0?'Übersicht':stations[index].label;
-    root.querySelector('[data-step-count]')!.textContent = `${String(index+1).padStart(2,'0')} / ${String(stations.length).padStart(2,'0')}`;
     back.setAttribute('href',index<0?import.meta.env.BASE_URL:index===0?'#landschaft':`#${stations[index-1].id}`);
     next.setAttribute('href',index===stations.length-1?`${import.meta.env.BASE_URL}#projektfinder`:`#${stations[index+1].id}`);
     root.querySelector('[data-back-label]')!.textContent=index<0?'Zur Startseite':'Zurück';
@@ -327,7 +325,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       return;
     }
     if(!stageVisible && !requested) return;
-    sceneLoading=(options.loadScene??(()=>import('./scene')))().then(module=>{
+    sceneLoading=(options.loadScene??(()=>import('./live')))().then(module=>{
       if(disposed || media.matches || connection?.saveData) return;
       scene=module.initLandscape(map);
       sceneFailed=false;

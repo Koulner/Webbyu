@@ -1,0 +1,272 @@
+/* Stufe 1 · Mappe
+   Ergänzung zum Grundstil (studien/basis/leuchttisch.css), Ausgang ist dessen ruhige Fassung (html.reduce).
+   Material: gedruckte Bögen auf warmem Papier in einer Mappe aus Karton. Kein Leuchttischlicht, keine Fahrten.
+   Jeder Bereich ist eine Doppelseite: links Text, Kontaktbogen und Notiz, rechts der markierte Abzug mit Begleitbildern.
+   Bewegung nur per CSS: Fettstift-Kreis zeichnet sich beim Ansehen (.is-seen aus main.ts), Abzüge heben sich bei Hover und Fokus. */
+
+.mappe {
+  --table: #e9e2d5; /* Karton der Mappe */
+  --ground: #e9e2d5;
+  --glow-a: 0;
+  --paper: #fcfaf5;
+  --sheet: #fffdf8;
+  --hair: rgb(74 56 32 / 0.16);
+  --shadow: 74 56 32;
+  --ink-2: #5a5348; /* 5,6 : 1 auf Karton, 7,0 : 1 auf Papier */
+  --spread: 1320px;
+}
+
+.mappe .bar {
+  background: rgb(233 226 213 / 0.92);
+}
+
+/* ---------- Doppelseite: Einstieg und Bögen ---------- */
+.mappe .hero,
+.mappe .stage {
+  width: min(var(--spread), 100%);
+  margin-inline: auto;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 28px), rgb(var(--shadow) / 0.07) calc(50% - 1px), rgb(var(--shadow) / 0.2) 50%, rgb(var(--shadow) / 0.05) calc(50% + 1px), transparent calc(50% + 22px)),
+    var(--paper);
+  box-shadow:
+    0 0 0 1px rgb(var(--shadow) / 0.08),
+    0 1px 2px rgb(var(--shadow) / 0.08),
+    0 26px 50px -38px rgb(var(--shadow) / 0.55);
+}
+
+.mappe .hero {
+  width: min(var(--spread), 100% - 2 * var(--gut));
+  min-height: 0;
+  margin-top: calc(var(--bar) + 28px);
+  margin-bottom: 48px;
+  padding: clamp(32px, 4vw, 64px);
+  column-gap: 48px;
+}
+.mappe .sleeve {
+  grid-column: 1 / 6;
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+}
+.mappe .hero-sheet {
+  grid-column: 7 / 13;
+  rotate: none;
+}
+.mappe .hero-hint {
+  display: none; /* spricht von der Lupe, die es hier nicht gibt */
+}
+
+.mappe .bogen {
+  padding: 0 var(--gut) 48px;
+  scroll-margin-top: var(--bar);
+}
+.mappe .stage {
+  height: auto;
+  min-height: 0;
+  padding: clamp(32px, 4vw, 56px);
+  grid-template-rows: auto auto auto 1fr;
+  column-gap: 48px;
+  overflow: visible;
+}
+.mappe :is(.copy, .sheet-slot, .log, .caption) {
+  grid-column: 1 / 7;
+}
+.mappe .sheet {
+  box-shadow: 0 0 0 1px rgb(var(--shadow) / 0.05);
+}
+/* Auf dem gedruckten Bogen bleibt das gewählte Bild sichtbar. Ohne vorgezeichneten Kreis: Kreise setzt nur der Nutzer. */
+.mappe .cell.is-pick img {
+  opacity: 1;
+}
+
+/* Lupen-Protokoll als stehende Notiz unter dem Bogen */
+.mappe .log {
+  display: grid;
+  grid-row: 3;
+  align-self: start;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 0;
+}
+.mappe .log li {
+  opacity: 1;
+  font-size: 16px;
+}
+.mappe .log .m {
+  display: inline;
+  margin-right: 8px;
+}
+.mappe .caption {
+  grid-row: 4;
+  margin-top: 24px;
+}
+
+/* Rechte Seite: Abzug oben, Begleitbilder als Reihe darunter. Gerade montiert, nicht verstreut. */
+.mappe .bogen .story {
+  grid-column: 7 / 13;
+  grid-row: 1 / 5;
+  container-type: normal;
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr));
+  gap: 22px;
+  align-content: center;
+}
+.mappe .story[data-n='2'] {
+  --n: 2;
+}
+.mappe .story[data-n='3'] {
+  --n: 3;
+}
+.mappe .bogen .story > .print {
+  position: relative;
+  inset: auto;
+  margin: 0;
+  rotate: none;
+  will-change: auto;
+  --lift: 0.06;
+}
+.mappe .bogen .story > .print.main {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, calc(58vh * var(--ar)));
+}
+.mappe .bogen .story > .print.c {
+  align-self: end;
+  justify-self: center;
+  width: min(100%, calc(22vh * var(--ar)));
+}
+
+/* Video: drei Abzüge gerade in einer Reihe, wie eingeklebt */
+.mappe .reel {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+.mappe :is(.v1, .v2, .v3) {
+  grid-column: auto;
+  width: auto;
+  margin: 0;
+}
+.mappe .vprint {
+  rotate: none;
+  --lift: 0.06;
+}
+.mappe .vprint figcaption {
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Abheben bei Hover und Fokus, nur CSS */
+.mappe :is(.story .print, .vprint) .face {
+  transition:
+    translate 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.mappe :is(.story .print:hover, .vprint:hover) .face,
+.mappe .bogen:has(.turn:focus-visible) .print.main .face {
+  translate: 0 -5px;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.04),
+    0 20px 36px -18px rgb(var(--shadow) / 0.5);
+}
+.mappe .print-inner {
+  transition: transform 0.9s cubic-bezier(0.25, 0.7, 0.2, 1);
+}
+
+/* Fettstift: zeichnet sich, sobald Einstieg oder Bogen zu sehen ist */
+.mappe .cell .mark path {
+  stroke-dashoffset: 1.02;
+  transition: stroke-dashoffset 0.7s ease-in-out 0.25s;
+}
+.mappe .cell .mark path + path {
+  transition-delay: 0.85s;
+  transition-duration: 0.3s;
+}
+.mappe .is-seen .cell .mark path {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mappe .cell .mark path {
+    stroke-dashoffset: 0;
+  }
+  .mappe *,
+  .mappe *::before,
+  .mappe *::after {
+    transition: none !important;
+  }
+  .mappe :is(.story .print:hover, .vprint:hover) .face,
+  .mappe .bogen:has(.turn:focus-visible) .print.main .face {
+    translate: none;
+  }
+}
+
+/* ---------- Schmal: eine Seite statt Doppelseite ---------- */
+@media (max-width: 959px) {
+  .mappe .hero,
+  .mappe .stage {
+    background: var(--paper);
+  }
+  .mappe .hero {
+    width: calc(100% - 24px);
+    margin-top: calc(var(--bar) + 16px);
+    margin-bottom: 20px;
+    padding: 28px 18px 24px;
+  }
+  .mappe .sleeve {
+    margin: 0;
+  }
+  .mappe .hero-sheet {
+    margin: 24px 0 0;
+    padding: 12px;
+    border-right: 1px solid var(--hair);
+  }
+  .mappe .hero-sheet .sheet-head {
+    padding-right: 0;
+  }
+  .mappe .bogen {
+    padding: 0 12px 20px;
+  }
+  .mappe .stage {
+    padding: 28px 18px 30px;
+    grid-template-rows: none;
+  }
+  .mappe :is(.copy, .sheet-slot, .log, .caption),
+  .mappe .bogen .story {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .mappe .sheet-slot {
+    margin-top: 16px;
+  }
+  /* Reihenfolge: Text, Bogen, Notiz, Abzug, Bildunterschrift */
+  .mappe .bogen .story {
+    order: 1;
+    height: auto;
+    margin-top: 24px;
+    gap: 14px;
+  }
+  .mappe .bogen .story > .print.main {
+    width: min(100%, calc(52vh * var(--ar)));
+  }
+  .mappe .bogen .story > .print.c {
+    width: min(100%, calc(18vh * var(--ar)));
+  }
+  .mappe .log {
+    margin-top: 18px;
+  }
+  .mappe .log li {
+    font-size: 15px;
+  }
+  .mappe .reel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Lange Preisangabe („individuelles Angebot“) bricht um, statt über den Titel zu laufen. */
+  .mappe .caption {
+    order: 2;
+    margin-top: 22px;
+  }
+}
