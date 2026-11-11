@@ -243,3 +243,10 @@ html:has(.journey-embedded) { color-scheme: dark; scrollbar-color: #55716f #1027
 
 .journey-wordmark img { display: block; width: 154px; height: auto; filter: brightness(0) invert(95%); }
 @media (max-width: 600px) { .journey-wordmark img { width: 135px; } }
+
+/* Ladeanzeige der vorgerenderten Verwandlung; sitzt unten in der freien Fläche der Gestalt (Lage per Skript). */
+.journey-loading { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 9px; padding-bottom: 6px; color: #c2d0c7; font-size: 11px; letter-spacing: .04em; text-align: center; pointer-events: none; }
+.journey-loading[hidden] { display: none; }
+.journey-loading i { width: min(200px, 60%); height: 2px; border-radius: 1px; background: #d6e2d22e; overflow: hidden; }
+.journey-loading b { display: block; height: 100%; width: calc(var(--loaded, 0) * 100%); background: #d4e7a3; transition: width .2s; }
+.journey-loading small { font-size: 10px; color: #9fb3a8; font-variant-numeric: tabular-nums; }

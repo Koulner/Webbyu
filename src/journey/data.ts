@@ -15,6 +15,8 @@ export interface JourneyStation {
   packageId?: PackageId;
   image?: string;
   note?: string;
+  /** Eigene Seiten außerhalb der Paket- und Konzeptdemos: [Linktext, Pfad unter der Website-Basis]. */
+  pages?: readonly (readonly [string, string])[];
 }
 
 function project(demoId: DemoId, extra: Pick<JourneyStation, 'id' | 'position' | 'landmark' | 'detail' | 'note' | 'visual' | 'story'>): JourneyStation {
@@ -81,6 +83,16 @@ export const stations: readonly JourneyStation[] = [
     story: { task: 'Viele Möbel, Materialien und Maße sollen übersichtlich bleiben.', approach: 'Suche, Filter und Varianten führen vom Sortiment zur eigenen Merkliste.', benefit: 'Die Auswahl lässt sich bis zur vollständigen lokalen Bestellvorschau erproben.' },
   }),
   {
+    id: 'koulner', label: 'Koulner', eyebrow: 'Eigenprojekt / Foto & Video',
+    title: 'Ein Portfolio in drei Stufen.',
+    description: 'Ein Foto- und Videoportfolio für die Marke Koulner, umgesetzt als Eigenprojekt in drei Ausbaustufen.',
+    detail: 'Dieselben Inhalte als Mappe, als Leuchttisch mit Lupe und als Fahrt im Licht der Bilder.',
+    position: [16.5, -3.2], landmark: 'atelier',
+    visual: { color: '#d8c3b4', caption: 'Kontaktbögen, Fettstift und eine Anfrage, die die Auswahl mitnimmt.' },
+    story: { task: 'Ein Portfolio soll Bilder zeigen und schnell zu einer Shooting-Anfrage führen.', approach: 'Nummerierte Kontaktbögen, ein Fettstift für Kreis und Kreuz und eine Anfrage, die die markierten Bilder mitnimmt.', benefit: 'Interessierte zeigen vor dem ersten Gespräch, welche Bilder ihnen gefallen und welche nicht.' },
+    pages: [['Stufe 1 · Mappe', 'demos/koulner/stufe-1/'], ['Stufe 2 · Leuchttisch', 'demos/koulner/stufe-2/'], ['Stufe 3 · Im Licht der Bilder', 'demos/koulner/stufe-3/']],
+  },
+  {
     id: 'der-naechste-abschnitt', label: 'Der nächste Abschnitt', eyebrow: 'Der Weg bleibt offen',
     title: 'Was möchten Sie möglich machen?',
     description: 'Aus jeder Aufgabe entsteht eine eigene Lösung. Vielleicht soll Ihr Angebot verständlicher werden. Vielleicht soll eine Auswahl leichter fallen. Oder ein Ablauf braucht heute noch zu viele Rückfragen.',
@@ -100,6 +112,7 @@ export const networkConnections: readonly { from: number; to: number; strand: 'c
   { from: 4, to: 5, strand: 'design' },
   { from: 5, to: 6, strand: 'function' },
   { from: 6, to: 7, strand: 'content' },
+  { from: 7, to: 8, strand: 'design' },
   { from: 1, to: 4, strand: 'content' },
   { from: 2, to: 5, strand: 'design' },
   { from: 3, to: 5, strand: 'function' },

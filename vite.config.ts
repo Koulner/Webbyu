@@ -7,6 +7,7 @@ import { applyMetadata, robotsTxt, sitemapXml } from './scripts/seo-html.mjs';
 import { renderPageHtml } from './src/shell';
 import { renderJourneyHtml } from './src/journey/page';
 import { renderContentPage } from './src/seo/content';
+import { koulnerHtml } from './src/koulner/basis/page';
 
 // GitHub Pages serves project repositories below /<repository>/ while local
 // development and user pages are rooted at /. Keep the same build portable in
@@ -47,10 +48,10 @@ export default defineConfig({
         const page = pages.find(page => resolve(page.file) === resolve(context.filename));
         if (!page) return html;
         const noindex = process.env.NODE_ENV === 'development' || process.env.SITE_NOINDEX === 'true';
-        const renderers = { 'package-demo': () => renderPackageDemo(page.path, base), home: () => renderPageHtml(base), journey: () => renderJourneyHtml(base), content: () => renderContentPage(page.path, base) };
+        const renderers = { 'package-demo': () => renderPackageDemo(page.path, base), home: () => renderPageHtml(base), journey: () => renderJourneyHtml(base), content: () => renderContentPage(page.path, base), koulner: () => koulnerHtml(page.path, base) };
         const renderer = renderers[page.kind as keyof typeof renderers];
         if (renderer) {
-          const id = page.kind === 'package-demo' ? 'package-demo-app' : page.kind === 'home' ? 'app' : page.kind === 'journey' ? 'journey-app' : 'content-app';
+          const id = page.kind === 'package-demo' ? 'package-demo-app' : page.kind === 'home' ? 'app' : page.kind === 'journey' ? 'journey-app' : page.kind === 'koulner' ? 'koulner-app' : 'content-app';
           html = html.replace(`<div id="${id}"></div>`, `<div id="${id}" data-prerendered="true">${renderer()}</div>`);
         }
         return applyMetadata(html, page, { noindex });

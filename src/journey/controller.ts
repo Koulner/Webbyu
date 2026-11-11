@@ -325,7 +325,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       return;
     }
     if(!stageVisible && !requested) return;
-    sceneLoading=(options.loadScene??(()=>import('./scene')))().then(module=>{
+    sceneLoading=(options.loadScene??(()=>import('./live')))().then(module=>{
       if(disposed || media.matches || connection?.saveData) return;
       scene=module.initLandscape(map);
       sceneFailed=false;

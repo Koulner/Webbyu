@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Koulner Demo</title>
+    <link rel="icon" type="image/png" href="%BASE_URL%webbyu-w-icon.png" />
+    <script>
+      // Ruhige Fassung vor dem ersten Zeichnen festlegen.
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || /[?&]motion=reduce\b/.test(location.search)) document.documentElement.classList.add('reduce');
+    </script>
+    <script type="module" src="/src/koulner/stufe-2/main.ts"></script>
+  </head>
+  <body><div id="koulner-app"></div></body>
+</html>

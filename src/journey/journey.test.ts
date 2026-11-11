@@ -143,7 +143,8 @@ describe('journey content and navigation',()=>{
   });
   it('has unique linked stations, notes and the selected examples, without dated claims',()=>{
     renderJourney(root);
-    expect(new Set(stations.map(s=>s.id)).size).toBe(8);
+    expect(new Set(stations.map(s=>s.id)).size).toBe(9);
+    expect(stations.flatMap(s=>s.pages?.map(([,path])=>path)??[])).toEqual(['demos/koulner/stufe-1/','demos/koulner/stufe-2/','demos/koulner/stufe-3/']);
     expect(stations.filter(s=>s.note)).toHaveLength(2);
     expect(stations.flatMap(s=>s.demoId?[s.demoId]:[])).toEqual(['sales','raumgut']);
     expect(stations.flatMap(s=>s.packageId?[s.packageId]:[])).toEqual(['start','business','complete']);

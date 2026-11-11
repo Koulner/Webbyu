@@ -1,0 +1,71 @@
+/* Stufe 3 · Im Licht der Bilder: Ergänzungen zum Grundstil (studien/basis/leuchttisch.css) */
+
+/* Kopfleiste folgt dem Grundton der Fahrt (motion.ts setzt --ground und data-ink). */
+.bar {
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
+  transition: color 0.3s;
+}
+html[data-ink='light'] .bar {
+  --ink: #f1e9dc;
+  --ink-2: #bdb4a6;
+  --paper: #10131b;
+  --hair: rgb(241 233 220 / 0.18);
+  color: var(--ink);
+}
+
+/* Einfahrt ins bewegte Bild (einfahrt.ts, nur Desktop mit Bewegung und WebGL) */
+.einfahrt {
+  position: relative;
+  height: 320vh;
+  background: #10131b;
+}
+.ef-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.ef-stage canvas,
+.ef-full {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ef-full {
+  object-fit: cover;
+  opacity: 0;
+}
+.einfahrt.is-in .ef-full {
+  opacity: 1;
+}
+.einfahrt.is-in canvas {
+  visibility: hidden;
+}
+.ef-title {
+  position: absolute;
+  left: var(--gut);
+  bottom: clamp(28px, 6vh, 64px);
+  margin: 0;
+  color: #f1e9dc;
+  font: 800 clamp(46px, 5.2vw, 84px)/0.88 var(--display);
+  text-transform: uppercase;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.45);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+.einfahrt.is-in .ef-title {
+  opacity: 1;
+  transform: none;
+}
+.ef-focal {
+  position: absolute;
+  left: var(--gut);
+  top: calc(var(--bar) + 20px);
+  margin: 0;
+  color: #f1e9dc;
+  font: 500 11px/1.3 var(--mono);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}

@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderPage, renderPageHtml } from './shell';
 import { renderJourney, renderJourneyHtml } from './journey/page';
+import { stations } from './journey/data';
 
 describe('static page enhancement', () => {
   it('keeps existing homepage nodes when attaching browser features', () => {
@@ -21,7 +22,7 @@ describe('static page enhancement', () => {
     root.innerHTML = renderJourneyHtml('/Webbyu/');
     root.dataset.prerendered = 'true';
     const chapters = [...root.querySelectorAll('[data-chapter]')];
-    expect(chapters).toHaveLength(9);
+    expect(chapters).toHaveLength(stations.length + 1);
     expect(root.textContent).toContain('keine Kundenreferenzen');
     renderJourney(root);
     expect([...root.querySelectorAll('[data-chapter]')]).toEqual(chapters);

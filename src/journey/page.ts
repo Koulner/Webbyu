@@ -13,7 +13,7 @@ export function renderJourneyHtml(home: string): string {
     </header>
     <main class="journey-layout">
       <div class="journey-stage-wrap">
-        <div class="journey-stage" role="region" aria-label="Verbundene Erlebnisräume mit acht Stationen">
+        <div class="journey-stage" role="region" aria-label="Verbundene Erlebnisräume mit ${stations.length} Stationen">
           <div class="journey-viewport" data-map>
             <div class="journey-vector">${landscapeSvg()}</div>
             <div class="journey-webgl" aria-hidden="true"></div>
@@ -44,7 +44,7 @@ export function renderJourneyHtml(home: string): string {
             <p>Eine gute Website verbindet, was zusammengehört. Entdecken Sie, wie aus einer Aufgabe ein eigener digitaler Auftritt entsteht.</p>
             <a class="journey-action journey-start" href="#die-idee">Die Reise entdecken <span aria-hidden="true">→</span></a>
             <p class="journey-scroll-cue"><span aria-hidden="true">↕</span> Scrollen oder mit Weiter die Station wechseln.</p>
-            <p class="journey-disclaimer">Die Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Paketumfang und zusätzliche Funktionen werden individuell vereinbart.</p>
+            <p class="journey-disclaimer">Die Beispiele zeigen fiktive Marken und ein Eigenprojekt, keine Kundenreferenzen. Paketumfang und zusätzliche Funktionen werden individuell vereinbart.</p>
           </div>
         </section>
         ${stations.map((station, i) => `<section class="journey-chapter" id="${station.id}" aria-labelledby="${station.id}-title" data-chapter="${i}">
@@ -52,7 +52,7 @@ export function renderJourneyHtml(home: string): string {
             <p class="journey-eyebrow">${station.eyebrow}</p>
             <h2 id="${station.id}-title">${station.title}</h2>
             ${station.story ? `<dl class="journey-project-story"><div><dt>Die Aufgabe</dt><dd>${station.story.task}</dd></div><div><dt>Der Ansatz</dt><dd>${station.story.approach}</dd></div><div><dt>Der Nutzen</dt><dd>${station.story.benefit}</dd></div></dl>` : `<p>${station.description}</p><p class="journey-detail">${station.detail}</p>`}
-            ${station.packageId ? `<a class="journey-action" href="${home}demos/${station.packageId}/" target="_top">Beispielwebsite ansehen ${arrow}</a><p class="journey-simulation">${station.label} · Fiktive Marke · Paketbeispiel</p>` : station.demoId ? `<button class="journey-action" type="button" data-journey-demo="${station.demoId}">Konzept ausprobieren ${arrow}</button><p class="journey-simulation">${station.label} · Fiktive Marke · lokale Simulation</p>` : i === stations.length - 1 ? `<a class="journey-action" href="${home}#projektfinder">Ihr Vorhaben besprechen ${arrow}</a>` : `<a class="journey-action" href="#${stations[i + 1].id}">${i === 0 ? 'Das Fundament entdecken' : 'Die Arbeiten entdecken'} ${arrow}</a>`}
+            ${station.pages ? `${station.pages.map(([label, path]) => `<a class="journey-action" href="${home}${path}" target="_top">${label} ${arrow}</a>`).join('')}<p class="journey-simulation">${station.label} · Eigenprojekt · Bilder sind Platzhalter aus Stockmaterial</p>` : station.packageId ? `<a class="journey-action" href="${home}demos/${station.packageId}/" target="_top">Beispielwebsite ansehen ${arrow}</a><p class="journey-simulation">${station.label} · Fiktive Marke · Paketbeispiel</p>` : station.demoId ? `<button class="journey-action" type="button" data-journey-demo="${station.demoId}">Konzept ausprobieren ${arrow}</button><p class="journey-simulation">${station.label} · Fiktive Marke · lokale Simulation</p>` : i === stations.length - 1 ? `<a class="journey-action" href="${home}#projektfinder">Ihr Vorhaben besprechen ${arrow}</a>` : `<a class="journey-action" href="#${stations[i + 1].id}">${i === 0 ? 'Das Fundament entdecken' : 'Die Arbeiten entdecken'} ${arrow}</a>`}
             ${station.note ? `<p class="journey-inline-note"><span>Meine Arbeitsweise</span>„${station.note}“</p>` : ''}
           </div>
         </section>`).join('')}
