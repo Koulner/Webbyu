@@ -64,7 +64,7 @@ describe('static content page contracts', () => {
       expect(author?.textContent).toBe('Lukas Wagner');
       expect(author?.getAttribute('href')).toBe('/ueber-mich/');
       expect(root.querySelectorAll('.content-toc a').length).toBeGreaterThanOrEqual(5);
-      expect(root.querySelector('time')?.getAttribute('datetime')).toBe('2026-10-31');
+      expect(root.querySelector('time')?.getAttribute('datetime')).toBe('2026-11-12');
       expect(root.querySelector('.content-breadcrumbs a[href="/ratgeber/"]')).not.toBeNull();
     }
   });

@@ -98,7 +98,7 @@ const pages: Record<string, ContentPage> = {
         <div class="content-section-label">02 / Eigene Arbeitsbeispiele</div>
         <div class="content-section-body">
           <h2 id="beispiele">Zwei Beispiele aus meinen Studien.</h2>
-          <p>Beide stammen aus fiktiven Konzeptstudien, nicht aus Kundenaufträgen. Was Sie dort eingeben, bleibt in der Demo; es wird nichts verschickt.</p>
+          <p>Beide stammen aus fiktiven Konzeptstudien, nicht aus Kundenaufträgen. Was Sie dort eingeben, bleibt in der Demo und wird nicht verschickt.</p>
           <div class="content-example-grid">
             <article class="content-example"><p class="content-eyebrow">Paketbeispiel / Klarblick</p><h3>Eine Anfrage ohne Rückfragen.</h3><p><strong>Die Ausgangslage:</strong> Für ein Angebot zur Fensterreinigung muss man Ort, Zahl der Fenster und den Zugang kennen.</p><p><strong>Der Ansatz:</strong> Ein kurzes Formular fragt genau das ab.</p><p><strong>Die Grenze:</strong> Das Formular ist nur simuliert und sendet nichts.</p><a class="content-text-link" href="${link('/demos/start/')}">Klarblick ansehen <span aria-hidden="true">↗</span></a></article>
             <article class="content-example"><p class="content-eyebrow">Paketbeispiel / Eiche &amp; Form</p><h3>Eine Nische messen.</h3><p><strong>Die Ausgangslage:</strong> Ob ein Einbaumöbel in eine schiefe Altbaunische passt, lässt sich ohne Maße kaum sagen.</p><p><strong>Der Ansatz:</strong> Das Formular fragt vier Maße ab und zeichnet daraus sofort die Nische mit den nötigen Passleisten.</p><p><strong>Die Grenze:</strong> Die Demo verschickt keine Angaben und erstellt kein Angebot.</p><a class="content-text-link" href="${link('/demos/business/kontakt/')}">Eiche &amp; Form ansehen <span aria-hidden="true">↗</span></a></article>
@@ -253,7 +253,7 @@ export function renderContentPage(path: string, base: string): string {
         <p class="content-eyebrow">${page.eyebrow}</p>
         <h1>${page.title}</h1>
         <p class="content-introduction">${page.introduction}</p>
-        ${page.article ? `<p class="content-author">Von <a href="${link('/ueber-mich/')}" rel="author">Lukas Wagner</a> · Webbyu <span>Stand: <time datetime="2026-10-31">31. Oktober 2026</time></span></p>` : ''}
+        ${page.article ? `<p class="content-author">Von <a href="${link('/ueber-mich/')}" rel="author">Lukas Wagner</a> · Webbyu <span>Stand: <time datetime="2026-11-12">12. November 2026</time></span></p>` : ''}
       </header>
       ${page.body({ link })}
       <aside class="content-contact" aria-labelledby="kontakt-titel"><div><p class="content-eyebrow">Ihr nächster Schritt</p><h2 id="kontakt-titel">Was soll Ihre Website leichter machen?</h2><p>Schreiben Sie mir ein paar Sätze zu Ihrem Betrieb und dazu, was die Website erledigen soll. Den Umfang klären wir dann zusammen. Angebot auf Anfrage.</p><p class="content-contact-small">Für Unternehmen und Selbstständige · Bad Oldesloe, Stormarn & Umgebung</p></div><div class="content-contact-actions"><a class="content-button" href="${link('/#projektfinder')}">Vorhaben besprechen <span aria-hidden="true">↗</span></a><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><a href="tel:+4917642090983">+49 176 42090983</a></div></aside>

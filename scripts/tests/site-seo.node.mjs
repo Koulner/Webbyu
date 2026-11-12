@@ -124,3 +124,15 @@ test('built site passes the same source checks as the published site', { skip: p
   const noindex = /<meta\s+name="robots"\s+content="noindex/.test(readFileSync(resolve(root, 'index.html'), 'utf8'));
   await verifySite(new URL(SITE_ORIGIN), builtFetch, { noindex });
 });
+
+test('guide Article schema takes dateModified from the visible Stand date', async () => {
+  const { applyMetadata } = await import('../seo-html.mjs');
+  const guides = pages.filter(page => /^\/ratgeber\/.+\/$/.test(page.path));
+  assert.ok(guides.length > 0);
+  for (const page of guides) {
+    const html = applyMetadata('<html><head></head><body><time datetime="2026-11-12">12. November 2026</time></body></html>', page);
+    const article = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1])['@graph'].find(item => item['@type'] === 'Article');
+    assert.match(article.datePublished, /^\d{4}-\d{2}-\d{2}$/, page.path);
+    assert.equal(article.dateModified, '2026-11-12', page.path);
+  }
+});

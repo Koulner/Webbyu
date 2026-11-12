@@ -3,7 +3,7 @@ import { SITE_ORIGIN, pages } from '../site.config.mjs';
 export const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const json = value => JSON.stringify(value).replace(/</g, '\\u003c');
 
-export function structuredData(page) {
+export function structuredData(page, modified) {
   const url = SITE_ORIGIN + page.path;
   const organization = { '@type': 'Organization', '@id': SITE_ORIGIN + '/#organization', name: 'Webbyu', url: SITE_ORIGIN + '/', logo: SITE_ORIGIN + '/brand-mark.svg', email: 'lukas.wagner@webbyu.de', telephone: '+4917642090983', founder: { '@id': SITE_ORIGIN + '/#person' } };
   const person = { '@type': 'Person', '@id': SITE_ORIGIN + '/#person', name: 'Lukas Wagner', url: SITE_ORIGIN + '/ueber-mich/' };
@@ -15,7 +15,7 @@ export function structuredData(page) {
   if (article) crumbs.push({ name: 'Ratgeber', item: SITE_ORIGIN + '/ratgeber/' });
   crumbs.push({ name: page.title.replace(/\s*\| Webbyu$/, ''), item: url });
   const graph = [{ '@type': 'BreadcrumbList', itemListElement: crumbs.map((crumb, index) => ({ '@type': 'ListItem', position: index + 1, ...crumb })) }];
-  if (article) graph.push({ '@type': 'Article', '@id': url + '#article', url, mainEntityOfPage: url, headline: page.title.replace(/\s*\| Webbyu$/, ''), description: page.description, inLanguage: 'de-DE', author: person, publisher: organization });
+  if (article) graph.push({ '@type': 'Article', '@id': url + '#article', url, mainEntityOfPage: url, headline: page.title.replace(/\s*\| Webbyu$/, ''), description: page.description, inLanguage: 'de-DE', datePublished: page.published, dateModified: modified ?? page.published, author: person, publisher: organization });
   return { '@context': 'https://schema.org', '@graph': graph };
 }
 
@@ -36,7 +36,8 @@ export function applyMetadata(html, page, { noindex = false } = {}) {
     };
     for (const [property, content] of Object.entries(social)) tags.push(`<meta property="${property}" content="${escapeHtml(content)}" />`);
     tags.push('<meta name="twitter:card" content="summary_large_image" />');
-    const data = structuredData(page);
+    // The visible "Stand" date in the article is the single source for dateModified.
+    const data = structuredData(page, html.match(/<time datetime="(\d{4}-\d{2}-\d{2})"/)?.[1]);
     if (data) tags.push(`<script type="application/ld+json">${json(data)}</script>`);
   }
   return html.replace('</head>', `  ${tags.join('\n    ')}\n  </head>`);

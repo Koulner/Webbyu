@@ -65,7 +65,7 @@ describe('page shell contract', () => {
     const gallery = root.querySelector('#arbeiten')!;
     const description = root.querySelector(`#${gallery.getAttribute('aria-describedby')}`)!;
     expect(description.textContent).toContain('fiktive Marken');
-    expect(description.textContent).toContain('Simulationen');
+    expect(description.textContent).toContain('simuliert');
   });
 
   it('publishes inquiry-based offers and the business contact without internal drafts or blanket prototype notes', () => {

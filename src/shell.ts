@@ -103,7 +103,7 @@ export function renderPageHtml(base: string): string {
             </div>
           </div>
           </div></details>
-          <p id="gallery-disclaimer" class="studio-disclaimer">Alle Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Sie können alles anklicken; Anfragen und Käufe sind nur Simulationen in Ihrem Browser. KI-generierte Bilder sind direkt am Bild gekennzeichnet, die Übersicht steht im <a href="${base}impressum/#ki-kennzeichnung">Impressum</a>.</p>
+          <p id="gallery-disclaimer" class="studio-disclaimer">Alle Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Sie können alles anklicken. Anfragen und Käufe werden nur in Ihrem Browser simuliert. KI-generierte Bilder sind direkt am Bild gekennzeichnet, die Übersicht steht im <a href="${base}impressum/#ki-kennzeichnung">Impressum</a>.</p>
         </div>
       </section>
 
