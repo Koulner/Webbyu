@@ -54,6 +54,16 @@ describe('journey particle element',()=>{
     expect(frames.size).toBe(0);
   });
 
+  it('tints the whole stage in the station colour and removes the tint on dispose',()=>{
+    media.matches=true;
+    controller=initLandscape(map);
+    controller.setProgress(3);flush();
+    const [r,g,b]=[1,3,5].map(i=>parseInt(stations[3].visual.color.slice(i,i+2),16));
+    expect(map.style.getPropertyValue('--journey-world')).toBe(`rgb(${r} ${g} ${b})`);
+    controller.dispose();
+    expect(map.style.getPropertyValue('--journey-world')).toBe('');
+  });
+
   it('falls back to the static map when no GPU is available',()=>{
     gpu.fail=true;
     expect(()=>{controller=initLandscape(map);}).not.toThrow();

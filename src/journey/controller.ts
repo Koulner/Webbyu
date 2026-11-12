@@ -157,8 +157,8 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     map.dataset.view=index<0?'overview':'travel';
     map.dataset.project=String(Boolean(stations[index]?.demoId || stations[index]?.packageId));
     sections.forEach((section,i)=>section.classList.toggle('is-current',i===index+1));
-    root.querySelector('[data-scene-caption]')!.textContent=index<0?'Jede Idee eröffnet einen neuen Zusammenhang.':stations[index].visual.caption;
-    root.querySelector('[data-scene-index]')!.textContent=index<0?'WEBBYU / VERBUNDENE ERLEBNISRÄUME':`${String(index+1).padStart(2,'0')} / ${stations[index].label.toUpperCase()}`;
+    root.querySelector('[data-scene-caption]')!.textContent=index<0?'Von der ersten Frage bis zur fertigen Seite.':stations[index].visual.caption;
+    root.querySelector('[data-scene-index]')!.textContent=index<0?'WEBBYU / ACHT STATIONEN':`${String(index+1).padStart(2,'0')} / ${stations[index].label.toUpperCase()}`;
     const note=stations[index]?.note;
     // Notes remain readable in the chapter; the optional detail never opens over it automatically.
     guide.hidden=true;
@@ -293,7 +293,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
     }
   },listen);
   root.addEventListener('landscape-fallback',()=>{
-    root.querySelector('[data-map-hint]')!.textContent='Die Erlebnisräume werden als Illustration gezeigt. Alle Stationen und Demos sind erreichbar.';
+    root.querySelector('[data-map-hint]')!.textContent='Die Landschaft wird hier nur als Bild gezeigt. Alle Stationen und Demos funktionieren trotzdem.';
     positionFallbackPins();
   },listen);
   window.addEventListener('scroll',schedule,{...listen,passive:true});
@@ -337,7 +337,7 @@ export function mountJourney(root: HTMLElement, options: JourneyOptions = {}) {
       if(disposed) return;
       sceneFailed=true;
       map.dataset.render='static';
-      root.querySelector('[data-map-hint]')!.textContent='Die Erlebnisräume werden als Illustration gezeigt. Alle Stationen und Demos sind erreichbar.';
+      root.querySelector('[data-map-hint]')!.textContent='Die Landschaft wird hier nur als Bild gezeigt. Alle Stationen und Demos funktionieren trotzdem.';
       positionFallbackPins();
     }).finally(()=>{sceneLoading=undefined;settleScene();});
     return sceneLoading;

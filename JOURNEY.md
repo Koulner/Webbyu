@@ -1,5 +1,16 @@
 # Webbyu – Die Reise
 
+## Aktualisierung 11. November 2026: ganze Szene statt eines Objekts
+
+Nutzerentscheidung vom 11. November 2026. Sie ersetzt beim Punkt „ein einziges Element“ unten die Lage rechts in einer gleichbleibenden Bühne:
+
+- **Vollflächige Welt:** Jede Station füllt die ganze Bühne randlos (cover). Mobil gilt das nur für die obere Bühnenfläche (53 %), darunter steht der Text. Beim Weiterreisen verglüht der ganze Bildschirm von unten nach oben und setzt sich zur nächsten Welt zusammen.
+- **Stationsfarbe:** Hintergrund, Abdunklung und Bildtönung mischen sich aus `visual.color` der Station (`--journey-world`). Die Übersicht bleibt Petrol.
+- **Lesbarkeit:** Bilder und ruhende Funkenformen sind links unter dem Text abgedunkelt und leicht in der Stationsfarbe getönt, rechts voll sichtbar. Verglühende Funken bleiben hell. Mobil entfällt die Abdunklung, weil der Text unter dem Bild steht.
+- **Formen:** Der Glutball steht rechts neben dem Text. Die Idee zeigt ein Bauplanraster über die ganze Bühne und darauf die Skizze rechts. Das Fundament zeigt drei geneigte Ebenen über die volle Breite. Die Collage am Ende steht in zwei Spalten rechts (mobil mittig), damit „Ihr Projekt“ auch auf schmaleren Bildschirmen sichtbar bleibt.
+- Stationsmarker und Legende „Inhalt/Gestaltung/Funktion“ sind im WebGL-Betrieb ganz ausgeblendet.
+- Offen: gestalterische Freigabe durch den Nutzer, besonders für das Fundament.
+
 ## Aktualisierung 10. November 2026 (Redesign, Branch `redesign/unikat-2026`)
 
 Nutzerentscheidungen vom 9. und 10. November 2026 ersetzen die räumliche Landschaft und gehen den älteren Punkten unten vor:

@@ -4,9 +4,10 @@ import { stations } from './data';
 import type { LandscapeController } from './controller';
 
 /**
- * Ein einziges Element, das mit jeder Station weiter wächst: Glutball, Skizze, Ebenen, fünf fertige Websites und
- * am Ende alle Projekte zusammen mit einem leeren Rahmen für das nächste. Beim Weiterreisen verglüht es von unten nach
- * oben zu Funken und setzt sich zur nächsten Form zusammen. Lose Funken folgen dem Luftzug des Zeigers.
+ * Jede Station ist eine eigene Welt, die die ganze Bühne füllt: Glutball, Skizze, Ebenen, fünf fertige Websites und
+ * am Ende alle Projekte zusammen mit einem leeren Rahmen für das nächste. Beim Weiterreisen verglüht die ganze Bühne
+ * von unten nach oben zu Funken und setzt sich zur nächsten Welt zusammen. Hintergrund und Funken nehmen die
+ * Stationsfarbe an. Lose Funken folgen dem Luftzug des Zeigers.
  */
 const IMAGES: Record<string, string> = {
   klarblick: 'package-demos/klarblick-concept.webp',
@@ -15,23 +16,26 @@ const IMAGES: Record<string, string> = {
   raumgut: 'reference-assets/raumgut/hero.jpg',
 };
 const WIDTH = 3.2, HEIGHT = 2;
-/** `soft`: die Form besteht in Ruhe aus Funken (Glutball, Ebenen); sonst zeigt eine scharfe Bildfläche das Projekt. */
-type Shape = { position: Float32Array; color: Float32Array; soft: number; tint: number[]; texture?: Texture };
+/**
+ * `soft`: die Form besteht in Ruhe aus Funken (Glutball, Ebenen); sonst zeigt eine scharfe Bildfläche das Projekt.
+ * `spin`/`offset`: der Glutball dreht und schwebt um seinen eigenen Mittelpunkt.
+ */
+type Shape = { position: Float32Array; color: Float32Array; soft: number; tint: number[]; spin?: number; offset?: number[]; texture?: Texture };
 
-/** Glutball: dichter, heißer Kern, nach außen dünner und röter. */
-function emberBall(count: number): Shape {
-  const position = new Float32Array(count * 3), color = new Float32Array(count * 3);
+/** Glutball: dichter, heißer Kern, nach außen dünner und röter. Er steht rechts neben dem Text. */
+function emberBall(count: number, x: number): Shape {
+  const position = new Float32Array(count * 3), color = new Float32Array(count * 3), radius = .5;
   for (let i = 0; i < count; i++) {
-    const a = Math.random() * Math.PI * 2, b = Math.acos(2 * Math.random() - 1), r = Math.pow(Math.random(), 2.2) * .8;
+    const a = Math.random() * Math.PI * 2, b = Math.acos(2 * Math.random() - 1), r = Math.pow(Math.random(), 2.2) * radius;
     position.set([Math.sin(b) * Math.cos(a) * r, Math.cos(b) * r, Math.sin(b) * Math.sin(a) * r], i * 3);
-    const heat = 1 - r / .8;
+    const heat = 1 - r / radius;
     color.set([1, .4 + heat * .5, .1 + heat * .6], i * 3);
   }
-  return { position, color, soft: 1, tint: [1, .6, .25] };
+  return { position, color, soft: 1, tint: [1, .6, .25], spin: 1, offset: [x, 0, 0] };
 }
 
-/** Idee: eine Website als Skizze aus Funkenlinien (Rahmen, Kopfzeile, Überschrift, Text, Bildfeld, Knopf). */
-function sketch(count: number): Shape {
+/** Idee: ein Bauplanraster über die ganze Bühne und darauf eine Website als Skizze aus Funkenlinien. */
+function sketch(count: number, x: number, size: number): Shape {
   const w = WIDTH * .46, h = HEIGHT * .45;
   const rect = (x0: number, y0: number, x1: number, y1: number) => [[x0, y0, x1, y0], [x1, y0, x1, y1], [x1, y1, x0, y1], [x0, y1, x0, y0]];
   const lines = [
@@ -43,25 +47,36 @@ function sketch(count: number): Shape {
   ];
   const lengths = lines.map(([x0, y0, x1, y1]) => Math.hypot(x1 - x0, y1 - y0));
   const total = lengths.reduce((sum, value) => sum + value, 0);
+  // Feines Raster in Bauplanweite: waagerechte und senkrechte Linien über die ganze Bühne.
+  const step = .25, gridLines = Math.round(HEIGHT / step) + 1 + Math.round(WIDTH / step) + 1;
   const position = new Float32Array(count * 3), color = new Float32Array(count * 3);
+  const gridShare = Math.floor(count * .14);
   for (let i = 0; i < count; i++) {
+    const jitter = () => (Math.random() - .5) * .012;
+    if (i < gridShare) {
+      const line = Math.floor(Math.random() * gridLines), along = Math.random() - .5, rowsCount = Math.round(HEIGHT / step) + 1;
+      const point = line < rowsCount ? [along * WIDTH, -HEIGHT / 2 + line * step] : [-WIDTH / 2 + (line - rowsCount) * step, along * HEIGHT];
+      position.set([point[0] + jitter(), point[1] + jitter(), -.05], i * 3);
+      color.set([.42, .27, .16], i * 3);
+      continue;
+    }
     let pick = Math.random() * total, k = 0;
     while (pick > lengths[k] && k < lines.length - 1) pick -= lengths[k++];
-    const [x0, y0, x1, y1] = lines[k], t = pick / lengths[k], jitter = () => (Math.random() - .5) * .012;
-    position.set([x0 + (x1 - x0) * t + jitter(), y0 + (y1 - y0) * t + jitter(), jitter()], i * 3);
+    const [x0, y0, x1, y1] = lines[k], t = pick / lengths[k];
+    position.set([x + (x0 + (x1 - x0) * t) * size + jitter(), (y0 + (y1 - y0) * t) * size + jitter(), jitter()], i * 3);
     const warm = Math.random();
     color.set([1, .62 + warm * .25, .28 + warm * .3], i * 3);
   }
   return { position, color, soft: 1, tint: [1, .7, .35] };
 }
 
-/** Fundament: drei Ebenen für Inhalt, Gestaltung und Funktion. */
+/** Fundament: drei Ebenen für Inhalt, Gestaltung und Funktion, über die ganze Breite und zum Betrachter geneigt. */
 function layers(count: number): Shape {
   const position = new Float32Array(count * 3), color = new Float32Array(count * 3);
-  const tones = [[.78, .86, .66], [.66, .78, .74], [.93, .95, .9]];
+  const tones = [[.78, .86, .66], [.66, .78, .74], [.93, .95, .9]], tilt = .42;
   for (let i = 0; i < count; i++) {
-    const layer = i % 3, x = (Math.random() - .5) * WIDTH * .8, z = (Math.random() - .5) * 1.2;
-    position.set([x - layer * .18, (layer - 1) * .55, z], i * 3);
+    const layer = i % 3, x = (Math.random() - .5) * WIDTH * 1.25, z = (Math.random() - .5) * 1.1, y = (layer - 1) * .62;
+    position.set([x - layer * .12, y + z * Math.sin(tilt), z * Math.cos(tilt)], i * 3);
     color.set(tones[layer], i * 3);
   }
   return { position, color, soft: 1, tint: [.8, .9, .7] };
@@ -93,13 +108,20 @@ function picture(image: HTMLImageElement | HTMLCanvasElement, cols: number, rows
   return { position, color, soft: 0, tint: sum.map(value => value / peak), texture: new CanvasTexture(sharp) };
 }
 
-/** Ende der Reise: alle Projekte nebeneinander und ein glimmender leerer Rahmen für das nächste. */
-function collage(images: HTMLImageElement[], detail: number) {
+/**
+ * Ende der Reise: alle Projekte in zwei Spalten und ein glimmender leerer Rahmen für das nächste. Die Collage steht
+ * im Bereich, den die randlose Bühne auch auf schmaleren Bildschirmen nicht abschneidet: rechts neben dem Text,
+ * mobil mittig.
+ */
+function collage(images: HTMLImageElement[], detail: number, compact: boolean) {
   const canvas = document.createElement('canvas');
   canvas.width = detail; canvas.height = Math.round(detail * HEIGHT / WIDTH);
   const context = canvas.getContext('2d')!;
-  const gap = canvas.width * .025, tileWidth = (canvas.width - gap * 2) / 3, tileHeight = (canvas.height - gap) / 2;
-  const tile = (index: number) => [(index % 3) * (tileWidth + gap), Math.floor(index / 3) * (tileHeight + gap)];
+  const left = canvas.width * (compact ? .26 : .44), width = canvas.width * (compact ? .48 : .46);
+  // Oben liegt die feste Kopfzeile über der Bühne.
+  const top = canvas.height * .2, height = canvas.height * .68;
+  const gap = canvas.width * .012, tileWidth = (width - gap) / 2, tileHeight = (height - gap * 2) / 3;
+  const tile = (index: number) => [left + (index % 2) * (tileWidth + gap), top + Math.floor(index / 2) * (tileHeight + gap)];
   images.forEach((image, index) => {
     const [x, y] = tile(index), scale = Math.max(tileWidth / image.naturalWidth, tileHeight / image.naturalHeight);
     const sw = tileWidth / scale, sh = tileHeight / scale;
@@ -130,18 +152,22 @@ const burnTiming = `
 const emberVertex = `
   attribute vec3 positionB; attribute vec3 colorA; attribute vec3 colorB; attribute vec2 cell;
   uniform float uT; uniform float uSize; uniform float uTime; uniform float uSoftA; uniform float uSoftB; uniform vec2 uGrid;
+  uniform float uSpinA; uniform float uSpinB; uniform vec3 uOffsetA; uniform vec3 uOffsetB; uniform float uShade;
   varying vec3 vColor; varying float vBurn; varying float vSoft; varying float vVisible;
   ${burnTiming}
   void main(){
     float seed = hash(cell);
     float t = burnAt(cell, uGrid, uT);
     float burn = sin(t * 3.14159);
-    // Glutball und Ebenen drehen sich langsam, damit sie leben.
+    // Der Glutball dreht sich langsam um seinen Mittelpunkt und schwebt leicht, damit er lebt.
     float spin = uTime * .3;
     mat2 turn = mat2(cos(spin), -sin(spin), sin(spin), cos(spin));
+    vec3 hover = vec3(0., sin(uTime * .9) * .03, 0.);
     vec3 a = position, b = positionB;
-    a.xz = mix(a.xz, turn * a.xz, uSoftA);
-    b.xz = mix(b.xz, turn * b.xz, uSoftB);
+    a.xz = mix(a.xz, turn * a.xz, uSpinA);
+    b.xz = mix(b.xz, turn * b.xz, uSpinB);
+    a += uOffsetA + hover * uSpinA;
+    b += uOffsetB + hover * uSpinB;
     vec3 drift = vec3(sin(seed * 41. + uTime * 1.3 + a.y * 3.), 1.6 + seed, cos(seed * 23. + uTime)) * burn * (.35 + seed * .5);
     vec3 p = mix(a, b, t * t * (3. - 2. * t)) + drift;
     vec4 mv = modelViewMatrix * vec4(p, 1.);
@@ -153,6 +179,8 @@ const emberVertex = `
     vec3 base = mix(colorA, colorB, t);
     vec3 glow = mix(base / max(max(base.r, base.g), max(base.b, .2)), vec3(1., .55 + seed * .2, .2), .22);
     vColor = mix(base, glow, pow(burn, .7));
+    // Ruhende Funkenformen treten unter dem Text zurück wie die Bilder; verglühende Funken leuchten voll.
+    vColor *= 1. - uShade * .8 * (1. - smoothstep(.12, .58, p.x / ${WIDTH.toFixed(1)} + .5)) * (1. - burn);
     vBurn = burn;
     // In Ruhe zeigt bei Bildern die scharfe Fläche das Projekt; die Funken sind dann unsichtbar.
     vVisible = t <= 0. ? uSoftA : (t >= 1. ? uSoftB : 1.);
@@ -169,6 +197,7 @@ const emberFragment = `
 const pictureVertex = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }';
 const pictureFragment = `
   uniform sampler2D uTexA; uniform sampler2D uTexB; uniform float uHasA; uniform float uHasB; uniform float uT; uniform vec2 uGrid;
+  uniform vec3 uWorld; uniform float uShade;
   varying vec2 vUv;
   ${burnTiming}
   void main(){
@@ -178,6 +207,9 @@ const pictureFragment = `
     if (t <= 0.) color = texture2D(uTexA, vUv) * uHasA;
     else if (t >= 1.) color = texture2D(uTexB, vUv) * uHasB;
     else discard;
+    // Unter dem Text links abgedunkelt und in die Stationsfarbe getönt, rechts voll sichtbar.
+    float shade = uShade * (1. - smoothstep(.12, .58, vUv.x));
+    color.rgb = mix(color.rgb, mix(vec3(.063, .153, .184), uWorld, .2) * color.a, shade);
     // Kurz bevor eine Stelle verglüht, glimmt sie auf.
     float ember = t <= 0. ? clamp(1. - (burnAt(cell, uGrid, uT + .05) * 8.), 0., 1.) : 1.;
     color.rgb = mix(color.rgb, vec3(1., .6, .25), (1. - ember) * .85 * step(.0001, uT));
@@ -215,7 +247,13 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   let frame = 0, lastTime = 0, current = -1, target = -1, pair = '', halfWidth = 4, halfHeight = 2.2, pixelsPerUnit = 200;
   let pointerX = 99, pointerY = 99, pointerTime = 0, windX = 0, windY = 0;
 
-  const ball = emberBall(count), idea = sketch(count), base = layers(count);
+  // Desktop: Formen stehen rechts neben dem Text; mobil steht der Text darunter, die Formen bleiben mittig.
+  const ball = emberBall(count, compact ? 0 : .75), idea = sketch(count, compact ? 0 : .72, .55), base = layers(count);
+  // Stationsfarben für Hintergrund und Bildtönung; die Übersicht bleibt Petrol.
+  const petrol = [.063, .153, .184];
+  const worlds = stations.map(({ visual }) => [1, 3, 5].map(i => parseInt(visual.color.slice(i, i + 2), 16) / 255));
+  const worldAt = (index: number) => index < 0 ? petrol : worlds[Math.min(index, worlds.length - 1)];
+  let world = '';
   const shapes: Shape[] = stations.map(station => station.id === 'die-idee' ? idea : station.id === 'das-fundament' ? base : ball);
   const shapeAt = (index: number) => index < 0 ? ball : shapes[Math.min(index, shapes.length - 1)];
   const blank = new DataTexture(new Uint8Array(4), 1, 1);
@@ -230,13 +268,13 @@ export function initLandscape(container: HTMLElement): LandscapeController {
   geometry.setAttribute('colorB', new BufferAttribute(ball.color.slice(), 3));
   geometry.setAttribute('cell', new BufferAttribute(cells, 2));
   const grid = { value: [cols, rows] };
-  const progress = { value: 0 };
-  const uniforms = { uT: progress, uGrid: grid, uSize: { value: 4 }, uTime: { value: 0 }, uSoftA: { value: 1 }, uSoftB: { value: 1 } };
+  const progress = { value: 0 }, shade = { value: compact ? 0 : .82 };
+  const uniforms = { uShade: shade, uT: progress, uGrid: grid, uSize: { value: 4 }, uTime: { value: 0 }, uSoftA: { value: 1 }, uSoftB: { value: 1 }, uSpinA: { value: 0 }, uSpinB: { value: 0 }, uOffsetA: { value: [0, 0, 0] }, uOffsetB: { value: [0, 0, 0] } };
   const material = new ShaderMaterial({ uniforms, vertexShader: emberVertex, fragmentShader: emberFragment, transparent: true, depthWrite: false });
   const embers = new Points(geometry, material);
   embers.renderOrder = 1;
   const planeGeometry = new PlaneGeometry(WIDTH, HEIGHT);
-  const pictureUniforms = { uT: progress, uGrid: grid, uTexA: { value: blank as Texture }, uTexB: { value: blank as Texture }, uHasA: { value: 0 }, uHasB: { value: 0 } };
+  const pictureUniforms = { uT: progress, uGrid: grid, uTexA: { value: blank as Texture }, uTexB: { value: blank as Texture }, uHasA: { value: 0 }, uHasB: { value: 0 }, uWorld: { value: petrol }, uShade: shade };
   const pictureMaterial = new ShaderMaterial({ uniforms: pictureUniforms, vertexShader: pictureVertex, fragmentShader: pictureFragment, transparent: true, depthWrite: false });
   const plane = new Mesh(planeGeometry, pictureMaterial);
   const piece = new Group();
@@ -282,6 +320,7 @@ export function initLandscape(container: HTMLElement): LandscapeController {
     renderer?.forceContextLoss();
     renderer?.domElement.remove();
     delete container.dataset.render;
+    container.style.removeProperty('--journey-world');
   }
   function fallback() {
     cleanup();
@@ -321,7 +360,7 @@ export function initLandscape(container: HTMLElement): LandscapeController {
       if (disposed) return;
       shapes[i] = picture(image, cols, rows, detail);
       loaded.set(i, image);
-      if (loaded.size === expected) shapes[stations.length - 1] = picture(collage([...loaded.keys()].sort((a, b) => a - b).map(key => loaded.get(key)!), detail), cols, rows, detail);
+      if (loaded.size === expected) shapes[stations.length - 1] = picture(collage([...loaded.keys()].sort((a, b) => a - b).map(key => loaded.get(key)!), detail, compact), cols, rows, detail);
       pair = '';
       invalidate();
     };
@@ -340,6 +379,10 @@ export function initLandscape(container: HTMLElement): LandscapeController {
     }
     uniforms.uSoftA.value = a.soft;
     uniforms.uSoftB.value = b.soft;
+    uniforms.uSpinA.value = a.spin ?? 0;
+    uniforms.uSpinB.value = b.spin ?? 0;
+    uniforms.uOffsetA.value = a.offset ?? [0, 0, 0];
+    uniforms.uOffsetB.value = b.offset ?? [0, 0, 0];
     pictureUniforms.uTexA.value = a.texture ?? blank;
     pictureUniforms.uTexB.value = b.texture ?? blank;
     pictureUniforms.uHasA.value = a.texture ? 1 : 0;
@@ -370,17 +413,22 @@ export function initLandscape(container: HTMLElement): LandscapeController {
     setPair(from);
     progress.value = current - from;
     uniforms.uTime.value = ambient ? seconds : 0;
-    const scale = compact ? Math.min(1, (halfWidth * 1.8) / WIDTH) : 1;
+    // Die Welt füllt die Bühne randlos (cover). Mobil nur die obere Bühnenfläche, darunter steht der Text.
+    // shortcut: mobiler Anteil fest bei 53 % wie --journey-scene-height; bei abweichender Bühnenhöhe aus dem Layout messen.
+    const cover = compact ? .53 : 1;
+    const scale = Math.max((halfWidth * 2) / WIDTH, (halfHeight * 2 * cover) / HEIGHT);
     uniforms.uSize.value = Math.max(2 * ratio, (WIDTH / cols) * pixelsPerUnit * scale * ratio * 1.15);
     piece.scale.setScalar(scale);
-    // Der Glutball schwebt leicht; Bilder stehen ruhig.
-    const hover = ambient ? Math.sin(seconds * .9) * .06 * Math.max(uniforms.uSoftA.value, uniforms.uSoftB.value) : 0;
-    piece.position.set(compact ? 0 : halfWidth * .28, (compact ? halfHeight * .34 : 0) + hover, 0);
-    piece.rotation.set(-.08, compact ? 0 : -.22, 0);
+    piece.position.set(0, compact ? halfHeight - (HEIGHT * scale) / 2 : 0, 0);
+    const blend = current - from, worldA = worldAt(from), worldB = worldAt(from + 1);
+    const tone = worldA.map((value, i) => value + (worldB[i] - value) * blend);
+    pictureUniforms.uWorld.value = tone;
+    const css = `rgb(${tone.map(value => Math.round(value * 255)).join(' ')})`;
+    if (css !== world) container.style.setProperty('--journey-world', world = css);
     sparks.visible = ambient;
     if (ambient) {
       drift(step, seconds);
-      const tintA = shapeAt(from).tint, tintB = shapeAt(from + 1).tint, blend = current - from;
+      const tintA = shapeAt(from).tint, tintB = shapeAt(from + 1).tint;
       sparkUniforms.uTime.value = seconds;
       sparkUniforms.uSize.value = pixelsPerUnit * .03 * ratio;
       sparkUniforms.uTint.value = tintA.map((value, i) => value + (tintB[i] - value) * blend);
