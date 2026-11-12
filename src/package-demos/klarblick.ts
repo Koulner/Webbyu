@@ -114,7 +114,7 @@ function anfrageTuer(): string {
       <div class="kb-zustand" data-form-review hidden tabindex="-1">
         <h3>So würde Ihre Anfrage bei uns ankommen</h3>
         <dl></dl>
-        <p>Diese Vorschau bleibt ausschließlich in dieser geöffneten Seite.</p>
+        <p>Diese Vorschau gibt es nur in dieser geöffneten Seite.</p>
         <button class="kb-klingel" data-confirm type="button">Demo-Anfrage abschließen</button>
         <button class="pd-link" data-edit type="button">Angaben korrigieren</button>
       </div>

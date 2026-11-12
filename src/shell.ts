@@ -63,9 +63,9 @@ export function renderPageHtml(base: string): string {
           <div class="hero-copy">
             <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Lukas Wagner · Webdesign aus Bad Oldesloe</p>
             <h1 id="hero-title">Jede Website hat eine <em>Rückseite.</em></h1>
-            <p class="hero-description">Ihre Kunden sehen die Vorderseite: Angebot, Bilder, Kontakt. Dahinter stehen die Fragen, die Ihr Unternehmen ausmachen, und die Entscheidungen, die daraus folgen. Ich gestalte beides, für jedes Unternehmen neu.</p>
+            <p class="hero-description">Ihre Kunden sehen die Vorderseite: Angebot, Bilder, Kontakt. Auf der Rückseite steht, was sie eigentlich wissen wollen und warum die Seite deshalb so aussieht. Ich arbeite an beiden Seiten und fange bei jedem Betrieb von vorn an.</p>
             <div class="hero-actions">
-              <a class="button button--primary" href="#projektfinder">Ihr Vorhaben durchdenken ${arrow}</a>
+              <a class="button button--primary" href="#projektfinder">Ihr Projekt durchgehen ${arrow}</a>
               <a class="text-link" href="#arbeiten">Rückseiten ansehen <span aria-hidden="true">↓</span></a>
             </div>
           </div>
@@ -76,18 +76,18 @@ export function renderPageHtml(base: string): string {
 
       <section id="arbeiten" class="work-section" aria-labelledby="work-title" aria-describedby="gallery-disclaimer">
         <div class="section-shell">
-          <div class="section-kicker"><span>01 / DREI BEISPIELE</span><span>Erfundene Unternehmen. Echte Arbeitsweise.</span></div>
+          <div class="section-kicker"><span>01 / DREI BEISPIELE</span><span>Die Firmen sind erfunden, die Arbeit nicht.</span></div>
           <div class="section-heading gallery-heading">
-            <h2 id="work-title">Drei Unternehmen.<br><em>Drei Rückseiten.</em></h2>
-            <p>Auf jeder Rückseite steht, von welcher Kundenfrage die Gestaltung ausgeht und welche Richtung dafür verworfen wurde.</p>
+            <h2 id="work-title">Drei Firmen,<br><em>umgedreht.</em></h2>
+            <p>Dreht man eine Karte um, steht dort die Kundenfrage, von der ich ausgegangen bin. Und die Idee, die ich dafür wieder verworfen habe.</p>
           </div>
           <article class="side-row">${panel(sides.klarblick, base)}<div class="side-copy"><h3>Ein Haus voller Fenster.</h3><p><b>Vorne</b> sehen Besucher ihr eigenes Haus wieder: das runde Fenster im Giebel, das über der Treppe.</p><p><b>Hinten</b> steht, warum: Die Höhe ist das eigentliche Problem, und eine Seite wird von oben nach unten gelesen.</p><a class="text-link" href="${base}demos/start/">Klarblick ansehen ${arrow}</a></div></article>
           <article class="side-row side-row--flip">${panel(sides.hof, base)}<div class="side-copy"><h3>Ein Abend am Feuer.</h3><p><b>Vorne</b> läuft die Karte in der Reihenfolge, in der der Herd abkühlt.</p><p><b>Hinten</b> ordnet eine einzige Kurve Gänge, Schriftgröße und Papierfarbe.</p><a class="text-link" href="${base}demos/complete/">Hof &amp; Flamme ansehen ${arrow}</a></div></article>
-          <article class="side-row"><figure class="panel panel--yours" data-panel><div class="card"><div class="face front"><div class="blank" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></div><span class="face-tag">Ihre Vorderseite</span></div><div class="face back"><div class="back-notes"><p class="face-tag face-tag--back">Ihre Rückseite</p><dl><dt>Kundenfrage</dt><dd>Noch offen.</dd><dt>Leitidee</dt><dd>Entsteht aus Ihrem Unternehmen.</dd><dt>Zielhandlung</dt><dd>Beginnt mit Ihrer ersten Antwort.</dd></dl></div></div><span class="sheen" aria-hidden="true"></span></div>${flip('Ihr Unternehmen')}</figure><div class="side-copy"><h3>Und Ihre?</h3><p>Eine Vorlage hätte vorne schon alles fertig. Bei Ihnen beginnt die Arbeit hinten: mit dem, was Ihre Kunden fragen, und dem, was nach dem Klick bei Ihnen passiert.</p><a class="text-link" href="#projektfinder">Mit Ihrer Rückseite beginnen <span aria-hidden="true">↓</span></a></div></article>
-          <details class="studio-lab"><summary><span><span class="lab-label">DAS WEBBYU LABOR</span><strong>Was kann eine Website noch?</strong><span class="lab-description">Auswahlhilfen, Shops und räumliche Erlebnisse ausprobieren.</span></span><span class="lab-toggle" aria-hidden="true">+</span></summary><div class="studio-lab-content"><p>Die Reise verbindet die drei Paketbeispiele mit zwei zusätzlichen Funktionsstudien für Shops und besondere Interaktionen. Diese Erweiterungen werden gesondert angeboten.</p>
+          <article class="side-row"><figure class="panel panel--yours" data-panel><div class="card"><div class="face front"><div class="blank" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b></div><span class="face-tag">Ihre Vorderseite</span></div><div class="face back"><div class="back-notes"><p class="face-tag face-tag--back">Ihre Rückseite</p><dl><dt>Kundenfrage</dt><dd>Noch offen.</dd><dt>Leitidee</dt><dd>Entsteht aus Ihrem Unternehmen.</dd><dt>Zielhandlung</dt><dd>Beginnt mit Ihrer ersten Antwort.</dd></dl></div></div><span class="sheen" aria-hidden="true"></span></div>${flip('Ihr Unternehmen')}</figure><div class="side-copy"><h3>Und Ihre?</h3><p>Bei einer Vorlage ist die Vorderseite fertig, bevor jemand nach Ihrem Betrieb gefragt hat. Ich fange hinten an: Was fragen Ihre Kunden, und was passiert bei Ihnen, nachdem jemand auf „Senden“ gedrückt hat?</p><a class="text-link" href="#projektfinder">Mit Ihrer Rückseite beginnen <span aria-hidden="true">↓</span></a></div></article>
+          <details class="studio-lab"><summary><span><span class="lab-label">DAS WEBBYU LABOR</span><strong>Was kann eine Website noch?</strong><span class="lab-description">Auswahlhilfen, Shops und ein bisschen 3D zum Ausprobieren.</span></span><span class="lab-toggle" aria-hidden="true">+</span></summary><div class="studio-lab-content"><p>In der Reise hängen die drei Paketbeispiele mit zwei Studien zusammen, in denen ich Shops und aufwendigere Interaktionen ausprobiere. Solche Erweiterungen bekommen ein eigenes Angebot.</p>
           <div id="journey-preview" class="journey-embed" role="region" aria-label="Die Reise – interaktive Vorschau">
             <div class="journey-embed-bar">
-              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Von der Idee zum Erlebnis.</span></div>
+              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Acht Stationen, fünf Beispiele.</span></div>
               <div class="journey-embed-actions">
                 <a href="${base}reise/" data-journey-page>Reise öffnen ${arrow}</a>
                 <button type="button" data-journey-fullscreen aria-label="Die Reise im Vollbild ansehen" aria-pressed="false" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span data-fullscreen-label>Vollbild</span></button>
@@ -103,17 +103,17 @@ export function renderPageHtml(base: string): string {
             </div>
           </div>
           </div></details>
-          <p id="gallery-disclaimer" class="studio-disclaimer">Beispiele für fiktive Marken, keine Kundenreferenzen. Sie können die Abläufe ausprobieren; Anfragen und Käufe sind lokale Simulationen. KI-generierte Bilder sind direkt am Bild gekennzeichnet; eine Übersicht steht im <a href="${base}impressum/#ki-kennzeichnung">Impressum</a>.</p>
+          <p id="gallery-disclaimer" class="studio-disclaimer">Alle Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Sie können alles anklicken; Anfragen und Käufe sind nur Simulationen in Ihrem Browser. KI-generierte Bilder sind direkt am Bild gekennzeichnet, die Übersicht steht im <a href="${base}impressum/#ki-kennzeichnung">Impressum</a>.</p>
         </div>
       </section>
 
       <section id="ansatz" class="approach-section section-shell" aria-labelledby="approach-title">
-        <div class="section-kicker"><span>02 / DER ANSATZ</span><span>Ihr Unternehmen ist der Ausgangspunkt.</span></div>
+        <div class="section-kicker"><span>02 / DER ANSATZ</span><span>Erst fragen, dann zeichnen.</span></div>
         <div class="section-heading">
-          <h2 id="approach-title">Gute Gestaltung beginnt<br><em>mit einer guten Frage.</em></h2>
-          <p>Was soll für Ihre Kunden leichter werden? Eine Website erklärt Ihr Angebot, beantwortet Fragen und bereitet Entscheidungen vor. Deshalb beginnt meine Arbeit mit Ihrem Unternehmen.</p>
+          <h2 id="approach-title">Bevor ich etwas zeichne,<br><em>frage ich viel.</em></h2>
+          <p>Eine Website soll Ihr Angebot erklären und die Fragen beantworten, die sonst am Telefon landen. Das klappt nur, wenn ich Ihren Betrieb verstanden habe. Also fange ich dort an.</p>
         </div>
-        <div class="approach-intro"><p>Vielleicht finden Kunden nicht die passende Leistung. Vielleicht fehlen bei Anfragen immer dieselben Angaben. Oder Sie übertragen Informationen mehrmals von Hand.</p><p>Ich kläre mit Ihnen, wo es hakt. Daraus entsteht ein Auftritt mit den Funktionen, die für Ihre Aufgabe sinnvoll sind — vom verständlichen Unternehmensauftritt bis zum angebundenen Shop.</p></div>
+        <div class="approach-intro"><p>Oft ist das Problem ganz handfest. Kunden finden die Leistung nicht, die sie suchen. In Anfragen fehlt immer wieder dieselbe Angabe. Oder jemand tippt abends Bestellungen von einer Liste in die nächste.</p><p>Wir schauen zusammen, wo es hakt. Danach schlage ich vor, was die Seite können muss. Manchmal reicht eine gut sortierte Unternehmensseite, manchmal braucht es einen angebundenen Shop.</p></div>
         <div class="layers">
           <div class="stack-wrap" aria-hidden="true"><div class="stack">
             <div class="layer" style="--i:3"><span class="layer-tag">04 Betrieb</span><div class="l-run"><b>ihre-firma.de</b><i>Domain: auf Ihren Namen</i><i>Hosting: Ihr Vertrag</i><i>Übergabe: Dateien &amp; Zugänge</i></div></div>
@@ -128,7 +128,7 @@ export function renderPageHtml(base: string): string {
             <li><span>04 Betrieb</span><p>Wem gehört die Domain? <b>Ihnen.</b></p></li>
           </ol>
         </div>
-        <div class="situation-heading"><span>KENNEN SIE DAS?</span><p>Drei typische Ausgangspunkte — und was daraus werden kann.</p></div>
+        <div class="situation-heading"><span>KENNEN SIE DAS?</span><p>Drei typische Sätze und was man daraus machen kann.</p></div>
         <div class="situation-list">${situations.map((situation, index) => `
           <details class="situation" ${index === 0 ? 'open' : ''}>
             <summary><span class="situation-number">0${index + 1}</span><span class="situation-title">${situation.title}</span><span class="situation-toggle" aria-hidden="true">+</span></summary>
@@ -138,36 +138,36 @@ export function renderPageHtml(base: string): string {
       </section>
 
       <section id="leistungen" class="services-section section-shell" aria-labelledby="services-title">
-        <div class="section-kicker"><span>03 / WAS ICH FÜR SIE ENTWICKLE</span><span>Die passende Tiefe für Ihre Aufgabe.</span></div>
+        <div class="section-kicker"><span>03 / WAS ICH FÜR SIE ENTWICKLE</span><span>So viel wie nötig.</span></div>
         <div class="section-heading">
-          <h2 id="services-title">Verständlich nach außen.<br><em>Durchdacht dahinter.</em></h2>
-          <p>Manchmal genügt eine klar aufgebaute Website. Manchmal braucht es eine Auswahlhilfe, einen Shop oder die Verbindung zu einem vorhandenen Dienst. Das klären wir vor der Umsetzung.</p>
+          <h2 id="services-title">Manchmal reicht eine gute Seite.<br><em>Manchmal nicht.</em></h2>
+          <p>Für viele Betriebe ist eine klar aufgebaute Website genau richtig. Andere brauchen eine Auswahlhilfe, einen Shop oder die Verbindung zu einem Dienst, den sie schon nutzen. Was davon nötig ist, klären wir, bevor ich anfange.</p>
         </div>
         <div class="services-grid">${services.map((service, index) => `<article><span class="service-number">0${index + 1}</span><h3>${service.name}</h3><p>${service.description}</p><ul>${service.examples.map(example => `<li>${example}</li>`).join('')}</ul><p class="service-outcome">${service.outcome}</p></article>`).join('')}</div>
         <nav class="service-page-links" aria-label="Leistungen im Detail"><a href="${base}websites-fuer-unternehmen/">Ihre Unternehmenswebsite planen ${arrow}</a><a href="${base}anfrageformulare-auswahlhilfen/">Anfrageformulare & Auswahlhilfen ${arrow}</a></nav>
-        <div class="service-footnote"><p><strong>Auch die Inhalte gehören zur Lösung.</strong> Texte, eigene Fotos, Videos oder eine interaktive Produktgeschichte können erklären, was Ihr Unternehmen besonders macht. Produktion und technische Anbindungen planen wir passend zum Projekt.</p><a class="text-link" href="#projektfinder">Ihre Aufgabe beschreiben ${arrow}</a></div>
-        <div class="development-note"><span>INDIVIDUELL ENTWICKELT</span><p>Gestaltung und Funktionen richten sich nach Ihrem Unternehmen. Wenn ein vorhandener Shop- oder Buchungsdienst gut passt, kann er angebunden werden. Wie Sie Inhalte später pflegen und was im laufenden Betrieb nötig ist, legen wir gemeinsam fest.</p></div>
+        <div class="service-footnote"><p><strong>Texte und Bilder gehören dazu.</strong> Eigene Fotos, ein Video oder gut geschriebene Texte zeigen oft besser als jede Gestaltung, was Ihren Betrieb ausmacht. Was davon neu produziert wird, steht im Angebot.</p><a class="text-link" href="#projektfinder">Ihre Aufgabe beschreiben ${arrow}</a></div>
+        <div class="development-note"><span>OHNE BAUKASTEN</span><p>Ich baue jede Seite selbst. Wenn Sie schon einen Shop- oder Buchungsdienst nutzen, der gut funktioniert, binde ich ihn ein, statt ihn nachzubauen. Wie Sie später Inhalte ändern und wer sich um den Betrieb kümmert, besprechen wir vorher.</p></div>
       </section>
 
       <section id="pakete" class="packages-section section-shell" aria-labelledby="packages-title" aria-describedby="package-offer-note">
-        <div class="section-kicker"><span>04 / PAKETE & INDIVIDUELLE VORHABEN</span><span>Ein klarer Rahmen für Ihren Einstieg.</span></div>
+        <div class="section-kicker"><span>04 / PAKETE & EIGENE VORHABEN</span><span>Drei Startpunkte zur Orientierung.</span></div>
         <div class="section-heading">
-          <h2 id="packages-title">Ein passender Einstieg.<br><em>Ein geklärter Umfang.</em></h2>
-          <p>Die Pakete geben Orientierung für Unternehmenswebsites und passende Inhalte. Besondere Funktionen und angebundene Dienste planen wir als eigenes Vorhaben.</p>
+          <h2 id="packages-title">Drei Pakete<br><em>als Ausgangspunkt.</em></h2>
+          <p>Die Pakete geben eine grobe Richtung für Unternehmenswebsites mit Inhalten vor. Besondere Funktionen und angebundene Dienste plane ich separat.</p>
         </div>
-        <p id="package-offer-note" class="offer-note"><strong>Alle Pakete: Angebot auf Anfrage.</strong> Wir klären Ihre Anforderungen und halten Inhalte, Funktionen und Ablauf in einem individuellen Angebot fest.</p>
+        <p id="package-offer-note" class="offer-note"><strong>Alle Pakete: Angebot auf Anfrage.</strong> Einen Preis nenne ich, sobald ich weiß, was Sie brauchen. Im Angebot steht dann genau, was dazugehört.</p>
         <div class="package-list">${packages.map(p => `
           <article class="package-row">
             <span class="package-number">${p.number}</span>
             <div class="package-intro"><h3>${p.name}</h3><p>${p.description}</p><details class="package-details"><summary>Ablauf & Umfang</summary>${p.details.map(detail => `<p>${detail}</p>`).join('')}</details></div>
             <ul>${p.features.map(f => `<li><span aria-hidden="true">↗</span>${f}</li>`).join('')}</ul>
-            <div class="package-action"><a class="text-link" href="${base}demos/${p.id}/">Paket-Demo ansehen ↗</a><div><strong class="package-price">${p.price}</strong><span class="package-price-note">Umfang individuell vereinbart</span></div><button type="button" data-package="${p.id}" class="round-arrow" aria-label="Paket ${p.name} vormerken">${arrow}</button></div>
+            <div class="package-action"><a class="text-link" href="${base}demos/${p.id}/">Paket-Demo ansehen ↗</a><div><strong class="package-price">${p.price}</strong><span class="package-price-note">Umfang nach Absprache</span></div><button type="button" data-package="${p.id}" class="round-arrow" aria-label="Paket ${p.name} vormerken">${arrow}</button></div>
           </article>`).join('')}
         </div>
-        <div class="package-included"><span>GEMEINSAM KLÄREN</span><ul><li>Gestaltung & Besucherführung</li><li>Darstellung auf Handy und Computer</li><li>Inhalte & benötigte Funktionen</li><li>Prüfung, Übergabe & Betrieb</li></ul></div>
+        <div class="package-included"><span>DAS BESPRECHEN WIR</span><ul><li>Gestaltung und Wege durch die Seite</li><li>Darstellung auf Handy und Computer</li><li>Inhalte und nötige Funktionen</li><li>Test, Übergabe und Betrieb</li></ul></div>
         <p class="package-scope-note">${businessNotice} ${scopeNotice}</p>
-        <div class="package-faq"><h3>Vor dem Start<br><em>gut zu wissen.</em></h3><div>${packageQuestions.map(item => `<details><summary>${item.question}<span aria-hidden="true">+</span></summary><p>${item.answer}</p></details>`).join('')}</div></div>
-        <div class="extensions-heading"><h3>Raum für mehr.</h3><p>Erweiterungen, die zu Ihrem Alltag passen.</p></div>
+        <div class="package-faq"><h3>Häufige Fragen<br><em>vor dem Start.</em></h3><div>${packageQuestions.map(item => `<details><summary>${item.question}<span aria-hidden="true">+</span></summary><p>${item.answer}</p></details>`).join('')}</div></div>
+        <div class="extensions-heading"><h3>Was noch dazukommen kann.</h3><p>Erweiterungen, falls Sie sie brauchen.</p></div>
         <div class="extensions-grid">${extensions.map((e, i) => `
           <details class="extension"><summary><span class="extension-index">0${i + 1}</span><span>${e.short}</span><span class="extension-toggle" aria-hidden="true">+</span></summary>
             <div><h4>${e.name}</h4><p>${e.description}</p><button type="button" class="extension-add" data-extension="${e.id}" aria-pressed="false">Für mein Projekt vormerken ${arrow}</button></div>
@@ -177,20 +177,20 @@ export function renderPageHtml(base: string): string {
 
       <section id="zusammenarbeit" class="about-section" aria-labelledby="about-title">
         <div class="section-shell">
-          <div class="section-kicker"><span>05 / ZUSAMMENARBEIT</span><span>Ein Ansprechpartner. Ein gemeinsamer Weg.</span></div>
+          <div class="section-kicker"><span>05 / ZUSAMMENARBEIT</span><span>Ein Ansprechpartner, von Anfang bis Ende.</span></div>
           <div class="about-layout">
             <div class="about-copy" id="ueber-uns" tabindex="-1">
-              <h2 id="about-title">Sie kennen Ihr Geschäft.<br><em>Wir entwickeln den<br>passenden Weg.</em></h2>
-              <p>Hinter Webbyu stehe ich als einzelner Gründer. Sie sprechen direkt mit der Person, die Ihr Vorhaben plant, gestaltet und entwickelt. Mein Ausgangspunkt ist Ihr Unternehmen: Ihre Kunden, Ihre Leistungen und die Arbeit dahinter.</p>
-              <p>Sie müssen keine fertige technische Lösung mitbringen. Beschreiben Sie, was heute schwierig ist oder was Sie ermöglichen möchten. Ich übersetze das mit Ihnen in einen verständlichen, umsetzbaren Plan.</p>
-              <p>Domain und Hosting bleiben in Ihrer Hand. Sie erhalten die vereinbarten Dateien und Zugänge – ohne verpflichtenden laufenden Betreuungsvertrag.</p>
+              <h2 id="about-title">Sie kennen Ihren Betrieb.<br><em>Ich kenne mich<br>mit Websites aus.</em></h2>
+              <p>Webbyu bin ich, Lukas Wagner. Wer mit mir spricht, spricht mit dem, der die Seite plant, gestaltet und programmiert. Dazwischen sitzt niemand.</p>
+              <p>Sie müssen nicht wissen, welche Technik Sie brauchen. Erzählen Sie mir, was heute umständlich ist oder besser laufen soll. Daraus mache ich einen Plan, den Sie ohne Fachwörter verstehen.</p>
+              <p>Domain und Hosting gehören Ihnen. Sie bekommen die vereinbarten Dateien und Zugänge, und einen Wartungsvertrag müssen Sie nicht abschließen.</p>
               <a class="text-link" href="${base}ueber-mich/">Lukas Wagner kennenlernen ${arrow}</a>
             </div>
             <ol class="process-list">
-              <li><span>01</span><div><h3>Gemeinsam verstehen.</h3><p>Was möchten Sie erreichen? Welche Fragen haben Ihre Kunden? Wir halten fest, wo die Website helfen soll.</p></div></li>
-              <li><span>02</span><div><h3>Den Weg festlegen.</h3><p>Sie sehen, welche Inhalte und Funktionen vorgeschlagen werden und warum. Umfang, Kosten und offene Fragen werden besprochen.</p></div></li>
-              <li><span>03</span><div><h3>Gestalten & entwickeln.</h3><p>Sie können Entwürfe und wichtige Abläufe früh ausprobieren. Ihre Rückmeldung fließt in die vereinbarten Überarbeitungen ein.</p></div></li>
-              <li><span>04</span><div><h3>Prüfen & übergeben.</h3><p>Wir gehen die fertige Lösung gemeinsam durch. Sie erhalten die vereinbarten Dateien, Zugänge und eine Einführung. Betrieb und spätere Änderungen sind geklärt.</p></div></li>
+              <li><span>01</span><div><h3>Zuhören</h3><p>Was soll die Website erreichen, und was fragen Ihre Kunden? Ich schreibe mit, wo die Seite Ihnen Arbeit abnehmen kann.</p></div></li>
+              <li><span>02</span><div><h3>Vorschlagen</h3><p>Sie bekommen einen Vorschlag mit Inhalten und Funktionen, jeweils mit Begründung. Umfang, Kosten und offene Punkte besprechen wir dann.</p></div></li>
+              <li><span>03</span><div><h3>Bauen</h3><p>Sie sehen Entwürfe früh und können wichtige Abläufe selbst durchklicken. Ihre Anmerkungen arbeite ich in den vereinbarten Korrekturschleifen ein.</p></div></li>
+              <li><span>04</span><div><h3>Übergeben</h3><p>Wir gehen die fertige Seite zusammen durch. Sie bekommen Dateien, Zugänge und eine Einführung, und es ist klar, wer sich danach um was kümmert.</p></div></li>
             </ol>
           </div>
         </div>
@@ -198,21 +198,21 @@ export function renderPageHtml(base: string): string {
 
       <section class="seo-guide-section section-shell" aria-labelledby="guide-title">
         <div class="section-kicker"><span>VOR DEM ERSTEN GESPRÄCH</span><a href="${base}ratgeber/">Alle Ratgeber ${arrow}</a></div>
-        <div class="section-heading"><h2 id="guide-title">Gut vorbereitet.<br><em>Klar entschieden.</em></h2><p>Welche Angaben braucht ein Angebot? Welche Kosten entstehen später? Zwei praktische Hilfen für Ihre Unternehmenswebsite.</p></div>
+        <div class="section-heading"><h2 id="guide-title">Zwei Texte<br><em>zum Vorbereiten.</em></h2><p>Was gehört in ein Angebot, und welche Kosten kommen nach dem Start noch dazu? Beides habe ich aufgeschrieben.</p></div>
         <div class="service-page-links"><a href="${base}ratgeber/website-kosten/">Was kostet eine Unternehmenswebsite? ${arrow}</a><a href="${base}ratgeber/website-planen-checkliste/">Website planen: Ihre Checkliste ${arrow}</a></div>
       </section>
       <section id="projektfinder" class="finder-section" aria-labelledby="finder-title">
         <div class="section-shell">
-          <div class="section-kicker"><span>06 / IHR VORHABEN</span><span>Eine konkrete Aufgabe ist ein guter Anfang.</span></div>
+          <div class="section-kicker"><span>06 / IHR VORHABEN</span><span>Fangen Sie mit einer Sache an.</span></div>
           <div class="finder-layout">
             <div class="finder-intro">
               <span class="finder-spark" aria-hidden="true">↗</span>
               <h2 id="finder-title">Was haben<br>Sie <em>vor?</em></h2>
-              <p>Was sollen Ihre Kunden besser verstehen oder leichter erledigen können? Was kostet Sie im Alltag unnötig Zeit? Ein paar Fragen helfen, Ihr Vorhaben zu ordnen.</p>
-              <p class="finder-assurance">Sie brauchen dafür kein technisches Vorwissen.</p>
+              <p>Ein paar Fragen zu Ihrem Betrieb und dazu, was die Website erledigen soll. Am Ende haben Sie eine Zusammenfassung, mit der wir gleich konkret werden können.</p>
+              <p class="finder-assurance">Technisches Wissen brauchen Sie dafür nicht.</p>
               <p class="finder-assurance">${businessNotice}</p>
-              <p class="finder-local-note">Der Projektfinder hilft Ihnen, Ihre Wünsche zusammenzustellen. Sie können die Zusammenfassung kopieren und mich direkt kontaktieren.</p>
-              <p class="finder-contact-note">Bad Oldesloe, Stormarn & Hamburg.<br>Persönliche Gespräche bei Ihnen nach Vereinbarung.<br>Direkt Kontakt aufnehmen:<br><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
+              <p class="finder-local-note">Der Projektfinder sammelt Ihre Wünsche an einer Stelle. Sie können die Zusammenfassung kopieren und mich direkt kontaktieren.</p>
+              <p class="finder-contact-note">Bad Oldesloe, Stormarn und Hamburg.<br>Nach Absprache komme ich auch zu Ihnen.<br>Oder direkt:<br><a href="mailto:lukas.wagner@webbyu.de">lukas.wagner@webbyu.de</a><br><a href="tel:+4917642090983">+49 176 42090983</a></p>
             <div class="finder-back"><p class="face-tag face-tag--back">Ihre Rückseite · Notizen</p><ol class="brief-notes" data-brief-notes><li class="is-empty">Noch leer. Ihre Antworten im Projektberater erscheinen hier als Notizen.</li></ol><p class="brief-local">Ihre Angaben bleiben auf Ihrem Gerät, bis Sie sie selbst weitergeben.</p></div>
             </div>
             <div id="finder-mount"></div>
@@ -221,13 +221,13 @@ export function renderPageHtml(base: string): string {
       </section>
     </main>
     <footer class="site-footer section-shell">
-      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">${wordmarkImg(base, '(max-width: 600px) 245px, clamp(180px, 30vw, 410px)')}</a><p>Ihr Angebot klarer.<br>Ihr Alltag einfacher.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
+      <div class="footer-top"><a class="wordmark" href="#" aria-label="Webbyu – zurück nach oben">${wordmarkImg(base, '(max-width: 600px) 245px, clamp(180px, 30vw, 410px)')}</a><p>Websites aus Bad Oldesloe,<br>ohne Baukasten.</p><a class="back-to-top" href="#">Zurück nach oben <span aria-hidden="true">↑</span></a></div>
       <nav class="footer-nav" aria-label="Weitere Navigation"><a href="#ansatz">Ansatz</a><a href="#arbeiten">Beispiele</a><a href="#leistungen">Leistungen</a><a href="#pakete">Pakete</a><a href="#ueber-uns">Über mich</a><a href="#projektfinder">Kontakt</a><a href="${base}impressum/">Impressum</a><a href="${base}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav>
       <div class="legal-notes">
         <details id="impressum"><summary>Impressum</summary><p>Betreiber: Lukas Wagner · Webbyu. Anschrift und Kontakt finden Sie im <a href="${base}impressum/">Impressum</a>.</p></details>
         <details id="datenschutz"><summary>Datenschutz</summary><p>Informationen zum Hosting, zur Kontaktaufnahme und zu Ihrer Cookie-Auswahl finden Sie in der <a href="${base}datenschutz/">Datenschutzerklärung</a>. Der Projektfinder hält Ihre Angaben im Speicher der geöffneten Seite. Kopieren und Bearbeiten übertragen keine Anfrage.</p></details>
       </div>
-      <div class="footer-bottom"><span>© ${new Date().getFullYear()} Webbyu</span><span>Hamburg · Bad Oldesloe · Umgebung</span><span>Individuelle Websites & Funktionen</span></div>
+      <div class="footer-bottom"><span>© ${new Date().getFullYear()} Webbyu</span><span>Hamburg · Bad Oldesloe · Umgebung</span><span>Websites, selbst gebaut</span></div>
     </footer>
     <div class="toast" role="status" aria-live="polite"></div>
   `;

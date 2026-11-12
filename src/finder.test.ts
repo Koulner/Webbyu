@@ -360,7 +360,7 @@ describe('project finder', () => {
     expect(summary()).toContain('Produkte verkaufen');
     expect(summary()).toContain('Webbyu Complete');
     expect(summary()).toContain('Inhalte selbst pflegen');
-    expect(summary()).toContain('Etwas Besonderes erleben');
+    expect(summary()).toContain('Produkte in 3D zeigen');
     expect(summary()).toContain('Eine bestehende Website erneuern');
     expect(summary()).toContain('Möglichst bald');
     expect(summary()).toContain('<img src=x onerror="alert(1)">');
@@ -454,14 +454,14 @@ describe('project finder', () => {
     expect(text('.finder-recommendation')).toContain('in keinem der drei Website-Pakete');
     change('selectedPackage', 'complete');
     expect(store.get().goal).toBe('sales');
-    expect(text('.finder-hints')).toContain('Shops, komplexe Buchungen und individuelle Integrationen benötigen einen gesonderten Umfang und ein eigenes Angebot.');
+    expect(text('.finder-hints')).toContain('Shops, aufwendige Buchungen und Anbindungen an andere Systeme sind nicht in den Paketen enthalten und bekommen ein eigenes Angebot.');
     expect(text('.finder-hints')).toContain('Außerhalb der drei Pakete liegt: Shop.');
     expect(lineTexts()).toEqual(expect.arrayContaining(['Shop', 'Inhalte selbst pflegen']));
     next();
     action('copy').click();
     await Promise.resolve();
     expect(writeText.mock.calls[0][0]).toContain('Zusammenstellung: Webbyu Complete');
-    expect(writeText.mock.calls[0][0]).toContain('Shops, komplexe Buchungen');
+    expect(writeText.mock.calls[0][0]).toContain('Shops, aufwendige Buchungen');
     expect(writeText.mock.calls[0][0]).toContain('Produkte verkaufen');
     expect(writeText.mock.calls[0][0]).toContain('Shop: offen');
   });

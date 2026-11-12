@@ -6,5 +6,5 @@ const definitions = {
 };
 export const packageDemoPages = Object.entries(definitions).flatMap(([packageId, entries]) => entries.map(([slug, heading]) => {
   const path = `/demos/${packageId}/${slug ? slug + '/' : ''}`;
-  return { id: `demo-${packageId}-${slug.replaceAll('/', '-') || 'home'}`, path, file: path.slice(1) + 'index.html', kind: 'package-demo', indexable: false, packageId, slug, heading, title: `${heading} | ${demoBrands[packageId]} · Webbyu Demo`, description: `Vollständige Beispielwebsite für Webbyu ${packageId}. ${heading}. Fiktives Unternehmen, lokal bedienbare Demo.` };
+  return { id: `demo-${packageId}-${slug.replaceAll('/', '-') || 'home'}`, path, file: path.slice(1) + 'index.html', kind: 'package-demo', indexable: false, packageId, slug, heading, title: `${heading} | ${demoBrands[packageId]} · Webbyu Demo`, description: `${heading}: eine Seite aus der Demo-Website von ${demoBrands[packageId]}, einem erfundenen Betrieb. Gehört zu den Webbyu-Paketbeispielen.` };
 }));

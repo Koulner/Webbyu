@@ -31,7 +31,7 @@ export function renderJourneyHtml(home: string): string {
               <p class="journey-preview-loading" data-preview-loading hidden>Website-Vorschau wird geladen …</p>
             </div>
           </div>
-          <div class="journey-scene-label" aria-hidden="true"><span data-scene-index>WEBBYU / VERBUNDENE ERLEBNISRÄUME</span><span data-scene-caption>Jede Idee eröffnet einen neuen Zusammenhang.</span></div>
+          <div class="journey-scene-label" aria-hidden="true"><span data-scene-index>WEBBYU / ACHT STATIONEN</span><span data-scene-caption>Von der ersten Frage bis zur fertigen Seite.</span></div>
           <div class="journey-network-key" aria-hidden="true"><span>Inhalt</span><span>Gestaltung</span><span>Funktion</span></div>
         </div>
       </div>
@@ -39,14 +39,14 @@ export function renderJourneyHtml(home: string): string {
         <section class="journey-chapter journey-welcome" id="landschaft" aria-labelledby="landschaft-title" data-chapter="-1">
           <div class="journey-copy">
             <p class="journey-eyebrow"><i aria-hidden="true"></i> DER WEG VON WEBBYU</p>
-            <h1>Aus Ideen<br>wird ein <em>Ganzes.</em></h1>
+            <h1>Wie bei mir<br>eine <em>Website</em> entsteht.</h1>
             <h2 id="landschaft-title" class="journey-sr">Übersicht der Reise</h2>
-            <p class="journey-lead">Inhalt. Gestaltung. Funktion.</p>
-            <p>Eine gute Website verbindet, was zusammengehört. Entdecken Sie, wie aus einer Aufgabe ein eigener digitaler Auftritt entsteht.</p>
+            <p class="journey-lead">Von der ersten Frage bis zu fünf Beispielen.</p>
+            <p>Acht Stationen: wie ich arbeite, drei Paketbeispiele und zwei Studien, in denen ich mehr ausprobiert habe. Alles lässt sich anklicken.</p>
             <div class="journey-facts" aria-label="Acht Stationen, fünf Beispiele"><span><b>08</b> Stationen</span><span><b>05</b> Beispiele</span></div>
             <a class="journey-action journey-start" href="#die-idee">Die Reise entdecken <span aria-hidden="true">→</span></a>
             <p class="journey-scroll-cue"><span aria-hidden="true">↕</span> Scrollen oder mit Weiter die Station wechseln.</p>
-            <p class="journey-disclaimer">Die Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Paketumfang und zusätzliche Funktionen werden individuell vereinbart.</p>
+            <p class="journey-disclaimer">Die Beispiele zeigen fiktive Marken, keine Kundenreferenzen. Was ein Paket umfasst und was extra kommt, steht im jeweiligen Angebot.</p>
           </div>
         </section>
         ${stations.map((station, i) => `<section class="journey-chapter" id="${station.id}" aria-labelledby="${station.id}-title" data-chapter="${i}">
@@ -77,8 +77,8 @@ export function renderJourneyHtml(home: string): string {
       <button class="journey-guide-open" data-guide-open hidden type="button" aria-controls="weg-dialog">Meine Arbeitsweise ${arrow}</button>
       <div class="journey-progress" aria-hidden="true"><span></span></div>
     </div>
-    <p class="journey-map-hint" data-map-hint>Scrollen führt Sie durch die Erlebnisräume. Alle Stationen sind auch direkt anwählbar.</p>
-    <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">${wordmarkImg(home, '(max-width: 600px) 135px, 154px')}</a><p>Ein Gründer. Ein direkter Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><nav class="journey-legal" aria-label="Rechtliche Angaben"><a href="${home}impressum/">Impressum</a><a href="${home}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav><a href="${home}">Zur Startseite ${arrow}</a></footer>
+    <p class="journey-map-hint" data-map-hint>Scrollen Sie weiter, oder springen Sie direkt zu einer Station.</p>
+    <footer class="journey-footer"><a class="journey-wordmark" href="${home}" aria-label="Webbyu – Startseite">${wordmarkImg(home, '(max-width: 600px) 135px, 154px')}</a><p>Lukas Wagner, Ihr einziger Ansprechpartner.<br>Hamburg · Bad Oldesloe · Umgebung</p><nav class="journey-legal" aria-label="Rechtliche Angaben"><a href="${home}impressum/">Impressum</a><a href="${home}datenschutz/">Datenschutz</a><button class="privacy-settings" type="button" data-privacy-open>Cookie-Einstellungen</button></nav><a href="${home}">Zur Startseite ${arrow}</a></footer>
     <div class="journey-status" role="status" aria-live="polite"></div><div data-demo-parking hidden></div>`;
 }
 

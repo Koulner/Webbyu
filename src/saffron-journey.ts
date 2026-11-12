@@ -7,9 +7,9 @@ import { aiBadge } from './ai-media';
 export const LAST_SAFFRON_FRAME = 400;
 const FRAME_STEP = 2;
 export const saffronChapters = [
-  { title: 'Die Blüte', frame: 160, image: new URL('./assets/demos/saffron/flower.webp', import.meta.url).href, alt: 'Violette Safranblüte mit roten Narbenästen in Nahaufnahme', text: 'Alles beginnt mit einer Blüte. Zwischen violetten Blütenblättern liegen die feinen roten Narbenäste.' },
-  { title: 'Der rote Faden', frame: 288, image: new URL('./assets/demos/saffron/detail.webp', import.meta.url).href, alt: 'Ein roter Narbenast mit trichterförmiger Spitze vor violetten Blütenblättern', text: 'Ein kleines Detail im großen Bild: die rote Narbe. Die Nahaufnahme macht ihre Struktur sichtbar.' },
-  { title: 'Das Gewürz', frame: 400, image: new URL('./assets/demos/saffron/threads.webp', import.meta.url).href, alt: 'Getrocknete rote Safranfäden auf hellem Grund', text: 'Getrocknete Fäden, intensive Farbe. In dieser fiktiven Kollektion entdecken Sie Safran in drei Größen.' },
+  { title: 'Die Blüte', frame: 160, image: new URL('./assets/demos/saffron/flower.webp', import.meta.url).href, alt: 'Violette Safranblüte mit roten Narbenästen in Nahaufnahme', text: 'Safran wächst in einer violetten Krokusblüte. In ihrer Mitte sitzen drei rote Narbenäste.' },
+  { title: 'Der rote Faden', frame: 288, image: new URL('./assets/demos/saffron/detail.webp', import.meta.url).href, alt: 'Ein roter Narbenast mit trichterförmiger Spitze vor violetten Blütenblättern', text: 'Nur diese roten Narben werden geerntet. In der Nahaufnahme sieht man ihre trichterförmige Spitze.' },
+  { title: 'Das Gewürz', frame: 400, image: new URL('./assets/demos/saffron/threads.webp', import.meta.url).href, alt: 'Getrocknete rote Safranfäden auf hellem Grund', text: 'Getrocknet werden daraus die Fäden, die man kauft. Diese fiktive Kollektion hat drei Größen.' },
 ];
 
 export function saffronFramePair(progress: number) {
