@@ -1,8 +1,7 @@
 /* Reference content extends the accepted editorial shell; the gallery owns itself. */
 .services-section { padding-block: 88px 48px; }
-.services-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
+.services-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px; }
 .services-grid article { border-top: 1px solid var(--color-border); padding-top: 24px; }
-.service-number { color: var(--color-aubergine); font-size: 12px; }
 .services-grid h3 { margin-block: 24px 16px; font: 400 36px/1.1 var(--font-serif); }
 .services-grid p, .service-footnote p { color: var(--color-muted); font-size: 16px; line-height: 1.75; }
 .service-footnote { display: flex; align-items: start; gap: 48px; justify-content: space-between; padding-top: 32px; margin-top: 36px; border-top: 1px solid var(--color-border); }
@@ -45,7 +44,7 @@
   .package-price-note { margin-top: 4px; }
 }
 @media (max-width: 900px) {
-  .services-grid { gap: 24px; }
+  .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
   .services-grid h3 { font-size: 30px; }
   .service-footnote { flex-direction: column; gap: 16px; }
   .package-faq { gap: 32px; grid-template-columns: 1fr 1.6fr; }
@@ -104,18 +103,14 @@
 .section-heading > p { max-width: 42ch; font-size: 17px; line-height: 1.75; }
 .approach-section { padding-block: 64px 80px; }
 .approach-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; max-width: 1080px; color: var(--color-muted); font-size: 18px; line-height: 1.8; }
-.situation-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; margin-top: 52px; padding-bottom: 20px; }
-.situation-heading > span { font-size: 12px; letter-spacing: .08em; }
-.situation-heading > p { color: var(--color-muted); font-size: 16px; }
 .situation { border-top: 1px solid var(--color-border); }
 .situation:last-child { border-bottom: 1px solid var(--color-border); }
-.situation summary { display: grid; grid-template-columns: 40px minmax(0, 1fr) 24px; align-items: center; gap: 24px; padding-block: 26px; cursor: pointer; list-style: none; }
+.situation summary { display: grid; grid-template-columns: minmax(0, 1fr) 24px; align-items: center; gap: 24px; padding-block: 26px; cursor: pointer; list-style: none; }
 .situation summary::-webkit-details-marker { display: none; }
-.situation-number { align-self: start; padding-top: 7px; font-size: 12px; color: var(--color-muted); }
 .situation-title { font-size: clamp(1.375rem, 2.3vw, 1.875rem); font-weight: 550; line-height: 1.3; letter-spacing: -.035em; }
 .situation-toggle { font-size: 28px; line-height: 1; transition: transform var(--duration-fast); }
 .situation[open] .situation-toggle { transform: rotate(45deg); }
-.situation-body { display: grid; grid-template-columns: 1fr 1.4fr .9fr; gap: 32px; padding: 4px 0 32px 64px; }
+.situation-body { display: grid; grid-template-columns: 1fr 1.4fr .9fr; gap: 32px; padding: 4px 0 32px; }
 .situation-body > div > span { display: block; margin-bottom: 12px; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
 .situation-body p { color: var(--color-muted); font-size: 16px; line-height: 1.75; }
 .situation-body .situation-example { margin-top: 16px; }
@@ -174,7 +169,7 @@
   .services-grid { grid-template-columns: 1fr; gap: 32px; }
   .services-grid article { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; }
   .services-grid h3 { margin-block: 16px; }
-  .service-number, .services-grid h3, .services-grid article > p:first-of-type { grid-column: 1; }
+  .services-grid h3, .services-grid article > p:first-of-type { grid-column: 1; }
   .services-grid ul { grid-column: 2; grid-row: 2 / span 2; margin-top: 16px; }
   .services-grid .service-outcome { grid-column: 1 / -1; margin-top: 22px; }
   .situation-body { grid-template-columns: 1fr 1.4fr; }
@@ -197,10 +192,7 @@
   .approach-intro { grid-template-columns: 1fr; gap: 18px; font-size: 17px; }
   .section-heading h2, .about-copy h2 { font-size: clamp(2rem, 7.6vw, 2.75rem); }
   .section-heading > p { font-size: 16px; }
-  .situation-heading { display: block; margin-top: 32px; }
-  .situation-heading > p { margin-top: 12px; }
-  .situation summary { grid-template-columns: 22px minmax(0, 1fr) 20px; gap: 12px; padding-block: 22px; }
-  .situation-number { padding-top: 4px; }
+  .situation summary { grid-template-columns: minmax(0, 1fr) 20px; gap: 12px; padding-block: 22px; }
   .situation-title { font-size: 21px; }
   .situation-body { grid-template-columns: 1fr; gap: 22px; padding-bottom: 26px; }
   .situation-result { grid-column: auto; }

@@ -13,12 +13,15 @@
 #app .gallery-shortcuts button:hover { color: var(--color-blue); }
 
 /* Die Fläche */
-.panel { margin: 0; --ry: -12deg; --rx: 5deg; --draw: 1; }
+/* Container: Die Rückseite richtet sich nach der Breite der Karte, nicht nach dem Fenster. */
+.panel { margin: 0; --ry: -12deg; --rx: 5deg; --draw: 1; container-type: inline-size; }
 .card { position: relative; display: grid; gap: 12px; }
-.face { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 12px; box-shadow: 0 0 0 1px rgba(22, 24, 26, .1); }
+/* Seitenformat als Mindesthöhe (16:10 der Kartenbreite); die Rückseite darf für ihren Inhalt höher werden. */
+.face { position: relative; min-height: 62.5cqi; overflow: hidden; border-radius: 12px; box-shadow: 0 0 0 1px rgba(22, 24, 26, .1); }
 .front { background: #fff; }
+/* Die Rückseite schneidet nichts ab: Reicht das Seitenformat nicht, wird die Karte höher. */
 .back {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 1.2rem; align-items: center; padding: clamp(1rem, 2.4vw, 1.9rem);
+  overflow: visible; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 1.2rem; align-items: center; padding: clamp(1rem, 2.4vw, 1.9rem);
   background: var(--color-paper) linear-gradient(rgba(34, 54, 240, .12) 1px, transparent 1px) 0 0 / 100% 22px;
 }
 .viewport { position: absolute; inset: 0; overflow: hidden; }
@@ -39,8 +42,9 @@
 
 /* Räumlich: eine Karte mit zwei Seiten */
 .is-3d .panel { perspective: 1700px; --draw: 0; }
-.is-3d .card { display: block; aspect-ratio: 16 / 10; transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(var(--ry)); will-change: transform; }
-.is-3d .face { position: absolute; inset: 0; aspect-ratio: auto; backface-visibility: visible; -webkit-backface-visibility: visible; }
+.is-3d .card { display: grid; transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(var(--ry)); will-change: transform; }
+/* Beide Seiten liegen in derselben Zelle; die längere bestimmt die Höhe der Karte. */
+.is-3d .face { grid-area: 1 / 1; align-self: stretch; backface-visibility: visible; -webkit-backface-visibility: visible; }
 .is-3d .back { transform: rotateY(180deg); visibility: hidden; }
 /* Beide Flächen wechseln gemeinsam beim tatsächlich gerenderten 90°-Winkel. */
 .is-3d .card[data-facing='back'] .front { visibility: hidden; }
@@ -91,18 +95,25 @@
 .layer-list b { color: var(--color-blue); }
 
 /* Projektberater: Notizen als Rückseite */
-.finder-back { margin-top: 2rem; padding: 1.4rem; border-radius: 14px; background: var(--color-paper) linear-gradient(rgba(34, 54, 240, .1) 1px, transparent 1px) 0 0 / 100% 22px; color: var(--color-ink); box-shadow: 0 0 0 1.5px var(--color-blue); }
+.brief-card { margin-top: 2rem; padding: 1.4rem; border-radius: 14px; background: var(--color-paper) linear-gradient(rgba(34, 54, 240, .1) 1px, transparent 1px) 0 0 / 100% 22px; color: var(--color-ink); box-shadow: 0 0 0 1.5px var(--color-blue); }
 .brief-notes { display: grid; gap: .7rem; margin: 0; padding: 0; list-style: none; font: 500 .88rem/1.5 var(--font-mono); color: var(--color-blue); }
 .brief-notes .is-empty { color: var(--color-muted); }
 .brief-local { margin: 1.1rem 0 0; font: 600 .78rem/1.4 var(--font-mono); color: var(--color-blue); }
+
+/* Schmale Karten: Notizen über der Skizze statt daneben. */
+@container (max-width: 34rem) {
+  .back { grid-template-columns: minmax(0, 1fr); align-content: start; }
+  .sketch { max-height: 11rem; min-height: 7rem; }
+}
 
 @media (max-width: 900px) {
   #app .hero-layout, .side-row, .layers { grid-template-columns: minmax(0, 1fr); }
   #app .hero-story h1 { font-size: clamp(44px, 10.4vw, 80px); }
   .side-row--flip .panel { order: 0; }
-  .face { aspect-ratio: 4 / 5; }
-  .is-3d .card { aspect-ratio: 4 / 5; }
+  /* Hochformat 4:5, aber nie höher als der Bildschirm unter dem Header, solange der Inhalt passt. */
+  .face { min-height: min(125cqi, 100svh - 7.5rem); }
   .back { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: .4rem; }
-  .sketch { height: 100%; min-height: 0; }
+  /* Die Skizze füllt nur den Rest der Seite und bläht sie nicht mit ihrer Eigenhöhe auf. */
+  .sketch { height: 100%; min-height: 7rem; contain: size; }
   .layer-list li { grid-template-columns: 1fr; gap: .2rem; }
 }

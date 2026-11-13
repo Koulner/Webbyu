@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { mountBackside } from './backside';
+import { mountBackside, turnProgress } from './backside';
 
 function fixture() {
   const root = document.createElement('div');
@@ -13,6 +13,22 @@ function fixture() {
 const media = (reduce: boolean) => vi.stubGlobal('matchMedia', (query: string) => ({ matches: reduce && query.includes('reduce') }));
 
 afterEach(() => { vi.unstubAllGlobals(); document.body.innerHTML = ''; });
+
+describe('Wendefortschritt', () => {
+  const header = 88;
+  it('ist fertig, solange eine kurze Karte ganz zu sehen ist', () => {
+    // 900 hoch, Karte 480: fertig, sobald ihre Mitte bei 40 % steht, also Oberkante 120 und Unterkante 600.
+    expect(turnProgress(120, 480, 900, header)).toBe(1);
+    expect(turnProgress(500, 480, 900, header)).toBe(0);
+  });
+
+  it('ist bei einer Karte höher als der Bildschirm fertig, bevor die Oberkante unter den Header rutscht', () => {
+    expect(turnProgress(header, 900, 833, header)).toBeCloseTo(1, 5);
+    expect(turnProgress(header + 40, 900, 833, header)).toBeLessThan(1);
+    // Beim Weiterlesen weiter unten bleibt sie hinten.
+    expect(turnProgress(-600, 900, 833, header)).toBe(1);
+  });
+});
 
 describe('Vorder- und Rückseite', () => {
   it('dreht nur bei erlaubter Bewegung und schaltet die Seite per Schaltfläche sofort um', () => {

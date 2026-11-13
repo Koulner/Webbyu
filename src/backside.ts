@@ -10,6 +10,16 @@ const BACK = 192;
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const smooth = (from: number, to: number, x: number) => { const t = clamp((x - from) / (to - from)); return t * t * (3 - 2 * t); };
 
+/**
+ * Wendefortschritt einer Karte (0 vorn, 1 hinten). Die Wende ist fertig, solange die ganze Karte
+ * oder bei hohen Karten wenigstens ihre Oberkante unter dem Header (`safeTop`) zu sehen ist.
+ * Danach bleibt sie hinten, während man durch eine hohe Rückseite weiterscrollt.
+ */
+export function turnProgress(top: number, height: number, viewport: number, safeTop: number) {
+  const reach = Math.min(height / 2, Math.max(viewport * .4 - safeTop, 0));
+  return smooth(.7, .4, (top + reach) / viewport);
+}
+
 export function mountBackside(root: HTMLElement, loadLight: () => Promise<LightModule> = () => import('./backside-light')) {
   const events = new AbortController();
   const signal = events.signal;
@@ -60,11 +70,12 @@ export function mountBackside(root: HTMLElement, loadLight: () => Promise<LightM
     }, { signal });
   });
 
-  function target(panel: typeof panels[number]) {
+  function target(panel: typeof panels[number], rect: DOMRect, safeTop: number) {
     if (panel.forced) return panel.forced === 'back' ? 1 : 0;
-    if (panel.hero && innerWidth > 900) return smooth(innerHeight * .04, innerHeight * .3, scrollY);
-    const rect = panel.el.getBoundingClientRect();
-    return smooth(.7, .4, (rect.top + rect.height / 2) / innerHeight);
+    // Die Figur ist ungedreht und beginnt mit der Karte; die Bildunterschrift darunter zählt nicht zur Fläche.
+    // Die Hero-Karte steht beim Laden schon im Bild: Sie dreht mit den ersten Scrollpixeln, fertig bevor sie unter den Header rutscht.
+    if (panel.hero && innerWidth > 900) return smooth(innerHeight * .04, Math.max(innerHeight * .05, Math.min(innerHeight * .3, rect.top + scrollY - safeTop)), scrollY);
+    return turnProgress(rect.top, panel.card.offsetHeight, innerHeight, safeTop);
   }
 
   function update(time: number) {
@@ -72,10 +83,11 @@ export function mountBackside(root: HTMLElement, loadLight: () => Promise<LightM
     if (disposed || !moving() || document.hidden) return;
     pointerX += (targetX - pointerX) * .08;
     pointerY += (targetY - pointerY) * .08;
+    const safeTop = Math.max(0, root.querySelector('.site-header')?.getBoundingClientRect().bottom ?? 0) + 16;
     for (const panel of panels) {
       const rect = panel.el.getBoundingClientRect();
       if (panel.forced && (rect.bottom < 0 || rect.top > innerHeight)) panel.forced = null;
-      const goal = FRONT + (BACK - FRONT) * target(panel);
+      const goal = FRONT + (BACK - FRONT) * target(panel, rect, safeTop);
       panel.angle += (goal - panel.angle) * (panel.forced ? .1 : .16);
       const progress = (panel.angle - FRONT) / (BACK - FRONT);
       const renderedAngle = Number((panel.angle + pointerX * 6).toFixed(2));

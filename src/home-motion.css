@@ -53,6 +53,22 @@
 #app[data-motion=full] .studio-lab[open] .studio-lab-content { animation: lab-open 400ms ease-out; }
 @keyframes lab-open { from { opacity: .3; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
 
+/* Kartenwende: Jede Kapitelüberschrift kommt als Karte mit dem Titel davor an und dreht sich beim Scrollen um.
+   Ohne Scroll-Timeline, ohne Skript oder mit reduzierter Bewegung bleibt nur die Überschrift stehen. */
+#app .turn-front { display: none; }
+@supports (animation-timeline: view()) {
+  #app[data-motion=full] .turn { position: relative; transform-style: preserve-3d; view-timeline: --turn block; animation: kartenwende linear both; animation-timeline: --turn; animation-range: entry 10% cover 50%; }
+  #app[data-motion=full] .turn::before { content: ''; position: absolute; inset: -14px -24px; border-radius: 14px; background: var(--color-paper); box-shadow: 0 24px 60px #16181a24; transform: translateZ(-1px); pointer-events: none; animation: kartenblatt linear both; animation-timeline: --turn; animation-range: entry 10% cover 50%; }
+  #app[data-motion=full] .turn > :not(.turn-front) { backface-visibility: hidden; }
+  /* Die Vorderseite liegt gedreht hinter dem Blatt und zeigt nach vorn, solange die Karte noch umgedreht ist. */
+  #app[data-motion=full] .turn-front { display: block; position: absolute; inset: 0; padding: inherit; transform: rotateX(180deg) translateZ(2px); backface-visibility: hidden; color: var(--color-muted); font-size: clamp(31px, 4.2vw, 64px); font-weight: 500; letter-spacing: -.055em; line-height: 1.07; pointer-events: none; }
+  #app[data-motion=full] .turn-front em { font-style: normal; color: inherit; white-space: normal; }
+  #app[data-motion=full] .finder-section .turn::before { background: #24272b; }
+  #app[data-motion=full] .finder-section .turn-front { color: #aeb2b5; }
+}
+@keyframes kartenwende { from { transform: perspective(1400px) rotateX(-180deg); } to { transform: perspective(1400px) rotateX(0deg); } }
+@keyframes kartenblatt { 0%, 70% { opacity: 1; } to { opacity: 0; } }
+
 #app[data-motion=quiet] *, #app[data-motion=quiet] *::before, #app[data-motion=quiet] *::after { animation: none !important; transition: none !important; scroll-behavior: auto; }
 #app[data-motion=quiet] .stage-piece:hover, #app[data-motion=quiet] .stage-piece:focus-visible { transform: rotate(-7deg); }
 #app[data-motion=quiet] .stage-piece--clear:is(:hover, :focus-visible) { transform: rotate(8deg); }
@@ -65,7 +81,6 @@ html:has(#app[data-motion=quiet]) { scroll-behavior: auto; }
   #app .stage-piece--food:is(:hover, :focus-visible) { transform: rotate(6deg); }
 }
 @media (max-width: 900px) {
-  #app .hero-bottom > p { flex: 1 1 60%; }
   #app .hero-bottom > span { flex-basis: 100%; }
 }
 @media (max-width: 600px) {

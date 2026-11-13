@@ -37,19 +37,14 @@
 #app .hero-promise { margin-top: 15px; font-size: 12px; letter-spacing: .02em; }
 #app .hero-actions { margin-top: 28px; gap: 23px; }
 #app .hero-bottom { padding-block: 22px; border-top: 1px solid var(--color-border); border-bottom: 0; }
-#app .hero-bottom p { display: flex; align-items: center; gap: 10px; font-size: 11px; }
 #app .hero-bottom > span { display: flex; align-items: center; gap: 40px; font-size: 11px; }
 #app .hero-bottom > span > span { font-size: 26px; }
 
-#app .section-kicker { font-size: 10px; letter-spacing: .1em; padding-bottom: 20px; }
 #app .section-heading { padding-block: 42px 55px; gap: 44px; }
 #app .section-heading h2, #app .about-copy h2 { font-size: clamp(36px, 4.2vw, 64px); font-weight: 500; letter-spacing: -.055em; line-height: 1.07; }
 #app .section-heading h2 em, #app .about-copy h2 em { font-style: normal; font-weight: inherit; color: var(--color-blue); }
 #app .section-heading > p { font-size: 15px; max-width: 36ch; }
 #app .work-section { padding-block: 90px 64px; background: transparent; color: var(--color-ink); }
-#app .work-section .section-kicker { border-color: var(--color-border); }
-#app .work-section .section-kicker > span { color: var(--color-muted); }
-#app .work-section .section-kicker > span:first-child { color: var(--color-blue); }
 #app .gallery-heading > p { color: var(--color-muted); }
 #app .gallery-heading h2 em { color: var(--color-blue); }
 #app .package-demo-cards { grid-template-columns: 1fr 1fr; gap: 60px 35px; margin: 8px 0 70px; }
@@ -84,13 +79,11 @@
 #app .finder-section .finder :focus-visible { outline-color: var(--color-ink); }
 #app .approach-section, #app .services-section, #app .packages-section { padding-block: 90px; }
 #app .approach-intro { gap: 7%; font-size: 16px; }
-#app .situation-heading { margin-top: 45px; }
 #app .situation-title { font-weight: 400; }
 #app .situation-result { background: #e9eddb; border-left: 2px solid #8ba05d; }
 #app .services-section { border-top: 1px solid var(--color-border); }
 #app .services-grid { gap: 35px; }
 #app .services-grid article { border-top: 0; padding-top: 0; }
-#app .service-number { display: grid; place-items: center; width: 45px; height: 45px; border: 1px solid #a8b4a7; border-radius: 50%; }
 #app .services-grid h3 { font-size: 29px; font-weight: 500; margin-top: 25px; }
 #app .services-grid p, #app .services-grid ul { font-size: 15px; }
 #app .development-note { background: var(--color-highlight); padding: 32px; }
@@ -100,7 +93,6 @@
 #app .package-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 0; gap: 18px; }
 #app .package-row { display: flex; flex-direction: column; align-items: stretch; padding: 28px; border: 1px solid var(--color-border); gap: 25px; }
 #app .package-row:nth-child(2) { background: #e9eddf; border-color: #b9c4ab; }
-#app .package-number { font-size: 10px; padding: 0; }
 #app .package-intro h3 { font-size: clamp(24px, 2.35vw, 34px); font-weight: 500; }
 #app .package-intro > p { font-size: 14px; min-height: 70px; }
 #app .package-row ul { font-size: 14px; line-height: 1.65; border-top: 1px solid var(--color-border); padding-top: 18px; }
@@ -163,7 +155,6 @@
   #app .mobile-menu-button span { display: block; width: 24px; height: 1px; background: var(--color-ink); }
   #app .mobile-nav { display: grid; position: fixed; z-index: 49; top: 72px; inset-inline: 0; max-height: calc(100svh - 72px); overflow-y: auto; padding: 16px var(--page-gutter) 24px; background: var(--color-ivory); border-bottom: 1px solid var(--color-border); }
   #app .mobile-nav a { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; border-top: 1px solid var(--color-border); font-size: 20px; }
-  #app .mobile-nav a > span { font-size: 14px; }
   #app .hero-layout { grid-template-columns: 1fr 1fr; gap: 10px; }
   #app .hero-story h1 { font-size: 6.3vw; }
   #app .hero-story .eyebrow { font-size: 9px; }
@@ -177,10 +168,10 @@
   #app .package-demo-card:first-child .text-link { margin-top: 14px; }
   #app .package-demo-cards { gap: 45px 25px; }
   #app .package-list { grid-template-columns: 1fr; }
-  #app .package-row { display: grid; grid-template-columns: 25px 1.2fr 1fr; gap: 20px; padding: 28px; }
+  #app .package-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; padding: 28px; }
   #app .package-row ul { padding: 0; border: 0; }
   #app .package-intro > p { min-height: 0; }
-  #app .package-action { grid-column: 2 / -1; display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap; padding-top: 20px; border-top: 1px solid var(--color-border); }
+  #app .package-action { grid-column: 1 / -1; display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap; padding-top: 20px; border-top: 1px solid var(--color-border); }
   #app .package-action > div { width: auto; margin-left: auto; }
   #app .round-arrow { flex-shrink: 0; }
 }
@@ -197,11 +188,9 @@
   #app .hero-actions .button { padding: 14px 19px; font-size: 13px; min-height: 50px; }
   #app .hero-actions .text-link { font-size: 12px; align-self: center; }
   #app .hero-bottom { flex-direction: column; gap: 12px; padding-block: 19px; }
-  #app .hero-bottom p, #app .hero-bottom > span { font-size: 10px; }
+  #app .hero-bottom > span { font-size: 10px; }
   #app .hero-bottom > span { width: 100%; justify-content: space-between; }
   #app .work-section, #app .approach-section, #app .services-section, #app .packages-section { padding-block: 55px; }
-  #app .section-kicker { font-size: 9px; gap: 20px; }
-  #app .section-kicker > span:last-child { max-width: 17ch; }
   #app .section-heading { padding-block: 30px 36px; gap: 24px; }
   #app .section-heading h2, #app .about-copy h2 { font-size: clamp(31px, 8.5vw, 44px); }
   #app .section-heading > p { font-size: 14px; }
@@ -216,7 +205,6 @@
   .lab-description { font-size: 12px; line-height: 1.6; }
   .studio-disclaimer { font-size: 10px; }
   #app .approach-intro { font-size: 15px; }
-  #app .situation-heading > p { font-size: 14px; line-height: 1.6; }
   #app .situation-title { font-size: 20px; }
   #app .situation-body p { font-size: 15px; }
   #app .services-grid { gap: 34px; }
