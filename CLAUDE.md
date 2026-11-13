@@ -10,7 +10,7 @@ Website von Webbyu (Vite, TypeScript, kein WordPress, kein Baukasten) mit Projek
 - Keine erfundenen Referenzen, Kunden, Zahlen oder Erfolgsversprechen. Konzeptstudien, Eigenprojekte und Kundenarbeiten klar trennen.
 - In Konzepten Fakt, Nutzerentscheidung, Vorschlag und Annahme getrennt kennzeichnen.
 - Privacy by Design, Security by Design, Local First. Berechnungen im Finder laufen lokal; Versand bleibt eine bewusste Handlung.
-- Individuelle Gestaltung nach Unikat-Standard, Raumgut ist der einzige bestätigte Qualitätsanker. Keine Selbstabnahme: Die gestalterische Schlussfreigabe gibt der Nutzer.
+- Individuelle Gestaltung nach Unikat-Standard, Es gibt derzeit keinen bestätigten Qualitätsanker (Raumgut seit 13.11.2026 aufgehoben, Neubau geplant). Keine Selbstabnahme: Die gestalterische Schlussfreigabe gibt der Nutzer.
 
 ## Befehle
 

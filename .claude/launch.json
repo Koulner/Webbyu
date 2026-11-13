@@ -4,8 +4,170 @@
     {
       "name": "webbyu-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 5173
+    },
+    {
+      "name": "webbyu-redesign",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/redesign-unikat",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5180",
+        "--strictPort"
+      ],
+      "port": 5180
+    },
+    {
+      "name": "webbyu-fix-flip",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/fix-flip-backface",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5183",
+        "--strictPort"
+      ],
+      "port": 5183
+    },
+    {
+      "name": "webbyu-reise-blob",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/reise-blob-e73aec",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5184",
+        "--strictPort"
+      ],
+      "port": 5184
+    },
+    {
+      "name": "webbyu-reise-szene",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5187",
+        "--strictPort"
+      ],
+      "port": 5187
+    },
+    {
+      "name": "webbyu-reise-welt",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/reise-welt",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5188",
+        "--strictPort"
+      ],
+      "port": 5188
+    },
+    {
+      "name": "koulner",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "../Koulner",
+        "run",
+        "dev"
+      ],
+      "port": 5190
+    },
+    {
+      "name": "webbyu-koulner",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/koulner-demos",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5186",
+        "--strictPort"
+      ],
+      "port": 5186
+    },
+    {
+      "name": "webbyu-reise-abschnitt",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/reise-abschnitt",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5187",
+        "--strictPort"
+      ],
+      "port": 5187
+    },
+    {
+      "name": "webbyu-safran-neu",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/safran-neu",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5192",
+        "--strictPort"
+      ],
+      "port": 5192
+    },
+    {
+      "name": "webbyu-reise-leicht",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/reise-leicht",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5190",
+        "--strictPort"
+      ],
+      "port": 5190
+    },
+    {
+      "name": "webbyu-reise-fluessig",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        ".claude/worktrees/reise-fluessig",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5191",
+        "--strictPort"
+      ],
+      "port": 5191
     }
   ]
 }
