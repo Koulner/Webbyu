@@ -107,6 +107,7 @@ export async function verifySite(site, fetcher = fetch, { noindex = false } = {}
   const checked = new Map();
   const titles = new Set();
   const assets = new Set();
+  const staticPages = new Set();
   for (const page of pages.filter(page => page.kind !== 'error')) {
     const response = await get(page.path.slice(1));
     assert.equal(response.status, 200, `Page ${page.path}`);
@@ -123,9 +124,16 @@ export async function verifySite(site, fetcher = fetch, { noindex = false } = {}
       if (!['http:', 'https:'].includes(target.protocol) || ![root.origin, SITE_ORIGIN].includes(target.origin)) continue;
       const targetPath = root.pathname !== '/' && target.pathname.startsWith(root.pathname) ? `/${target.pathname.slice(root.pathname.length)}` : target.pathname;
       if (/\.[a-z0-9]+$/i.test(targetPath) && targetPath !== '/404.html') { assets.add(target.href); continue; }
+      // Prebuilt static demo (public/demos/safran-atelier/): not in site.config, checked as a reachable HTML page.
+      if (targetPath.startsWith('/demos/safran-atelier/')) { staticPages.add(new URL(target.pathname, target).href); continue; }
       assert(checked.has(targetPath), `Internal page link ${path} → ${href}`);
       if (target.hash.length > 1) assert(checked.get(targetPath).ids.has(decodeURIComponent(target.hash.slice(1))), `Internal fragment ${path} → ${href}`);
     }
+  }
+  for (const href of staticPages) {
+    const response = await fetcher(new URL(href), { signal: AbortSignal.timeout(10000), redirect: 'error' });
+    assert.equal(response.status, 200, `Static demo page ${href}`);
+    assert.match(response.headers.get('content-type') ?? '', /text\/html/i, `Static demo page ${href}`);
   }
   const missing = await get('nicht-vorhanden/seo-pruefung');
   assert.equal(missing.status, 404, 'A missing route must return HTTP 404');
