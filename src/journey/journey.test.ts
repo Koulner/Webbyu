@@ -59,6 +59,13 @@ function mockDemos() {
     mountDemoDialog,
   };
 }
+it('shows no counters, chapter numbers or all-caps labels, and the footer carries no second home link',()=>{
+  renderJourney(root);mount();
+  for(const gone of ['[data-scene-index]','[data-step-count]','.journey-chapter-number','.journey-facts']) expect(root.querySelector(gone)).toBeNull();
+  expect(root.textContent).not.toMatch(/\d\d ?\/ ?\d\d|VERBUNDENE|VORSCHAU ÖFFNEN|DER WEG VON|MEINE ARBEITSWEISE/);
+  expect(root.querySelector('.journey-footer a[href="/"]')).toBeNull();
+  expect([...root.querySelectorAll('.journey-footer a')].map(a=>a.textContent)).toEqual(['Impressum','Datenschutz']);
+});
 function mount(extra:Parameters<typeof mountJourney>[1]={}) {
   const demos=mockDemos();
   app=mountJourney(root,{loadScene:async()=>({initLandscape:()=>scene}),loadDemos:async()=>demos,...extra});
@@ -109,13 +116,13 @@ describe('journey content and navigation',()=>{
     const loadScene = vi.fn(async () => ({ initLandscape: () => scene }));
     mount({ loadDemos, loadScene });
     await app!.sceneReady; flush();
-    selectStation('safran-atelier');
+    selectStation('raumgut');
     expect(loadScene).not.toHaveBeenCalled();
     expect(loadDemos).not.toHaveBeenCalled();
     expect(root.querySelector('[data-preview-loading]')?.textContent).toContain('Datensparmodus');
     root.querySelector<HTMLButtonElement>('[data-preview-open]')!.click();
     await vi.waitFor(() => expect(document.querySelector('dialog')?.open).toBe(true));
-    expect(demos.prepareDemo).toHaveBeenCalledExactlyOnceWith('sales');
+    expect(demos.prepareDemo).toHaveBeenCalledExactlyOnceWith('raumgut');
     expect(loadScene).not.toHaveBeenCalled();
   });
 
@@ -136,14 +143,16 @@ describe('journey content and navigation',()=>{
   });
   it('has unique linked stations, notes and the selected examples, without dated claims',()=>{
     renderJourney(root);
-    expect(new Set(stations.map(s=>s.id)).size).toBe(8);
+    expect(new Set(stations.map(s=>s.id)).size).toBe(9);
+    expect(stations.flatMap(s=>s.pages?.map(([,path])=>path)??[])).toEqual(['demos/safran-atelier/','demos/koulner/stufe-1/','demos/koulner/stufe-2/','demos/koulner/stufe-3/']);
     expect(stations.filter(s=>s.note)).toHaveLength(2);
-    expect(stations.flatMap(s=>s.demoId?[s.demoId]:[])).toEqual(['sales','raumgut']);
+    expect(stations.flatMap(s=>s.demoId?[s.demoId]:[])).toEqual(['raumgut']);
     expect(stations.flatMap(s=>s.packageId?[s.packageId]:[])).toEqual(['start','business','complete']);
     root.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(link=>expect(root.querySelector(link.hash)).not.toBeNull());
     expect(root.querySelectorAll('h1')).toHaveLength(1);
     expect(root.textContent).toContain('keine Kundenreferenzen');
-    expect(root.querySelectorAll('[data-journey-demo]')).toHaveLength(2);
+    // Safran Atelier links to its demo page; only Raumgut still opens the dialog demo.
+    expect(root.querySelectorAll('[data-journey-demo]')).toHaveLength(1);
     expect(stationIndex('#raumgut')).toBe(6);
     expect(stationIndex('#unknown')).toBe(-1);
     expect(terrainHeight(2,3)).toBe(terrainHeight(2,3));
@@ -175,7 +184,8 @@ describe('journey content and navigation',()=>{
     expect(root.querySelector('[data-map]')?.getAttribute('data-render')).toBe('static');
     root.querySelector<HTMLAnchorElement>('a.journey-overview')!.click();flush();
     expect(app!.getActive()).toBe(-1);
-    expect(root.querySelectorAll('[data-journey-demo]')).toHaveLength(2);
+    // Safran Atelier links to its demo page; only Raumgut still opens the dialog demo.
+    expect(root.querySelectorAll('[data-journey-demo]')).toHaveLength(1);
   });
 
   it('traverses every station with the corner controls and exposes the correct endpoints and labels',async()=>{
@@ -276,9 +286,6 @@ describe('journey demo lifecycle',()=>{
     expect(demo.querySelector('input')).toBe(input);
     expect(input.value).toBe('Eiche, 180 cm');
 
-    selectStation('safran-atelier');
-    await vi.waitFor(()=>expect(slot.querySelector<HTMLElement>('.demo')?.dataset.demoId).toBe('sales'));
-    expect(demo.closest('[data-demo-parking]')).not.toBeNull();
     selectStation('raumgut');
     await vi.waitFor(()=>expect(slot.querySelector('.demo')).toBe(demo));
     expect(input.value).toBe('Eiche, 180 cm');
@@ -288,9 +295,9 @@ describe('journey demo lifecycle',()=>{
     dialog.dispatchEvent(new Event('cancel',{cancelable:true}));
     await vi.waitFor(()=>expect(slot.querySelector('.demo')).toBe(demo));
     expect(document.activeElement).toBe(previewOpen);
-    expect(demos.createDemo.mock.calls.map(([id])=>id)).toEqual(['raumgut','sales']);
+    expect(demos.createDemo.mock.calls.map(([id])=>id)).toEqual(['raumgut']);
     app!.dispose();
-    expect(demos.disposeDemo).toHaveBeenCalledTimes(2);
+    expect(demos.disposeDemo).toHaveBeenCalledTimes(1);
     expect(demos.disposeDemo).toHaveBeenCalledWith(demo);
   });
 
@@ -299,21 +306,21 @@ describe('journey demo lifecycle',()=>{
     const loading=deferred<typeof demos>();
     const loadDemos=vi.fn(()=>loading.promise);
     mount({loadDemos});await app!.sceneReady;flush();
+    selectStation('koulner');
     selectStation('raumgut');
-    selectStation('safran-atelier');
     loading.resolve(demos);
     const slot=root.querySelector('[data-preview-slot]')!;
-    await vi.waitFor(()=>expect(slot.querySelector<HTMLElement>('.demo')?.dataset.demoId).toBe('sales'));
-    expect(demos.createDemo).toHaveBeenCalledExactlyOnceWith('sales');
+    await vi.waitFor(()=>expect(slot.querySelector<HTMLElement>('.demo')?.dataset.demoId).toBe('raumgut'));
+    expect(demos.createDemo).toHaveBeenCalledExactlyOnceWith('raumgut');
     expect(loadDemos).toHaveBeenCalledOnce();
-    expect(root.querySelector('[data-preview-name]')?.textContent).toBe('Safran Atelier');
+    expect(root.querySelector('[data-preview-name]')?.textContent).toBe('Raumgut');
   });
 
   it.each(['leave','dispose'] as const)('does not attach a late preview after %s',async(action)=>{
     const demos=mockDemos();
     const loading=deferred<typeof demos>();
     mount({loadDemos:()=>loading.promise});await app!.sceneReady;flush();
-    selectStation('safran-atelier');
+    selectStation('raumgut');
     if(action==='leave') selectStation('landschaft');
     else app!.dispose();
     loading.resolve(demos);
@@ -330,7 +337,7 @@ describe('journey demo lifecycle',()=>{
     const demos=mockDemos();
     const loadDemos=vi.fn().mockRejectedValueOnce(Error('offline')).mockResolvedValueOnce(demos);
     mount({loadDemos});await app!.sceneReady;flush();
-    selectStation('safran-atelier');
+    selectStation('raumgut');
     await vi.waitFor(()=>expect(root.querySelector('[data-preview-loading]')?.textContent).toContain('erneuten Laden'));
     const trigger=root.querySelector<HTMLButtonElement>('[data-preview-open]')!;
     expect(trigger.disabled).toBe(false);
@@ -340,7 +347,7 @@ describe('journey demo lifecycle',()=>{
     const dialog=document.querySelector<HTMLDialogElement>('dialog')!;
     const demo=dialog.querySelector('.demo');
     expect(loadDemos).toHaveBeenCalledTimes(2);
-    expect(demos.createDemo).toHaveBeenCalledExactlyOnceWith('sales');
+    expect(demos.createDemo).toHaveBeenCalledExactlyOnceWith('raumgut');
     dialog.querySelector<HTMLButtonElement>('.concept-dialog-close')!.click();
     await vi.waitFor(()=>expect(root.querySelector('[data-preview-slot] .demo')).toBe(demo));
     expect(root.querySelector<HTMLElement>('[data-preview-loading]')!.hidden).toBe(true);

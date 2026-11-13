@@ -9,7 +9,8 @@ export async function verifySeoBuild(directory = 'dist', { noindex = false } = {
   const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.xml': 'application/xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg' };
   const builtFetch = async url => {
     const page = pages.find(item => item.path === url.pathname);
-    const file = resolve(root, page?.file ?? decodeURIComponent(url.pathname.slice(1)));
+    // folder URLs of prebuilt static pages resolve to their index.html, as Apache's DirectoryIndex does
+    const file = resolve(root, page?.file ?? decodeURIComponent(url.pathname.slice(1)) + (url.pathname.endsWith('/') ? 'index.html' : ''));
     assert(file.startsWith(root + sep), 'Build fetch must stay within dist');
     if (!existsSync(file)) return new Response(readFileSync(resolve(root, '404.html')), { status: 404, headers: { 'Content-Type': 'text/html' } });
     return new Response(readFileSync(file), { headers: { 'Content-Type': mime[extname(file)] ?? 'application/octet-stream' } });

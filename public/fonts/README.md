@@ -42,3 +42,15 @@ Import `src/fonts.css` and `src/tokens.css` once from the entry point. Use
 display text. Use `font-style: italic` for the supplied italic faces; do not
 simulate italics with transforms. Sans weights outside 400–700 and serif weights
 other than 400 are intentionally not supplied.
+
+## Koulner demo fonts
+
+Only the Koulner pages under `/demos/koulner/` use these faces, declared in
+`src/koulner/fonts.css` (Latin and Latin-ext only, WOFF2 copied unmodified,
+CSS derived from the packages with local URLs and the WOFF fallback removed).
+
+| Family | Included styles | Weight | Source package | License |
+| --- | --- | --- | --- | --- |
+| Newsreader Variable | normal, italic (`opsz` axis) | variable 200–800 | `@fontsource-variable/newsreader@5.3.0` | [OFL 1.1](./Newsreader-OFL.txt) |
+| IBM Plex Mono | normal | 400, 500 | `@fontsource/ibm-plex-mono@5.3.0` | [OFL 1.1](./IBM-Plex-Mono-OFL.txt) |
+| Big Shoulders Display Variable | normal | variable 100–900 | `@fontsource-variable/big-shoulders-display@5.3.0` | [OFL 1.1](./Big-Shoulders-Display-OFL.txt) |

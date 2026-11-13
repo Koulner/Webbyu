@@ -99,13 +99,13 @@ export function renderPageHtml(base: string): string {
           <details class="studio-lab"><summary><span><span class="lab-label">Das Webbyu-Labor</span><strong>Was kann eine Website noch?</strong><span class="lab-description">Auswahlhilfen, Shops und ein bisschen 3D zum Ausprobieren.</span></span><span class="lab-toggle" aria-hidden="true">+</span></summary><div class="studio-lab-content"><p>In der Reise hängen die drei Paketbeispiele mit zwei Studien zusammen, in denen ich Shops und aufwendigere Interaktionen ausprobiere. Solche Erweiterungen bekommen ein eigenes Angebot.</p>
           <div id="journey-preview" class="journey-embed" role="region" aria-label="Die Reise – interaktive Vorschau">
             <div class="journey-embed-bar">
-              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Acht Stationen, fünf Beispiele.</span></div>
+              <div class="journey-embed-title"><span class="journey-embed-dot" aria-hidden="true"></span><strong>Die Reise</strong><span>Neun Stationen, sechs Beispiele.</span></div>
               <div class="journey-embed-actions">
                 <a href="${base}reise/" data-journey-page>Reise öffnen ${arrow}</a>
                 <button type="button" data-journey-fullscreen aria-label="Die Reise im Vollbild ansehen" aria-pressed="false" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span data-fullscreen-label>Vollbild</span></button>
               </div>
             </div>
-            <iframe class="journey-embed-frame" src="${base}reise/?embed=1" title="Die Reise von Webbyu – acht Stationen und fünf Beispiele" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+            <iframe class="journey-embed-frame" src="${base}reise/?embed=1" title="Die Reise von Webbyu – neun Stationen und sechs Beispiele" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             <p class="journey-embed-status" role="status" hidden></p>
           </div>
           <div class="gallery-footer">

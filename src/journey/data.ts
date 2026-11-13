@@ -15,6 +15,10 @@ export interface JourneyStation {
   packageId?: PackageId;
   image?: string;
   note?: string;
+  /** Eigene Seiten außerhalb der Paket- und Konzeptdemos: [Linktext, Pfad unter der Website-Basis]. */
+  pages?: readonly (readonly [string, string])[];
+  /** Hinweis unter den Seitenlinks; ohne Angabe der Eigenprojekt-Hinweis. */
+  pagesNote?: string;
 }
 
 function project(demoId: DemoId, extra: Pick<JourneyStation, 'id' | 'position' | 'landmark' | 'detail' | 'note' | 'visual' | 'story'>): JourneyStation {
@@ -68,18 +72,33 @@ export const stations: readonly JourneyStation[] = [
     visual: { color: '#c8b6a2', caption: 'Die Gänge folgen dem abkühlenden Herd.' },
     story: { task: 'Gäste sollen schon vor dem Besuch wissen, worauf sie sich freuen können.', approach: 'Küche und Speisekarte bekommen eigene Seiten mit Fotos, Film und allem, was man vorher wissen will.', benefit: 'Wer Lust bekommen hat, findet direkt den Weg zur Reservierungsanfrage.' },
   },
-  project('sales', {
-    id: 'safran-atelier', position: [8, -3.1], landmark: 'garden',
-    visual: { color: '#beb1cb', caption: 'Erst die Blüte, dann der Einkauf.' },
-    detail: 'Von der Blüte zum Safranfaden: Die Kamerafahrt beginnt bei einem winzigen Detail und erzählt von dort aus das ganze Produkt.',
-    story: { task: 'Ein besonderes Produkt braucht mehr als ein Produktfoto.', approach: 'Botanische Nahaufnahmen führen von der Blüte zum Faden und weiter zur Produktauswahl.', benefit: 'Schauen, verstehen und kaufen passieren auf einem durchgehenden Weg.' },
-  }),
+  {
+    id: 'safran-atelier', label: 'Safran Atelier', eyebrow: 'Konzeptstudie / Genuss & Botanik',
+    title: 'Ein Safranshop, der sagt, wofür ein Glas reicht.',
+    description: 'Ein mehrseitiger Shop für eine fiktive Safranmarke.',
+    detail: 'Gerenderte Nahaufnahmen von Blüte und Narbe, Produktseiten mit Mengenangaben, Catering, Handel und ein Anfrageweg.',
+    position: [8, -3.1], landmark: 'garden',
+    visual: { color: '#beb1cb', caption: 'Von der Blüte zum Faden, vom Faden zum Glas.' },
+    story: { task: 'Ein kleiner Händler verkauft ein teures Gewürz, das die meisten nur selten kaufen.', approach: 'Renderings von Blüte und Narbe, Produktseiten mit Fadenzahl, Seiten für Catering und Handel und ein Anfrageweg.', benefit: 'Besucher verstehen, was sie kaufen und wofür ein Glas reicht, und finden den passenden Weg zur Anfrage.' },
+    pages: [['Demoseite ansehen', 'demos/safran-atelier/']],
+    pagesNote: 'Safran Atelier · fiktive Marke · Blüte und Fäden als 3D-Renderings, keine Fotos',
+  },
   project('raumgut', {
     id: 'raumgut', position: [13.5, 3.2], landmark: 'furniture',
     visual: { color: '#bacab4', caption: 'Vom großen Sortiment zur eigenen Merkliste.' },
     detail: 'Suche, Filter, Varianten und Merkliste führen durch ein Sortiment.',
     story: { task: 'Viele Möbel, Materialien und Maße sollen übersichtlich bleiben.', approach: 'Suche, Filter und Varianten führen vom Sortiment zur eigenen Merkliste.', benefit: 'Die Auswahl lässt sich bis zur vollständigen lokalen Bestellvorschau erproben.' },
   }),
+  {
+    id: 'koulner', label: 'Koulner', eyebrow: 'Eigenprojekt / Foto & Video',
+    title: 'Ein Portfolio in drei Stufen.',
+    description: 'Ein Foto- und Videoportfolio für die Marke Koulner, umgesetzt als Eigenprojekt in drei Ausbaustufen.',
+    detail: 'Dieselben Inhalte als Mappe, als Leuchttisch mit Lupe und als Fahrt im Licht der Bilder.',
+    position: [16.5, -3.2], landmark: 'atelier',
+    visual: { color: '#d8c3b4', caption: 'Kontaktbögen, Fettstift und eine Anfrage, die die Auswahl mitnimmt.' },
+    story: { task: 'Ein Portfolio soll Bilder zeigen und schnell zu einer Shooting-Anfrage führen.', approach: 'Nummerierte Kontaktbögen, ein Fettstift für Kreis und Kreuz und eine Anfrage, die die markierten Bilder mitnimmt.', benefit: 'Interessierte zeigen vor dem ersten Gespräch, welche Bilder ihnen gefallen und welche nicht.' },
+    pages: [['Stufe 1 · Mappe', 'demos/koulner/stufe-1/'], ['Stufe 2 · Leuchttisch', 'demos/koulner/stufe-2/'], ['Stufe 3 · Im Licht der Bilder', 'demos/koulner/stufe-3/']],
+  },
   {
     id: 'der-naechste-abschnitt', label: 'Der nächste Abschnitt', eyebrow: 'Der Weg bleibt offen',
     title: 'Und was steht bei Ihnen an?',
@@ -100,6 +119,7 @@ export const networkConnections: readonly { from: number; to: number; strand: 'c
   { from: 4, to: 5, strand: 'design' },
   { from: 5, to: 6, strand: 'function' },
   { from: 6, to: 7, strand: 'content' },
+  { from: 7, to: 8, strand: 'design' },
   { from: 1, to: 4, strand: 'content' },
   { from: 2, to: 5, strand: 'design' },
   { from: 3, to: 5, strand: 'function' },
