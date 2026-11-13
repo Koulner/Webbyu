@@ -149,10 +149,25 @@ try {
     unset($s);
     check($worker($c->stateDirectory) === 'open', 'Independent PHP process acquires released lock');
     check(invoke($c)['body']['outcome'] === 'unknown', 'Crash after reservation must not resend');
+    $c = config();
+    $holder = proc_open([PHP_BINARY, __DIR__ . '/lock-worker.php', $c->stateDirectory, '300'], [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+    if (!is_resource($holder)) throw new RuntimeException('Cannot start short lock holder');
+    fclose($pipes[0]);
+    check(fread($pipes[1], 4) === 'open', 'Short lock holder has the lock');
+    check(invoke($c)['http'] === 200, 'A brief lock (health check, cleanup) is waited out instead of failing the inquiry');
+    stream_get_contents($pipes[1]); $error = stream_get_contents($pipes[2]);
+    fclose($pipes[1]); fclose($pipes[2]);
+    check(proc_close($holder) === 0 && $error === '', 'Short lock holder finished cleanly');
 
     $broken = config();
     file_put_contents($broken->stateDirectory . '/inquiry-state.json', '{partial');
     check(invoke($broken, [], fn() => throw new RuntimeException('Must not send with corrupt state'))['http'] === 503, 'Corrupt state fails closed');
+    $c = config();
+    file_put_contents($c->stateDirectory . '/inquiry-state.json.tmp', '{left over from a crash');
+    check(invoke($c)['http'] === 200, 'A temporary file left by a crash does not matter');
+    $stored = $c->stateDirectory . '/inquiry-state.json';
+    check(!file_exists($stored . '.tmp') && is_array(json_decode(file_get_contents($stored), true)), 'State is replaced as a whole file');
+    check(PHP_OS_FAMILY === 'Windows' || (fileperms($stored) & 0777) === 0600, 'Replaced state stays private');
 
     foreach (['email' => 3, 'ip' => 5, 'global' => 30] as $limitType => $limit) {
         $c = config();
@@ -166,6 +181,18 @@ try {
         check($r['body']['retryAfter'] === 3600 && $r['headers']['Retry-After'] === '3600', 'Rate wait contract');
         check(invoke($c, ['requestId' => 'ffffffff-ffff-4fff-8fff-ffffffffffff', 'description' => 'after expiry'], null, 103600)['http'] === 200, 'Rate window expires');
     }
+    foreach ([['2001:db8:1:2::%x', 429], ['::ffff:192.0.2.%d', 200]] as [$pattern, $sixth]) {
+        $c = config();
+        for ($i = 0; $i < 6; $i++) {
+            $v = payload(['requestId' => sprintf('%08x-bbbb-4bbb-8bbb-bbbbbbbbbbbb', $i), 'description' => (string)$i, 'email' => "net$i@example.org"]);
+            $r = Application::handle(server(['REMOTE_ADDR' => sprintf($pattern, $i + 1)]), json_encode($v), fn() => $c, fn() => 'accepted', 100000);
+            check($r['http'] === ($i < 5 ? 200 : $sixth), 'IPv6 counts per /64 network, IPv4-mapped addresses per address');
+        }
+    }
+    $c = config(); $calls = 0;
+    $down = function () use (&$calls) { $calls++; return 'not_sent'; };
+    for ($i = 0; $i < 6; $i++) check(invoke($c, [], $down)['body'] === ['status' => 'temporary', 'outcome' => 'not_sent'], 'Definite failure is reported, never rate limited');
+    check($calls === 6 && invoke($c)['http'] === 200, 'Attempts that sent nothing do not use up the rate limit');
 
     $c = config();
     $message = (new IonosTransport($c))->message(Input::validate(asInput(payload()))['data']);

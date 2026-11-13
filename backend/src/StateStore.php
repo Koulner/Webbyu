@@ -10,24 +10,34 @@ final class StateStore
 {
     public const DEDUP_SECONDS = 86400;
     public const RATE_SECONDS = 3600;
+    /** Short holders (health check, cleanup) are waited out; an SMTP send still answers Busy. */
+    public const LOCK_WAIT_MICROSECONDS = 1_000_000;
+    private const MAX_BYTES = 2_000_000;
     private mixed $handle = null;
+    private string $file;
     private array $state;
 
     public function __construct(string $directory, private readonly string $key, private readonly int $now)
     {
-        $file = $directory . '/inquiry-state.json';
-        if (is_link($file)) throw new RuntimeException('Unsafe state');
-        $this->handle = fopen($file, 'c+b');
+        clearstatcache();
+        $this->file = $directory . '/inquiry-state.json';
+        $lock = $directory . '/inquiry-state.lock';
+        if (is_link($lock) || is_link($this->file) || is_link($this->file . '.tmp')) throw new RuntimeException('Unsafe state');
+        $this->handle = fopen($lock, 'cb');
         if (!$this->handle) throw new RuntimeException('State unavailable');
-        if (!flock($this->handle, LOCK_EX | LOCK_NB)) {
-            fclose($this->handle);
-            $this->handle = null;
-            throw new Busy();
+        $waited = 0;
+        while (!flock($this->handle, LOCK_EX | LOCK_NB)) {
+            if ($waited >= self::LOCK_WAIT_MICROSECONDS) {
+                fclose($this->handle);
+                $this->handle = null;
+                throw new Busy();
+            }
+            usleep(50_000);
+            $waited += 50_000;
         }
-        chmod($file, 0600);
-        $stat = fstat($this->handle);
-        if (!$stat || $stat['size'] > 2_000_000) throw new RuntimeException('State invalid');
-        $raw = stream_get_contents($this->handle);
+        chmod($lock, 0600);
+        $raw = is_file($this->file) ? file_get_contents($this->file, false, null, 0, self::MAX_BYTES + 1) : '';
+        if ($raw === false || strlen($raw) > self::MAX_BYTES) throw new RuntimeException('State invalid');
         $this->state = $raw === '' ? ['rates' => [], 'requests' => []] : json_decode($raw, true, 16, JSON_THROW_ON_ERROR);
         if (!isset($this->state['rates'], $this->state['requests']) || !is_array($this->state['rates']) || !is_array($this->state['requests'])) throw new RuntimeException('State invalid');
         foreach ($this->state['rates'] as $hash => $times) {
@@ -41,6 +51,21 @@ final class StateStore
     }
 
     private function hash(string $value): string { return hash_hmac('sha256', $value, $this->key); }
+
+    /** IPv6 counts per /64 network (one connection usually owns all of it); IPv4 and IPv4-mapped per address. */
+    private static function peer(string $ip): string
+    {
+        $bin = inet_pton($ip);
+        if ($bin === false || strlen($bin) !== 16) return $ip;
+        if (str_starts_with($bin, str_repeat("\0", 10) . "\xff\xff")) return inet_ntop(substr($bin, 12));
+        return inet_ntop(substr($bin, 0, 8) . str_repeat("\0", 8));
+    }
+
+    /** @return array<string, int> hashed counter key => limit per window */
+    private function rateKeys(string $ip, string $email): array
+    {
+        return [$this->hash('ip:' . self::peer($ip)) => 5, $this->hash('email:' . strtolower($email)) => 3, 'global' => 30];
+    }
 
     public function fingerprint(array $v): string
     {
@@ -63,7 +88,7 @@ final class StateStore
 
     public function rateLimit(string $ip, string $email): int
     {
-        $keys = [$this->hash('ip:' . $ip) => 5, $this->hash('email:' . strtolower($email)) => 3, 'global' => 30];
+        $keys = $this->rateKeys($ip, $email);
         $retry = 0;
         foreach ($keys as $hash => $limit) {
             $times = $this->state['rates'][$hash] ?? [];
@@ -73,6 +98,17 @@ final class StateStore
         foreach ($keys as $hash => $_) $this->state['rates'][$hash][] = $this->now;
         $this->save();
         return 0;
+    }
+
+    /** Gives back the attempt counted by rateLimit() when nothing was sent. The lock guarantees it is the last entry. */
+    public function refund(string $ip, string $email): void
+    {
+        foreach ($this->rateKeys($ip, $email) as $hash => $_) {
+            $times = $this->state['rates'][$hash] ?? [];
+            if ($times && end($times) === $this->now) array_pop($this->state['rates'][$hash]);
+            if (isset($this->state['rates'][$hash]) && !$this->state['rates'][$hash]) unset($this->state['rates'][$hash]);
+        }
+        $this->save();
     }
 
     public function record(string $id, string $fingerprint, string $status): void
@@ -90,11 +126,20 @@ final class StateStore
         $this->save();
     }
 
+    /** Complete file or old file, never half of one: write a temporary copy, then rename over the original. */
     private function save(): void
     {
         $json = json_encode($this->state, JSON_THROW_ON_ERROR);
-        rewind($this->handle);
-        if (fwrite($this->handle, $json) !== strlen($json) || !ftruncate($this->handle, strlen($json)) || !fflush($this->handle) || !fsync($this->handle)) throw new RuntimeException('State write failed');
+        $temporary = $this->file . '.tmp';
+        $out = fopen($temporary, 'wb');
+        if (!$out) throw new RuntimeException('State write failed');
+        try {
+            chmod($temporary, 0600);
+            if (fwrite($out, $json) !== strlen($json) || !fflush($out) || !fsync($out)) throw new RuntimeException('State write failed');
+        } finally {
+            fclose($out);
+        }
+        if (!rename($temporary, $this->file)) throw new RuntimeException('State write failed');
     }
 
     public function __destruct()

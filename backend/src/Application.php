@@ -51,7 +51,11 @@ final class Application
                 $state->record($v['requestId'], $fingerprint, 'accepted');
                 return self::response(200, ['status' => 'success', 'requestId' => $v['requestId'], 'duplicate' => false]);
             }
-            if ($outcome === 'not_sent') $state->forget($v['requestId']);
+            if ($outcome === 'not_sent') {
+                $state->forget($v['requestId']);
+                // Nothing left the server, so a manual retry must not run into the rate limit.
+                $state->refund($ip, $v['email']);
+            }
             return self::response(503, ['status' => 'temporary', 'outcome' => $outcome === 'not_sent' ? 'not_sent' : 'unknown']);
         } catch (Busy) {
             return self::response(503, ['status' => 'temporary', 'outcome' => 'not_sent', 'retryAfter' => 5]);
