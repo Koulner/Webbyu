@@ -1,0 +1,2 @@
+# Prebuilt demo: inline scripts are pinned by CSP hashes, so the bytes must stay exactly as built.
+public/demos/safran-atelier/** -text

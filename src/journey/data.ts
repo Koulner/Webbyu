@@ -17,6 +17,8 @@ export interface JourneyStation {
   note?: string;
   /** Eigene Seiten außerhalb der Paket- und Konzeptdemos: [Linktext, Pfad unter der Website-Basis]. */
   pages?: readonly (readonly [string, string])[];
+  /** Hinweis unter den Seitenlinks; ohne Angabe der Eigenprojekt-Hinweis. */
+  pagesNote?: string;
 }
 
 function project(demoId: DemoId, extra: Pick<JourneyStation, 'id' | 'position' | 'landmark' | 'detail' | 'note' | 'visual' | 'story'>): JourneyStation {
@@ -70,12 +72,17 @@ export const stations: readonly JourneyStation[] = [
     visual: { color: '#c8b6a2', caption: 'Küche und Atmosphäre zusammen erzählt.' },
     story: { task: 'Ein Restaurant möchte schon vor dem Besuch einen Eindruck seines Angebots vermitteln.', approach: 'Seiten für Küche und Speisekarte verbinden Fotografie, Film und Informationen.', benefit: 'Gäste entdecken das Restaurant und finden den Weg zum Kontakt.' },
   },
-  project('sales', {
-    id: 'safran-atelier', position: [8, -3.1], landmark: 'garden',
-    visual: { color: '#beb1cb', caption: 'Ein Produktdetail wird zur verständlichen Geschichte.' },
-    detail: 'Von der Blüte zum Safranfaden: Die Kamerafahrt macht ein kleines Produktdetail zum Ausgangspunkt einer ganzen Geschichte.',
-    story: { task: 'Ein besonderes Produkt braucht mehr als ein Produktfoto.', approach: 'Botanische Nahaufnahmen führen von der Blüte zum Faden und weiter zur Produktauswahl.', benefit: 'Entdeckung, Produktinformation und Einkauf bilden einen zusammenhängenden Weg.' },
-  }),
+  {
+    id: 'safran-atelier', label: 'Safran Atelier', eyebrow: 'Konzeptstudie / Genuss & Botanik',
+    title: 'Ein Safranshop, der sagt, wofür ein Glas reicht.',
+    description: 'Ein mehrseitiger Shop für eine fiktive Safranmarke.',
+    detail: 'Gerenderte Nahaufnahmen von Blüte und Narbe, Produktseiten mit Mengenangaben, Catering, Handel und ein Anfrageweg.',
+    position: [8, -3.1], landmark: 'garden',
+    visual: { color: '#beb1cb', caption: 'Von der Blüte zum Faden, vom Faden zum Glas.' },
+    story: { task: 'Ein kleiner Händler verkauft ein teures Gewürz, das die meisten nur selten kaufen.', approach: 'Renderings von Blüte und Narbe, Produktseiten mit Fadenzahl, Seiten für Catering und Handel und ein Anfrageweg.', benefit: 'Besucher verstehen, was sie kaufen und wofür ein Glas reicht, und finden den passenden Weg zur Anfrage.' },
+    pages: [['Demoseite ansehen', 'demos/safran-atelier/']],
+    pagesNote: 'Safran Atelier · fiktive Marke · Blüte und Fäden als 3D-Renderings, keine Fotos',
+  },
   project('raumgut', {
     id: 'raumgut', position: [13.5, 3.2], landmark: 'furniture',
     visual: { color: '#bacab4', caption: 'Ein Sortiment wird zu einer persönlichen Auswahl.' },

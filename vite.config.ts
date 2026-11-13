@@ -24,6 +24,13 @@ if (!/^\/(?:[A-Za-z0-9_-]+\/)*$/.test(base)) {
   throw new Error('SITE_BASE_PATH must be / or a slash-delimited site path.');
 }
 
+// The prebuilt Safran Atelier demo (public/demos/safran-atelier/) is plain HTML per folder. Apache serves
+// folder/index.html (DirectoryIndex); the Vite dev and preview servers would fall back to the home page.
+function staticDemoIndex(request: { url?: string }) {
+  const [path, query] = (request.url ?? '').split('?');
+  if (path.startsWith(`${base}demos/safran-atelier/`) && path.endsWith('/')) request.url = `${path}index.html${query ? `?${query}` : ''}`;
+}
+
 export default defineConfig({
   base,
   // Archived checkouts are not part of the application test suite.
@@ -39,8 +46,12 @@ export default defineConfig({
           response.end(path.endsWith('.xml') ? sitemapXml() : robotsTxt(true));
           return;
         }
+        staticDemoIndex(request);
         next();
       });
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use((request, _response, next) => { staticDemoIndex(request); next(); });
     },
     transformIndexHtml: {
       order: 'pre',
