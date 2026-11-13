@@ -44,4 +44,8 @@ const entry = await fetcher(new URL('/', SITE_ORIGIN));
 assert.match(entry.headers.get('cache-control') ?? '', /no-cache.*must-revalidate/);
 const compressed = await fetcher(new URL('/', SITE_ORIGIN), { headers: { 'Accept-Encoding': 'gzip' } });
 assert.equal(compressed.headers.get('content-encoding'), 'gzip', 'Apache must compress HTML when gzip is supported');
+for (const response of [entry, healthy, await fetcher(new URL('/does-not-exist/', SITE_ORIGIN))]) {
+  assert.match(response.headers.get('strict-transport-security') ?? '', /max-age=31536000/, 'HTTPS must stick in the browser');
+  assert.equal(response.headers.get('content-security-policy'), "frame-ancestors 'self'", 'Foreign sites must not frame webbyu.de');
+}
 console.log('Apache/PHP production-package integration passed.');

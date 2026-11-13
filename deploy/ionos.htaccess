@@ -44,6 +44,12 @@ RewriteRule ^assets/[^/]+-[A-Za-z0-9_-]{8}\.(?:js|css|woff2?|avif|webp|png|jpe?g
     Header set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
   Header set X-Content-Type-Options "nosniff"
+  # Browsers that once saw HTTPS never fall back to a plain-HTTP redirect (no SSL stripping).
+  # No includeSubDomains: other subdomains are not known to serve HTTPS.
+  Header always set Strict-Transport-Security "max-age=31536000"
+  # Only webbyu.de may frame its pages; src/shell.ts embeds its own demos and the journey.
+  Header always set Content-Security-Policy "frame-ancestors 'self'"
+  Header always set X-Frame-Options "SAMEORIGIN"
 </IfModule>
 
 <IfModule mod_deflate.c>
