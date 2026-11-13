@@ -96,11 +96,12 @@ export function deploy(env = process.env, run = spawnSync) {
     writeFileSync(batchFile, batch, { mode: 0o600 });
     // OpenSSH keeps the first BatchMode value. -b adds BatchMode=yes, so the
     // password-enabled override must precede -b, not follow it.
+    // shortcut: every deploy uploads all files (the Safran demo alone has 1,545); upload only changed files if this nears 40 min.
     const result = run('sshpass', ['-e', 'sftp', '-q', '-oBatchMode=no', '-b', batchFile, '-P', '22',
       '-oStrictHostKeyChecking=yes', `-oUserKnownHostsFile=${knownHosts}`,
       '-oConnectTimeout=30', '-oNumberOfPasswordPrompts=1', '-oPreferredAuthentications=password,keyboard-interactive',
       '-oPubkeyAuthentication=no', `${config.user}@${config.host}`], {
-      cwd: root, env: { ...env, SSHPASS: config.password }, encoding: 'utf8', timeout: 10 * 60 * 1000, maxBuffer: 8 * 1024 * 1024,
+      cwd: root, env: { ...env, SSHPASS: config.password }, encoding: 'utf8', timeout: 40 * 60 * 1000, maxBuffer: 8 * 1024 * 1024,
     });
     // Never print raw client output: it can contain private account details.
     if (result.status !== 0) {
